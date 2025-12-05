@@ -1,6 +1,6 @@
 """Pydantic schemas for Chemistry Batch API."""
 
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict
@@ -47,8 +47,8 @@ class ChemistryBatchResponse(ChemistryBatchBase):
     development_time_formatted: Optional[str] = Field(None, description="C41 development time (MM:SS)")
     development_time_seconds: Optional[int] = Field(None, description="C41 development time in seconds")
     is_active: bool = Field(..., description="Whether chemistry is still active")
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
     
     model_config = ConfigDict(from_attributes=True)
 

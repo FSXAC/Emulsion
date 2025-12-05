@@ -526,13 +526,13 @@ Since you're not familiar with Node/TS, you have options:
 - [ ] 2.8 Test all endpoints with sample data **← NEXT**
 
 ### Phase 3: Backend API - Chemistry
-- [ ] 3.1 Implement GET /api/chemistry (list all batches)
-- [ ] 3.2 Implement POST /api/chemistry (create batch)
-- [ ] 3.3 Implement PUT /api/chemistry/{id} (update batch)
-- [ ] 3.4 Implement DELETE /api/chemistry/{id} (delete batch)
-- [ ] 3.5 Add rolls_developed calculation
-- [ ] 3.6 Add C41 development time calculator function
-- [ ] 3.7 Test chemistry endpoints
+- [X] 3.1 Implement GET /api/chemistry (list all batches)
+- [X] 3.2 Implement POST /api/chemistry (create batch)
+- [X] 3.3 Implement PUT /api/chemistry/{id} (update batch)
+- [X] 3.4 Implement DELETE /api/chemistry/{id} (delete batch)
+- [X] 3.5 Add rolls_developed calculation
+- [X] 3.6 Add C41 development time calculator function
+- [ ] 3.7 Test chemistry endpoints **← NEXT**
 
 ### Phase 4: Backend - Roll/Chemistry Integration
 - [ ] 4.1 Add PATCH /api/rolls/{id}/load endpoint (set date_loaded)
@@ -819,3 +819,31 @@ Implements complete CRUD API for film rolls with:
 - `DELETE /api/rolls/{id}` - Delete roll
 
 All endpoints documented at http://localhost:8000/docs with interactive testing.
+
+### Task 3.1-3.6: Chemistry Batches API Implementation
+**Files Modified:**
+- `backend/app/api/chemistry.py` - Chemistry batches CRUD endpoints:
+  - `GET /api/chemistry` - List all batches with pagination and filtering (skip, limit, active_only, chemistry_type)
+  - `POST /api/chemistry` - Create new batch
+  - `GET /api/chemistry/{batch_id}` - Get single batch by ID
+  - `PUT /api/chemistry/{batch_id}` - Update existing batch (partial updates supported)
+  - `DELETE /api/chemistry/{batch_id}` - Delete batch (returns 204 No Content)
+
+**What It Does:**
+Implements complete CRUD API for chemistry batches with:
+- **Validation**: Pydantic schemas validate all input data (costs, dates, chemistry_type)
+- **Computed Fields**: rolls_developed, batch_cost, cost_per_roll automatically calculated
+- **C41 Development Time**: development_time_formatted and development_time_seconds computed for C41 batches
+- **rolls_offset Support**: Manual adjustment field affects roll count and dev time calculations
+- **Active Filtering**: Query parameter to filter only non-retired batches
+- **Type Filtering**: Query parameter to filter by chemistry_type (C41, E6, BW, etc.)
+- **Error Handling**: Returns 404 for not found, 422 for validation errors
+
+**API Endpoints Available:**
+- `GET /api/chemistry?skip=0&limit=100&active_only=true&chemistry_type=C41` - List/filter batches
+- `POST /api/chemistry` - Create batch
+- `GET /api/chemistry/{id}` - Get single batch
+- `PUT /api/chemistry/{id}` - Update batch
+- `DELETE /api/chemistry/{id}` - Delete batch
+
+**Note:** rolls_developed and C41 dev time are already implemented in the model (@property methods).

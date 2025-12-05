@@ -1,6 +1,6 @@
 """Pydantic schemas for Film Roll API."""
 
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict
@@ -56,8 +56,8 @@ class FilmRollResponse(FilmRollBase):
     total_cost: Optional[Decimal] = Field(None, description="Total cost (film + dev)")
     cost_per_shot: Optional[Decimal] = Field(None, description="Cost per exposure")
     duration_days: Optional[int] = Field(None, description="Days roll was loaded")
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
     
     model_config = ConfigDict(from_attributes=True)
 
