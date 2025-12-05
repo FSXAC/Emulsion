@@ -543,10 +543,10 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 4.6 Test status transitions work correctly
 
 ### Phase 5: Frontend Foundation
-- [ ] 5.1 Initialize Vite + React project (frontend/) **← IN PROGRESS**
-- [ ] 5.2 Install dependencies: dnd-kit, axios, tailwindcss, framer-motion
-- [ ] 5.3 Configure Tailwind CSS
-- [ ] 5.4 Create basic app structure and routing
+- [X] 5.1 Initialize Vite + React project (frontend/)
+- [X] 5.2 Install dependencies: dnd-kit, axios, tailwindcss, framer-motion
+- [X] 5.3 Configure Tailwind CSS
+- [ ] 5.4 Create basic app structure and routing **← NEXT**
 - [ ] 5.5 Set up API client (axios with base URL)
 - [ ] 5.6 Test frontend dev server runs
 
@@ -921,3 +921,42 @@ Note: Transitions are flexible - rolls can move between any states as fields are
 - Added `actual_exposures` to rating endpoint (known after scanning reveals successful frames)
 
 **Phase 4 Complete!** Backend API fully functional with status transitions. Ready for Phase 5: Frontend Foundation.
+
+### Task 5.1: Initialize Vite + React Project
+**Commands Run:**
+- `npm create vite@latest frontend -- --template react` - Created Vite project with React template (JavaScript)
+- `npm install` - Installed base dependencies (React 19, React-DOM, Vite)
+
+**What Was Created:**
+- Project structure with `src/`, `public/` directories
+- Base configuration files: `vite.config.js`, `package.json`, `index.html`
+- Default React components and entry points
+- Dev server configuration (runs on port 5173)
+
+### Task 5.2: Install Dependencies
+**Packages Added to package.json:**
+- **Drag & Drop**: `@dnd-kit/core@^6.1.0`, `@dnd-kit/sortable@^8.0.0`, `@dnd-kit/utilities@^3.2.2`
+- **HTTP Client**: `axios@^1.7.2`
+- **Animations**: `framer-motion@^11.2.10`
+- **Routing**: `react-router-dom@^7.3.0`
+- **Styling**: `tailwindcss@^3.4.4`, `postcss@^8.4.38`, `autoprefixer@^10.4.19`
+
+**Command Run:**
+- `npm install` - Installed all dependencies
+
+### Task 5.3: Configure Tailwind CSS
+**Files Created:**
+- `frontend/tailwind.config.js` - Tailwind configuration with custom film photography color palette:
+  - `film-black`, `film-gray`, `film-silver`, `film-red`, `film-amber`, `film-cyan`
+  - Content paths configured to scan all JSX files
+- `frontend/postcss.config.js` - PostCSS configuration for Tailwind and Autoprefixer
+
+**Files Modified:**
+- `frontend/src/index.css` - Replaced default CSS with Tailwind directives and custom component classes:
+  - Base styles for body and global elements
+  - Component classes: `.film-card`, `.status-column`, `.btn-primary`, `.btn-secondary`
+  - Utility classes: `.touch-friendly` (48px min size for mobile)
+  - Drag-and-drop specific styles
+
+**What It Does:**
+Tailwind CSS is now fully configured and ready to use throughout the application. Custom classes are defined for common UI patterns (film cards, status columns, buttons). The styling follows a clean, modern design with film photography-inspired colors.
