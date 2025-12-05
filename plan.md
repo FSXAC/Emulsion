@@ -546,9 +546,9 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 5.1 Initialize Vite + React project (frontend/)
 - [X] 5.2 Install dependencies: dnd-kit, axios, tailwindcss, framer-motion
 - [X] 5.3 Configure Tailwind CSS
-- [ ] 5.4 Create basic app structure and routing **← NEXT**
-- [ ] 5.5 Set up API client (axios with base URL)
-- [ ] 5.6 Test frontend dev server runs
+- [X] 5.4 Create basic app structure and routing
+- [X] 5.5 Set up API client (axios with base URL)
+- [ ] 5.6 Test frontend dev server runs **← NEXT**
 
 ### Phase 6: Frontend - Kanban Board UI
 - [ ] 6.1 Create FilmRollCard component
