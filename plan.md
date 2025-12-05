@@ -33,9 +33,9 @@ A web-based application for tracking analog film rolls through their lifecycle: 
 
 ### 3. Automation Goals
 - Auto-update chemistry roll count when associating with film
-- Auto-calculate development time based on chemistry usage
-- Auto-transition roll status based on actions (e.g., adding chemistry → "developed")
-- Cost calculations (dev cost, total cost, cost per shot)
+- Auto-calculate C41 development time based on chemistry usage (other types: future lookup table)
+- **Status derivation**: Inferred from field presence (dates, chemistry_id, stars) - flexible, no strict state machine
+- Cost calculations (dev cost, total cost, cost per shot) - **nice-to-have metrics for quick glancing**
 - Duration calculations (days loaded)
 
 ---
@@ -181,11 +181,16 @@ created_at         : Timestamp
 updated_at         : Timestamp
 
 # Calculated/derived fields:
-- status: Computed via logic (see Status Logic below)
-- dev_cost: calculated from chemistry_id
-- total_cost: film_cost + dev_cost
-- cost_per_shot: total_cost / actual_exposures
-- duration_days: date_unloaded - date_loaded
+- status: Inferred from field presence (flexible, not enforced):
+  * NEW: no dates, no chemistry, no stars
+  * LOADED: has date_loaded, no date_unloaded
+  * EXPOSED: has date_unloaded, no chemistry_id
+  * DEVELOPED: has chemistry_id, no stars
+  * SCANNED: has stars rating
+- dev_cost: chemistry.cost_per_roll (nullable if no chemistry or division-by-zero)
+- total_cost: film_cost + dev_cost (nullable if dev_cost is null)
+- cost_per_shot: total_cost / actual_exposures (nullable if null total_cost or zero exposures)
+- duration_days: date_unloaded - date_loaded (nullable if either date missing)
 ```
 
 ### Table: `chemistry_batches`
@@ -206,8 +211,10 @@ updated_at      : Timestamp
 - batch_cost: developer_cost + fixer_cost + other_cost
 - rolls_developed: COUNT(film_rolls where chemistry_id = this.id) + rolls_offset
 - cost_per_roll: batch_cost / rolls_developed
-- development_time_seconds: 210 + (rolls_developed * 0.02 * 210) # ONLY for C41
+- development_time_seconds: 210 + ((rolls_developed + rolls_offset) * 0.02 * 210) # ONLY for C41
 - development_time_formatted: "3:30" → "3:43" etc.
+
+Note: rolls_offset allows manual adjustment (e.g., to simulate stale chemistry usage)
 ```
 
 **C41 Development Time Calculation**:
@@ -244,13 +251,20 @@ date_taken      : Timestamp
 └─────────┴─────────┴─────────┴───────────┴─────────┘
 ```
 
-**Interactions**:
-- **Drag Roll → "Camera" button/zone**: Opens date picker → sets `date_loaded`
-- **Drag Roll → "Exposed" column**: Opens date picker → sets `date_unloaded`
-- **Drag Roll → "Chemistry" drop zone**: Opens chemistry picker → sets `chemistry_id` (auto-increments roll count)
-- **Click star icon**: Opens rating dialog (1-5 stars) → auto-moves to "Scanned"
+**Interactions** (Trello-style drag-and-drop):
+- **Drag Roll → LOADED column**: Auto-prompts date picker if no `date_loaded` → sets `date_loaded`
+- **Drag Roll → EXPOSED column**: Auto-prompts date picker if no `date_unloaded` → sets `date_unloaded`
+- **Drag Roll → DEVELOPED column**: Auto-prompts chemistry picker if no `chemistry_id` → sets `chemistry_id` (auto-increments roll count)
+- **Drag Roll → SCANNED column**: Auto-prompts rating dialog if no `stars` → sets `stars`
+- **Drag anywhere**: If required fields present, transition succeeds without prompt
 - **Click card**: Opens detail view/edit modal
 - **Add button (+)**: Create new roll (opens form modal)
+
+**"Not Mine" Rolls**:
+- Display with friend icon overlay
+- **Count toward chemistry roll counter** (they use chemistry)
+- **Exclude film_cost from total_cost** (user doesn't pay for friend's film)
+- Show dev_cost only in cost calculations
 
 **Visual Feedback**:
 - Drop zones highlight on drag-over
@@ -286,7 +300,12 @@ date_taken      : Timestamp
 - **Live cost preview** at bottom
 
 ### 4. Chemistry Management Page
+- **Simple form-based UI** (no drag-and-drop for chemistry)
 - List of chemistry batches (active highlighted)
+- Show C41 dev time based on rolls_developed + rolls_offset
+- Display cost per roll (handle division-by-zero gracefully)
+- Retire chemistry action
+- Link to view rolls that used each batch
 ## Deployment (Local Only)
 
 ### Selected: Local Development Server
@@ -451,9 +470,14 @@ Since you're not familiar with Node/TS, you have options:
 
 1. ✅ **Tech preference**: Python (FastAPI)
 2. ✅ **Deployment**: Local only
-3. ✅ **C41 calculation**: Only for C41, other chemistry types TBD with lookup table
+3. ✅ **C41 calculation**: Only for C41, other chemistry types will use lookup table (future)
 4. ✅ **Image storage**: No images, but future shot metadata integration from mobile app
-5. ✅ **UX style**: Playful drag-and-drop Kanban board, not traditional table
+5. ✅ **UX style**: Trello-style drag-and-drop Kanban board with auto-prompts
+6. ✅ **Status logic**: Flexible, inferred from field presence (not strict state machine)
+7. ✅ **Cost calculations**: Nice-to-have metrics, gracefully handle edge cases (show null/"N/A")
+8. ✅ **"Not mine" rolls**: Count toward chemistry usage, exclude film cost, show friend icon
+9. ✅ **rolls_offset**: Adjusts effective roll count for dev time calculation (stale chemistry)
+10. ✅ **Future features**: Out of scope for MVP (offline, sharing, advanced stats, PWA)
 
 ## Phase 1 Scope (MVP - Keep It Simple)
 
@@ -483,11 +507,11 @@ Since you're not familiar with Node/TS, you have options:
 ## Development Todo List
 
 ### Phase 1: Backend Foundation
-- [ ] 1.1 Set up Python virtual environment (venv)
-- [ ] 1.2 Create backend project structure (backend/)
-- [ ] 1.3 Install core dependencies: FastAPI, SQLAlchemy, Uvicorn, Pydantic
-- [ ] 1.4 Create database models (film_rolls, chemistry_batches)
-- [ ] 1.5 Set up SQLite database connection
+- [X] 1.1 Set up Python virtual environment (venv)
+- [X] 1.2 Verify backend project structure (backend/ already exists)
+- [X] 1.3 Install core dependencies: FastAPI, SQLAlchemy, Uvicorn, Pydantic, Alembic
+- [X] 1.4 Create database models (film_rolls, chemistry_batches)
+- [ ] 1.5 Set up SQLite database connection **← NEXT**
 - [ ] 1.6 Create basic FastAPI app with health check endpoint
 - [ ] 1.7 Test backend server runs successfully
 
