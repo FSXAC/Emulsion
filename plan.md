@@ -511,8 +511,8 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 1.2 Verify backend project structure (backend/ already exists)
 - [X] 1.3 Install core dependencies: FastAPI, SQLAlchemy, Uvicorn, Pydantic, Alembic
 - [X] 1.4 Create database models (film_rolls, chemistry_batches)
-- [ ] 1.5 Set up SQLite database connection **← NEXT**
-- [ ] 1.6 Create basic FastAPI app with health check endpoint
+- [X] 1.5 Set up SQLite database connection
+- [ ] 1.6 Create basic FastAPI app with health check endpoint **← NEXT**
 - [ ] 1.7 Test backend server runs successfully
 
 ### Phase 2: Backend API - Film Rolls
@@ -700,3 +700,45 @@ Since you're not familiar with Node/TS, you have options:
 ---
 
 *This plan prioritizes simplicity, maintainability, and your specific single-user use case while keeping the door open for future enhancements.*
+
+---
+
+## Implementation Log
+
+### Task 1.4: Create Database Models
+**Files Created:**
+- `backend/app/models/base.py` - Base model configuration with `DeclarativeBase`, `TimestampMixin` (created_at/updated_at), and UUID generation utility
+- `backend/app/models/film_roll.py` - `FilmRoll` model with all schema fields and calculated properties:
+  - `status` property: Derives status from field presence (NEW/LOADED/EXPOSED/DEVELOPED/SCANNED)
+  - `dev_cost`, `total_cost`, `cost_per_shot`, `duration_days` properties with null handling
+  - Special logic for "not mine" rolls (excludes film_cost from total_cost)
+- `backend/app/models/chemistry_batch.py` - `ChemistryBatch` model with:
+  - Cost tracking fields and `rolls_offset` for manual adjustments
+  - `batch_cost`, `rolls_developed`, `cost_per_roll` calculated properties
+  - `calc_c41_dev_time()` method for C41 development time calculation
+  - `development_time_seconds` and `development_time_formatted` properties
+- `backend/app/models/__init__.py` - Module exports for easy imports
+
+**What It Does:**
+Defines the SQLAlchemy ORM models that map Python classes to database tables. Implements all business logic for status derivation, cost calculations, and C41 development time as computed properties. Handles edge cases gracefully by returning None for division-by-zero or missing data scenarios.
+
+### Task 1.5: Set Up SQLite Database Connection
+**Files Created:**
+- `backend/app/core/config.py` - Application settings using Pydantic Settings:
+  - Loads configuration from environment variables or `.env` file
+  - Database URL defaults to `sqlite:///~/emulsion_data/emulsion.db`
+  - `get_database_path()` method creates database directory if needed
+  - CORS origins configuration
+- `backend/app/core/database.py` - Database connection and session management:
+  - SQLAlchemy engine with SQLite pragma for foreign key constraints
+  - `SessionLocal` session factory for database operations
+  - `get_db()` dependency function for FastAPI endpoints
+  - `init_db()` function to create all tables on startup
+- `backend/app/core/__init__.py` - Core module exports
+- `backend/.env.example` - Example environment configuration file
+
+**Files Modified:**
+- `backend/app/main.py` - Added database initialization on startup, imported settings for CORS configuration
+
+**What It Does:**
+Establishes SQLite database connection with proper configuration for local single-user deployment. The database file will be created at `~/emulsion_data/emulsion.db` for easy backups. Enables foreign key constraints (disabled by default in SQLite) and provides a dependency injection pattern (`get_db()`) for database sessions in FastAPI endpoints. Automatically creates tables on application startup if they don't exist.
