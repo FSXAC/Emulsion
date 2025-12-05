@@ -12,6 +12,12 @@ from app.api.schemas.film_roll import (
     FilmRollResponse,
     FilmRollList,
 )
+from app.api.schemas.actions import (
+    LoadRollRequest,
+    UnloadRollRequest,
+    AssignChemistryRequest,
+    RateRollRequest,
+)
 
 router = APIRouter()
 
@@ -143,3 +149,107 @@ def delete_film_roll(
     db.commit()
     
     return None
+@router.patch("/{roll_id}/load", response_model=FilmRollResponse)
+def load_roll(
+    roll_id: str,
+    data: LoadRollRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Load a film roll into camera (set date_loaded).
+    
+    This transitions the roll from NEW → LOADED status.
+    Triggered when dragging roll to LOADED column.
+    """
+    from app.api.schemas.actions import LoadRollRequest
+    
+    roll = db.query(FilmRoll).filter(FilmRoll.id == roll_id).first()
+    
+    if not roll:
+        raise HTTPException(status_code=404, detail="Film roll not found")
+    
+    roll.date_loaded = data.date_loaded
+    
+    db.commit()
+    db.refresh(roll)
+    
+    return roll
+
+
+@router.patch("/{roll_id}/unload", response_model=FilmRollResponse)
+def unload_roll(
+    roll_id: str,
+    data: UnloadRollRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Unload a film roll from camera (set date_unloaded and optionally actual_exposures).
+    
+    This transitions the roll from LOADED -> EXPOSED status.
+    Triggered when dragging roll to EXPOSED column.
+    """
+    roll = db.query(FilmRoll).filter(FilmRoll.id == roll_id).first()
+    if not roll:
+        raise HTTPException(status_code=404, detail="Film roll not found")
+    
+    roll.date_unloaded = data.date_unloaded
+    if data.actual_exposures is not None:
+        roll.actual_exposures = data.actual_exposures
+    
+    db.commit()
+    db.refresh(roll)
+    
+    return roll
+
+
+@router.patch("/{roll_id}/chemistry", response_model=FilmRollResponse)
+def assign_chemistry(
+    roll_id: str,
+    data: AssignChemistryRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Assign chemistry batch to a roll (set chemistry_id).
+    
+    This transitions the roll from EXPOSED -> DEVELOPED status.
+    Triggered when dragging roll to DEVELOPED column or selecting chemistry.
+    
+    Note: The roll count for chemistry batch is automatically calculated
+    via the relationship, no manual increment needed.
+    """
+    roll = db.query(FilmRoll).filter(FilmRoll.id == roll_id).first()
+    # Validate chemistry exists
+    chemistry = db.query(ChemistryBatch).filter(
+        ChemistryBatch.id == data.chemistry_id
+    ).first()
+    if not chemistry:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Chemistry batch with id {data.chemistry_id} not found"
+        )
+    
+    roll.chemistry_id = data.chemistry_id
+    
+    db.commit()
+    db.refresh(roll)
+    
+    return roll
+
+
+@router.patch("/{roll_id}/rating", response_model=FilmRollResponse)
+def rate_roll(
+    roll_id: str,
+    data: RateRollRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Rate a film roll (set stars).
+    
+    This transitions the roll from DEVELOPED -> SCANNED status.
+    Triggered when dragging roll to SCANNED column or clicking star rating.
+    """
+    roll = db.query(FilmRoll).filter(FilmRoll.id == roll_id).first()
+    db.commit()
+    db.refresh(roll)
+    
+    return roll

@@ -14,6 +14,12 @@ from app.api.schemas.chemistry_batch import (
     ChemistryBatchResponse,
     ChemistryBatchList,
 )
+from app.api.schemas.actions import (
+    LoadRollRequest,
+    UnloadRollRequest,
+    AssignChemistryRequest,
+    RateRollRequest,
+)
 
 __all__ = [
     "FilmRollBase",
@@ -26,4 +32,8 @@ __all__ = [
     "ChemistryBatchUpdate",
     "ChemistryBatchResponse",
     "ChemistryBatchList",
+    "LoadRollRequest",
+    "UnloadRollRequest",
+    "AssignChemistryRequest",
+    "RateRollRequest",
 ]

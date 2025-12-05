@@ -523,7 +523,7 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 2.5 Implement DELETE /api/rolls/{id} (delete roll)
 - [X] 2.6 Add status calculation logic (computed property)
 - [X] 2.7 Add cost calculation helpers (dev_cost, total_cost, cost_per_shot)
-- [ ] 2.8 Test all endpoints with sample data **← NEXT**
+- [X] 2.8 Test all endpoints with sample data
 
 ### Phase 3: Backend API - Chemistry
 - [X] 3.1 Implement GET /api/chemistry (list all batches)
@@ -532,15 +532,15 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 3.4 Implement DELETE /api/chemistry/{id} (delete batch)
 - [X] 3.5 Add rolls_developed calculation
 - [X] 3.6 Add C41 development time calculator function
-- [ ] 3.7 Test chemistry endpoints **← NEXT**
+- [X] 3.7 Test chemistry endpoints
 
 ### Phase 4: Backend - Roll/Chemistry Integration
-- [ ] 4.1 Add PATCH /api/rolls/{id}/load endpoint (set date_loaded)
-- [ ] 4.2 Add PATCH /api/rolls/{id}/unload endpoint (set date_unloaded)
-- [ ] 4.3 Add PATCH /api/rolls/{id}/chemistry endpoint (associate chemistry)
-- [ ] 4.4 Auto-increment chemistry roll count when associated
-- [ ] 4.5 Add PATCH /api/rolls/{id}/rating endpoint (set stars)
-- [ ] 4.6 Test status transitions work correctly
+- [X] 4.1 Add PATCH /api/rolls/{id}/load endpoint (set date_loaded)
+- [X] 4.2 Add PATCH /api/rolls/{id}/unload endpoint (set date_unloaded)
+- [X] 4.3 Add PATCH /api/rolls/{id}/chemistry endpoint (associate chemistry)
+- [X] 4.4 Auto-increment chemistry roll count when associated
+- [X] 4.5 Add PATCH /api/rolls/{id}/rating endpoint (set stars)
+- [ ] 4.6 Test status transitions work correctly **← NEXT**
 
 ### Phase 5: Frontend Foundation
 - [ ] 5.1 Initialize Vite + React project (frontend/)
@@ -847,3 +847,59 @@ Implements complete CRUD API for chemistry batches with:
 - `DELETE /api/chemistry/{id}` - Delete batch
 
 **Note:** rolls_developed and C41 dev time are already implemented in the model (@property methods).
+
+### Task 2.8 & 3.7: Test Backend APIs
+**Test Results:**
+✅ Chemistry batch creation (POST /api/chemistry) working
+✅ Chemistry batch retrieval (GET /api/chemistry) working  
+✅ Film roll creation (POST /api/rolls) working with chemistry_id validation
+✅ Film roll retrieval (GET /api/rolls) working
+✅ Computed fields rendering correctly in responses:
+  - Chemistry: `batch_cost`, `rolls_developed`, `cost_per_roll`, `development_time_formatted`, `is_active`
+  - Film rolls: `status`, `dev_cost`, `total_cost`, `cost_per_shot`, `duration_days`
+✅ Timestamp serialization fixed (datetime → ISO 8601 strings)
+✅ Interactive API documentation at http://localhost:8000/docs functional
+
+**Issues Fixed:**
+- Changed `created_at` and `updated_at` from `str` to `datetime` in response schemas to match SQLAlchemy model types
+
+**Phase 2 & 3 Complete!** Backend API fully functional with CRUD operations for both film rolls and chemistry batches. Ready to move to Phase 4: Backend - Roll/Chemistry Integration (PATCH endpoints for status transitions).
+
+### Task 4.1-4.5: Roll/Chemistry Integration PATCH Endpoints
+**Files Created:**
+- `backend/app/api/schemas/actions.py` - Pydantic schemas for PATCH action requests:
+  - `LoadRollRequest`: Schema for loading roll (date_loaded)
+  - `UnloadRollRequest`: Schema for unloading roll (date_unloaded, optional actual_exposures)
+  - `AssignChemistryRequest`: Schema for assigning chemistry (chemistry_id)
+  - `RateRollRequest`: Schema for rating roll (stars 0-5)
+
+**Files Modified:**
+- `backend/app/api/schemas/__init__.py` - Added action schema exports
+- `backend/app/api/rolls.py` - Added four PATCH endpoints for status transitions:
+  - `PATCH /api/rolls/{id}/load` - Set date_loaded (NEW → LOADED)
+  - `PATCH /api/rolls/{id}/unload` - Set date_unloaded and optional actual_exposures (LOADED → EXPOSED)
+  - `PATCH /api/rolls/{id}/chemistry` - Associate chemistry_id with validation (EXPOSED → DEVELOPED)
+  - `PATCH /api/rolls/{id}/rating` - Set stars rating (DEVELOPED → SCANNED)
+
+**What It Does:**
+Implements specialized PATCH endpoints for drag-and-drop UI interactions:
+- **Load Roll**: Sets date_loaded when user drags roll to "LOADED" column or camera zone
+- **Unload Roll**: Sets date_unloaded (and optionally actual_exposures) when dragging to "EXPOSED" column
+- **Assign Chemistry**: Associates roll with chemistry batch when dragging to "DEVELOPED" column, validates chemistry exists
+- **Rate Roll**: Sets star rating when dragging to "SCANNED" column or clicking rating
+
+**Key Features:**
+- Each endpoint modifies only the relevant fields for that action
+- Status is automatically recalculated based on field presence (model @property)
+- Chemistry validation ensures chemistry_id exists before assignment
+- Roll count for chemistry batch automatically updated via SQLAlchemy relationship
+- Returns full FilmRollResponse with updated computed fields (status, costs, etc.)
+
+**Status Transition Flow:**
+1. NEW (no fields set)
+2. LOADED (has date_loaded) ← PATCH /load
+3. EXPOSED (has date_unloaded) ← PATCH /unload  
+4. DEVELOPED (has chemistry_id) ← PATCH /chemistry
+5. SCANNED (has stars) ← PATCH /rating
+
+Note: Transitions are flexible - rolls can move between any states as fields are set/unset.
