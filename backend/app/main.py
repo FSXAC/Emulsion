@@ -42,5 +42,32 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
-    return {"status": "healthy"}
+    """
+    Health check endpoint.
+    
+    Returns basic application health status and database connectivity.
+    """
+    from sqlalchemy import text
+    from app.core.database import engine
+    
+    # Check database connectivity
+    db_connected = False
+    db_error = None
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        db_connected = True
+    except Exception as e:
+        db_error = str(e)
+    
+    response = {
+        "status": "healthy" if db_connected else "degraded",
+        "database": "connected" if db_connected else "disconnected",
+        "version": "0.1.0"
+    }
+    
+    # Include error in debug mode
+    if not db_connected and settings.debug and db_error:
+        response["error"] = db_error
+    
+    return response

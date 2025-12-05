@@ -512,8 +512,8 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 1.3 Install core dependencies: FastAPI, SQLAlchemy, Uvicorn, Pydantic, Alembic
 - [X] 1.4 Create database models (film_rolls, chemistry_batches)
 - [X] 1.5 Set up SQLite database connection
-- [ ] 1.6 Create basic FastAPI app with health check endpoint **← NEXT**
-- [ ] 1.7 Test backend server runs successfully
+- [X] 1.6 Create basic FastAPI app with health check endpoint
+- [X] 1.7 Test backend server runs successfully
 
 ### Phase 2: Backend API - Film Rolls
 - [ ] 2.1 Implement GET /api/rolls (list all rolls)
@@ -741,4 +741,39 @@ Defines the SQLAlchemy ORM models that map Python classes to database tables. Im
 - `backend/app/main.py` - Added database initialization on startup, imported settings for CORS configuration
 
 **What It Does:**
-Establishes SQLite database connection with proper configuration for local single-user deployment. The database file will be created at `~/emulsion_data/emulsion.db` for easy backups. Enables foreign key constraints (disabled by default in SQLite) and provides a dependency injection pattern (`get_db()`) for database sessions in FastAPI endpoints. Automatically creates tables on application startup if they don't exist.
+Establishes SQLite database connection with proper configuration for local single-user deployment. The database file will be created at `backend/data/emulsion.db` relative to the project directory. Enables foreign key constraints (disabled by default in SQLite) and provides a dependency injection pattern (`get_db()`) for database sessions in FastAPI endpoints. Automatically creates tables on application startup if they don't exist.
+
+### Task 1.6: Create Basic FastAPI App with Health Check Endpoint
+**Files Modified:**
+- `backend/app/main.py` - Enhanced health check endpoint to include database connectivity check
+
+**What It Does:**
+Completes the basic FastAPI application setup with a comprehensive health check endpoint. The `/health` endpoint now returns:
+- `status`: "healthy" if database is connected, "degraded" otherwise
+- `database`: Connection status ("connected" or "disconnected")
+- `version`: API version
+
+The application includes:
+- Root endpoint (`/`) returning API information
+- Health check endpoint (`/health`) for monitoring
+- CORS middleware configured for local frontend development
+- Database initialization on startup via `@app.on_event("startup")`
+- Auto-generated API docs at `/docs` (Swagger UI) and `/redoc` (ReDoc)
+
+### Task 1.7: Test Backend Server Runs Successfully
+**Test Results:**
+✅ Server starts successfully with `uvicorn app.main:app --reload`
+✅ Database file created at `backend/data/emulsion.db`
+✅ Database tables created automatically on startup (`film_rolls`, `chemistry_batches`)
+✅ Health check endpoint returns `{"status":"healthy","database":"connected","version":"0.1.0"}`
+✅ Root endpoint accessible at http://localhost:8000
+✅ Interactive API documentation available at http://localhost:8000/docs
+
+**What Was Verified:**
+- SQLAlchemy engine connects to SQLite database successfully
+- Foreign key constraints enabled (SQLite pragma applied)
+- Database tables created with proper schema (UUIDs, timestamps, relationships)
+- FastAPI application starts without errors
+- CORS middleware configured for frontend access
+
+**Phase 1 Complete!** Backend foundation is ready. Ready to move to Phase 2: Backend API - Film Rolls.
