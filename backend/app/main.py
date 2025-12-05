@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.database import init_db
+from app.api import api_router
 
 app = FastAPI(
     title="Emulsion API",
@@ -20,6 +21,7 @@ async def startup_event():
     """Initialize database on application startup."""
     init_db()
 
+
 # Configure CORS for local development
 app.add_middleware(
     CORSMiddleware,
@@ -28,6 +30,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include API routes
+app.include_router(api_router)
 
 
 @app.get("/")

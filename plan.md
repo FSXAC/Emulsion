@@ -516,14 +516,14 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 1.7 Test backend server runs successfully
 
 ### Phase 2: Backend API - Film Rolls
-- [ ] 2.1 Implement GET /api/rolls (list all rolls)
-- [ ] 2.2 Implement POST /api/rolls (create new roll)
-- [ ] 2.3 Implement GET /api/rolls/{id} (get single roll)
-- [ ] 2.4 Implement PUT /api/rolls/{id} (update roll)
-- [ ] 2.5 Implement DELETE /api/rolls/{id} (delete roll)
-- [ ] 2.6 Add status calculation logic (computed property)
-- [ ] 2.7 Add cost calculation helpers (dev_cost, total_cost, cost_per_shot)
-- [ ] 2.8 Test all endpoints with sample data
+- [X] 2.1 Implement GET /api/rolls (list all rolls)
+- [X] 2.2 Implement POST /api/rolls (create new roll)
+- [X] 2.3 Implement GET /api/rolls/{id} (get single roll)
+- [X] 2.4 Implement PUT /api/rolls/{id} (update roll)
+- [X] 2.5 Implement DELETE /api/rolls/{id} (delete roll)
+- [X] 2.6 Add status calculation logic (computed property)
+- [X] 2.7 Add cost calculation helpers (dev_cost, total_cost, cost_per_shot)
+- [ ] 2.8 Test all endpoints with sample data **← NEXT**
 
 ### Phase 3: Backend API - Chemistry
 - [ ] 3.1 Implement GET /api/chemistry (list all batches)
@@ -777,3 +777,45 @@ The application includes:
 - CORS middleware configured for frontend access
 
 **Phase 1 Complete!** Backend foundation is ready. Ready to move to Phase 2: Backend API - Film Rolls.
+
+### Task 2.1-2.7: Film Rolls API Implementation
+**Files Created:**
+- `backend/app/api/__init__.py` - API router configuration with `/api` prefix
+- `backend/app/api/schemas/__init__.py` - Pydantic schemas package exports
+- `backend/app/api/schemas/film_roll.py` - Film roll Pydantic schemas:
+  - `FilmRollBase`: Base schema with all fields
+  - `FilmRollCreate`: Schema for POST requests (all required fields)
+  - `FilmRollUpdate`: Schema for PUT requests (all fields optional)
+  - `FilmRollResponse`: Response schema with computed fields (status, costs, duration)
+  - `FilmRollList`: Schema for list responses with pagination
+- `backend/app/api/schemas/chemistry_batch.py` - Chemistry batch schemas (for Phase 3)
+- `backend/app/api/rolls.py` - Film rolls CRUD endpoints:
+  - `GET /api/rolls` - List all rolls with pagination and filtering (skip, limit, status, order_id)
+  - `POST /api/rolls` - Create new roll with validation
+  - `GET /api/rolls/{roll_id}` - Get single roll by ID
+  - `PUT /api/rolls/{roll_id}` - Update existing roll (partial updates supported)
+  - `DELETE /api/rolls/{roll_id}` - Delete roll (returns 204 No Content)
+- `backend/app/api/chemistry.py` - Placeholder for Phase 3
+
+**Files Modified:**
+- `backend/app/main.py` - Included API router, all endpoints now available under `/api` prefix
+
+**What It Does:**
+Implements complete CRUD API for film rolls with:
+- **Validation**: Pydantic schemas validate all input data (field types, ranges, required fields)
+- **Status Calculation**: Automatically computed from field presence (already in model @property)
+- **Cost Calculations**: dev_cost, total_cost, cost_per_shot computed on-the-fly (model @properties)
+- **Chemistry Validation**: Checks chemistry_id exists when creating/updating rolls
+- **Filtering**: Query parameters for status and order_id filtering
+- **Pagination**: Skip/limit parameters for large datasets
+- **Error Handling**: Returns 404 for not found, 422 for validation errors
+- **Response Models**: Clean JSON responses with computed fields included
+
+**API Endpoints Available:**
+- `GET /api/rolls?skip=0&limit=100&status=NEW&order_id=42` - List/filter rolls
+- `POST /api/rolls` - Create roll
+- `GET /api/rolls/{id}` - Get single roll
+- `PUT /api/rolls/{id}` - Update roll
+- `DELETE /api/rolls/{id}` - Delete roll
+
+All endpoints documented at http://localhost:8000/docs with interactive testing.
