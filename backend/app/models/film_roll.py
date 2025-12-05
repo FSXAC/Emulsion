@@ -69,7 +69,7 @@ class FilmRoll(Base, TimestampMixin):
         Returns:
             Status string: NEW, LOADED, EXPOSED, DEVELOPED, or SCANNED
         """
-        if self.stars is not None:
+        if self.stars is not None and self.stars > 0:
             return "SCANNED"
         if self.chemistry_id is not None:
             return "DEVELOPED"

@@ -18,7 +18,7 @@ class FilmRollBase(BaseModel):
     date_unloaded: Optional[date] = Field(None, description="Date roll was unloaded from camera")
     push_pull_stops: Optional[Decimal] = Field(None, ge=-3, le=3, description="Push/pull stops (e.g., +1, -0.5)")
     chemistry_id: Optional[str] = Field(None, description="Associated chemistry batch ID")
-    stars: Optional[int] = Field(None, ge=0, le=5, description="Rating (0-5 stars)")
+    stars: Optional[int] = Field(None, ge=1, le=5, description="Rating (1-5 stars)")
     film_cost: Decimal = Field(..., ge=0, description="Film purchase cost")
     not_mine: bool = Field(False, description="Flag for friend's rolls")
     notes: Optional[str] = Field(None, description="Additional notes")

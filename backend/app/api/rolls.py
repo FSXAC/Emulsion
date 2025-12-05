@@ -161,8 +161,6 @@ def load_roll(
     This transitions the roll from NEW → LOADED status.
     Triggered when dragging roll to LOADED column.
     """
-    from app.api.schemas.actions import LoadRollRequest
-    
     roll = db.query(FilmRoll).filter(FilmRoll.id == roll_id).first()
     
     if not roll:
@@ -183,18 +181,18 @@ def unload_roll(
     db: Session = Depends(get_db),
 ):
     """
-    Unload a film roll from camera (set date_unloaded and optionally actual_exposures).
+    Unload a film roll from camera (set date_unloaded).
     
     This transitions the roll from LOADED -> EXPOSED status.
     Triggered when dragging roll to EXPOSED column.
+    
+    Note: actual_exposures is set later when rating after scanning.
     """
     roll = db.query(FilmRoll).filter(FilmRoll.id == roll_id).first()
     if not roll:
         raise HTTPException(status_code=404, detail="Film roll not found")
     
     roll.date_unloaded = data.date_unloaded
-    if data.actual_exposures is not None:
-        roll.actual_exposures = data.actual_exposures
     
     db.commit()
     db.refresh(roll)
@@ -218,6 +216,9 @@ def assign_chemistry(
     via the relationship, no manual increment needed.
     """
     roll = db.query(FilmRoll).filter(FilmRoll.id == roll_id).first()
+    
+    if not roll:
+        raise HTTPException(status_code=404, detail="Film roll not found")
     # Validate chemistry exists
     chemistry = db.query(ChemistryBatch).filter(
         ChemistryBatch.id == data.chemistry_id
@@ -243,12 +244,23 @@ def rate_roll(
     db: Session = Depends(get_db),
 ):
     """
-    Rate a film roll (set stars).
+    Rate a film roll (set stars and actual_exposures).
     
     This transitions the roll from DEVELOPED -> SCANNED status.
     Triggered when dragging roll to SCANNED column or clicking star rating.
+    
+    Note: This is when actual_exposures is typically set, after scanning
+    reveals how many frames were successfully processed.
     """
     roll = db.query(FilmRoll).filter(FilmRoll.id == roll_id).first()
+    
+    if not roll:
+        raise HTTPException(status_code=404, detail="Film roll not found")
+    
+    roll.stars = data.stars
+    if data.actual_exposures is not None:
+        roll.actual_exposures = data.actual_exposures
+    
     db.commit()
     db.refresh(roll)
     

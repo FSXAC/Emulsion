@@ -13,7 +13,6 @@ class LoadRollRequest(BaseModel):
 class UnloadRollRequest(BaseModel):
     """Schema for unloading a roll from camera."""
     date_unloaded: date = Field(..., description="Date roll was unloaded from camera")
-    actual_exposures: Optional[int] = Field(None, gt=0, description="Actual number of exposures taken")
 
 
 class AssignChemistryRequest(BaseModel):
@@ -23,4 +22,5 @@ class AssignChemistryRequest(BaseModel):
 
 class RateRollRequest(BaseModel):
     """Schema for rating a scanned roll."""
-    stars: int = Field(..., ge=0, le=5, description="Rating (0-5 stars)")
+    stars: int = Field(..., ge=1, le=5, description="Rating (1-5 stars)")
+    actual_exposures: Optional[int] = Field(None, gt=0, description="Actual number of exposures (known after scanning)")
