@@ -540,10 +540,10 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 4.3 Add PATCH /api/rolls/{id}/chemistry endpoint (associate chemistry)
 - [X] 4.4 Auto-increment chemistry roll count when associated
 - [X] 4.5 Add PATCH /api/rolls/{id}/rating endpoint (set stars)
-- [ ] 4.6 Test status transitions work correctly **← NEXT**
+- [X] 4.6 Test status transitions work correctly
 
 ### Phase 5: Frontend Foundation
-- [ ] 5.1 Initialize Vite + React project (frontend/)
+- [ ] 5.1 Initialize Vite + React project (frontend/) **← IN PROGRESS**
 - [ ] 5.2 Install dependencies: dnd-kit, axios, tailwindcss, framer-motion
 - [ ] 5.3 Configure Tailwind CSS
 - [ ] 5.4 Create basic app structure and routing
@@ -903,3 +903,21 @@ Implements specialized PATCH endpoints for drag-and-drop UI interactions:
 5. SCANNED (has stars) ← PATCH /rating
 
 Note: Transitions are flexible - rolls can move between any states as fields are set/unset.
+
+### Task 4.6: Test Status Transitions
+**Test Results:**
+✅ Status transitions work correctly through all states (NEW → LOADED → EXPOSED → DEVELOPED → SCANNED)
+✅ PATCH /api/rolls/{id}/load sets date_loaded and transitions to LOADED
+✅ PATCH /api/rolls/{id}/unload sets date_unloaded and transitions to EXPOSED
+✅ PATCH /api/rolls/{id}/chemistry validates chemistry_id and transitions to DEVELOPED
+✅ PATCH /api/rolls/{id}/rating sets stars and actual_exposures, transitions to SCANNED
+✅ Computed fields (dev_cost, total_cost, cost_per_shot) calculate correctly
+✅ Chemistry batch rolls_developed count increments automatically when roll assigned
+
+**Refinements Made:**
+- Fixed status logic to require `stars > 0` (not just `!= None`) for SCANNED status
+- Changed rating validation from 0-5 to 1-5 stars
+- Removed `actual_exposures` from unload endpoint (not known until scanning)
+- Added `actual_exposures` to rating endpoint (known after scanning reveals successful frames)
+
+**Phase 4 Complete!** Backend API fully functional with status transitions. Ready for Phase 5: Frontend Foundation.
