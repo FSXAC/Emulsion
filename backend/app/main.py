@@ -2,8 +2,11 @@
 Emulsion Backend - FastAPI Application
 Film roll inventory management system
 """
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from app.core.config import settings
 from app.core.database import init_db
@@ -34,15 +37,41 @@ app.add_middleware(
 # Include API routes
 app.include_router(api_router)
 
-
-@app.get("/")
-async def root():
-    """Root endpoint - API information"""
-    return {
-        "name": "Emulsion API",
-        "version": "0.1.0",
-        "status": "running"
-    }
+# Serve frontend static files (production mode)
+frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "dist"
+if frontend_dist.exists():
+    # Mount static assets
+    app.mount("/assets", StaticFiles(directory=str(frontend_dist / "assets")), name="assets")
+    
+    @app.get("/", include_in_schema=False)
+    async def serve_root():
+        """Serve the frontend index.html for root path"""
+        return FileResponse(frontend_dist / "index.html")
+    
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_frontend(full_path: str):
+        """Serve frontend files or index.html for SPA routing"""
+        # Don't interfere with API routes
+        if full_path.startswith("api") or full_path.startswith("health"):
+            return
+        
+        # Check if file exists in dist
+        file_path = frontend_dist / full_path
+        if file_path.exists() and file_path.is_file():
+            return FileResponse(file_path)
+        
+        # Otherwise serve index.html (SPA catch-all)
+        return FileResponse(frontend_dist / "index.html")
+else:
+    @app.get("/")
+    async def root():
+        """Root endpoint - API information (dev mode)"""
+        return {
+            "name": "Emulsion API",
+            "version": "0.1.0",
+            "status": "running",
+            "message": "Frontend not built. Run 'npm run build' in frontend directory."
+        }
 
 
 @app.get("/health")

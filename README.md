@@ -19,26 +19,39 @@ A web-based application for tracking analog film rolls through their lifecycle: 
 
 ## Getting Started
 
-### Backend Server
+### Development Mode
 
+**Backend:**
 ```sh
 cd backend
 source venv/bin/activate
 uvicorn app.main:app --reload
 ```
 
-Backend runs at: **http://localhost:8000**
-- API docs: http://localhost:8000/docs (Swagger UI)
-- Health check: http://localhost:8000/health
-
-### Frontend Server
-
+**Frontend:**
 ```sh
 cd frontend
 npm run dev
 ```
 
-Frontend runs at: **http://localhost:5173**
+Access at: http://localhost:5173
+
+### Production Mode (Recommended)
+
+Build and run for local network access:
+
+```sh
+# First time setup
+chmod +x scripts/*.sh
+./scripts/build-production.sh
+
+# Start server
+./scripts/start-production.sh
+```
+
+Access at: http://localhost:8000 or http://YOUR_IP:8000
+
+📚 **See [QUICKSTART.md](QUICKSTART.md) for complete setup instructions**
 
 ## Features
 
@@ -135,6 +148,13 @@ Frontend runs at: **http://localhost:5173**
 - `film_rolls` - Film roll tracking
 - `chemistry_batches` - Chemistry batch tracking
 
+**Backups:**
+```sh
+./scripts/backup-database.sh
+```
+
+Backups stored in: `backend/data/backups/`
+
 ## Status Logic
 
 Status computed from field presence:
@@ -185,6 +205,13 @@ emulsion/
 - `FilmRoll` model - Status, cost, duration calculated properties
 - `ChemistryBatch` model - Roll count, C41 dev time calculation
 - CRUD + PATCH endpoints for all operations
+
+## Documentation
+
+- **[QUICKSTART.md](QUICKSTART.md)** - 🚀 Quick production setup (start here!)
+- **[PRODUCTION.md](PRODUCTION.md)** - Production deployment reference
+- **[DEPLOY.md](DEPLOY.md)** - Comprehensive deployment guide with all options
+- **[plan.md](plan.md)** - Full architecture and development plan
 
 ## Testing
 
