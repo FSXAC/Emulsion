@@ -181,32 +181,32 @@ export default function ChemistryPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Chemistry Batches</h2>
-          <p className="text-sm text-gray-500">
+          <p className="text-xs sm:text-sm text-gray-500">
             Track your film development chemistry and costs
           </p>
         </div>
         <button 
           onClick={() => setAddBatchModal({ isOpen: true })}
-          className="btn-primary"
+          className="btn-primary whitespace-nowrap touch-friendly"
         >
           + Add Chemistry
         </button>
       </div>
 
       {batches.length === 0 ? (
-        <div className="text-center py-16 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <div className="text-6xl mb-4">🧪</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No chemistry batches yet</h3>
-          <p className="text-sm text-gray-500 mb-4">
+        <div className="text-center py-12 sm:py-16 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+          <div className="text-5xl sm:text-6xl mb-4">🧪</div>
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No chemistry batches yet</h3>
+          <p className="text-xs sm:text-sm text-gray-500 mb-4 px-4">
             Add your first chemistry batch to start tracking development costs
           </p>
           <button 
             onClick={() => setAddBatchModal({ isOpen: true })}
-            className="btn-primary"
+            className="btn-primary touch-friendly"
           >
             + Add Chemistry Batch
           </button>

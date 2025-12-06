@@ -100,16 +100,6 @@ A web-based application for tracking analog film rolls through their lifecycle: 
 ## System Architecture
 
 ```
-┌─────────────────────────────────────────┐
-│           Browser (Desktop/Mobile)       │
-│                                          │
-│  ┌────────────────────────────────────┐ │
-│  │   React Frontend (SPA)             │ │
-│  │   - Film Roll Management UI        │ │
-│  │   - Chemistry Tracking UI          │ │
-│  │   - Dashboard/Stats                │ │
-│  │   - Mobile-responsive layouts      │ │
-```
 ┌─────────────────────────────────────────────┐
 │       Browser (Desktop/Mobile)               │
 │                                              │
@@ -139,9 +129,10 @@ A web-based application for tracking analog film rolls through their lifecycle: 
 │  │  API Routes (FastAPI)                  ││
 │  │  - GET/POST/PUT/DELETE /api/rolls      ││
 │  │  - GET/POST/PUT/DELETE /api/chemistry  ││
-│  │  - PATCH /api/rolls/{id}/status        ││
-│  │  - GET /api/stats                      ││
-│  │  - GET /api/shots (future)             ││
+│  │  - PATCH /api/rolls/{id}/load          ││
+│  │  - PATCH /api/rolls/{id}/unload        ││
+│  │  - PATCH /api/rolls/{id}/chemistry     ││
+│  │  - PATCH /api/rolls/{id}/rating        ││
 │  └────────────────────────────────────────┘│
 │                                             │
 │  ┌────────────────────────────────────────┐│
@@ -160,7 +151,14 @@ A web-based application for tracking analog film rolls through their lifecycle: 
                   │
 ┌─────────────────▼──────────────────────────┐
 │        SQLite Database (local file)        │
-│        ~/emulsion_data/emulsion.db         │
+│          backend/data/emulsion.db          │
+└────────────────────────────────────────────┘
+```
+
+---
+
+## Database Schema
+
 ### Table: `film_rolls`
 ```sql
 id                 : UUID (PK)
@@ -226,12 +224,18 @@ def calc_c41_dev_time(rolls_developed: int) -> str:
     minutes = int(total_seconds // 60)
     seconds = int(total_seconds % 60)
     return f"{minutes}:{seconds:02d}"
+```
+
 ### Table: `shots_metadata` (Future Integration)
 ```sql
 id              : UUID (PK)
 roll_id         : UUID (FK → film_rolls)
 frame_number    : Integer
 date_taken      : Timestamp
+```
+
+---
+
 ## Key Features & UI Flows
 
 ### 1. Film Roll Kanban Board (Main View)
@@ -306,15 +310,18 @@ date_taken      : Timestamp
 - Display cost per roll (handle division-by-zero gracefully)
 - Retire chemistry action
 - Link to view rolls that used each batch
+
+---
+
 ## Deployment (Local Only)
 
-### Selected: Local Development Server
+### Current Setup
 
-**Setup**:
-- Backend: `uvicorn main:app --reload` (FastAPI dev server)
-- Frontend: `npm run dev` (Vite dev server)
+**Development Servers**:
+- Backend: `uvicorn app.main:app --reload` (FastAPI dev server on port 8000)
+- Frontend: `npm run dev` (Vite dev server on port 5173)
 - Access: `http://localhost:5173` (frontend) → `http://localhost:8000` (backend API)
-- Database: SQLite file in `~/emulsion_data/emulsion.db`
+- Database: SQLite file at `backend/data/emulsion.db`
 
 **Production-style Local Setup** (optional):
 - Use `systemd` service (Linux) or `launchd` (macOS) to auto-start on boot
@@ -325,182 +332,71 @@ date_taken      : Timestamp
 **Backup Strategy**:
 - SQLite database is a single file - easy to backup
 - Cron job or manual copy to cloud storage (Dropbox, iCloud, etc.)
-- Git repo for code + database file (if you want versioning)
+- Git repo for code (database file should be excluded from version control)
 
 **Mobile Access on Local Network**:
 - Find your computer's local IP (e.g., `192.168.1.100`)
 - Access from phone: `http://192.168.1.100:5173`
 - Make responsive for mobile browser
-- Optional: Add to home screen as PWA0 + (rolls_developed * 0.02 * 210) # for C41
-```
-
-### Table: `film_stocks` (Optional reference data)
-```sql
-id              : UUID (PK)
-name            : String (e.g., "Kodak Portra 400")
-format          : String (35mm, 120)
-manufacturer    : String
-default_exposures: Integer
-is_color        : Boolean
-notes           : Text
-```
-
-### Relationships
-- `film_rolls.chemistry_id` → `chemistry_batches.id` (many-to-one)
-- Potential: `film_rolls.film_stock_id` → `film_stocks.id` (optional normalization)
+- Optional: Add to home screen as PWA
 
 ---
 
-## Frontend Framework Considerations
+## Implemented Technology Stack
 
-Since you're not familiar with Node/TS, you have options:
+### Backend
+- **Python 3.x** with FastAPI 0.115.0
+- **SQLAlchemy 2.0.36** for ORM
+- **Pydantic 2.9.2** for validation
+- **Uvicorn 0.32.0** as ASGI server
+- **SQLite** database at `backend/data/emulsion.db`
+- **Alembic 1.13.1** for migrations (configured but not yet used)
 
-### Option 1: React (JavaScript, minimal TypeScript)
-**Pros**: 
-- Most popular, tons of resources
-- Great drag-and-drop libraries (dnd-kit)
-- You can write mostly JS, minimal TS
-- Excellent mobile support
+### Frontend
+- **React 19.2.0** with JavaScript (no TypeScript)
+- **Vite 5.x** for fast development and builds
+- **@dnd-kit** (core 6.1.0, sortable 8.0.0) for drag-and-drop
+- **Axios 1.7.2** for API calls
+- **Framer Motion 11.2.10** for animations
+- **React Router DOM 7.3.0** for routing
+- **Tailwind CSS 3.4.4** for styling
+- **React Hot Toast 2.6.0** for notifications
 
-**Learning curve**: Moderate (JSX, hooks, state management)
-
-### Option 2: Python-based Frontend (Streamlit, Gradio, Reflex)
-**Pros**:
-- Pure Python, no JavaScript needed
-- Rapid prototyping
-
-**Cons**:
-- Limited drag-and-drop UX capabilities
-- Less tactile/playful interactions
-- Not ideal for Kanban board UX you want
-
-**Verdict**: Not recommended for your playful drag-drop UX
-
-### Option 3: HTMX + Alpine.js (minimal JS)
-**Pros**:
-- Mostly server-side rendered (Python templates)
-- Very minimal JavaScript
-- FastAPI serves HTML directly
-
-**Cons**:
-- Drag-and-drop is harder to implement
-- Less smooth animations
-
-**Verdict**: Could work but limits the tactile UX
-
-### **Recommendation**: Stick with React (JavaScript)
-- You can learn just enough React for this project
-- Copy/paste drag-drop examples from dnd-kit docs
-- Focus on Python backend (your comfort zone)
-- Frontend can be simple: just drag-drop + formsing spreadsheet data
-- [ ] Search and filtering
-- [ ] Sorting on all columns
-- [ ] Notes and editing history
-- [ ] Backup/export functionality
-
-### Phase 4: Enhancement
-- [ ] PWA support (offline access)
-- [ ] Statistics dashboard
-- [ ] Photo gallery integration (link scanned images?)
-- [ ] Push notifications (chemistry expiring?)
-- [ ] Batch operations (mark multiple rolls)
+### API Endpoints Implemented
+- **Film Rolls**: GET/POST/PUT/DELETE `/api/rolls`
+- **Chemistry Batches**: GET/POST/PUT/DELETE `/api/chemistry`
+- **Status Transitions**:
+  - PATCH `/api/rolls/{id}/load` - Set date_loaded
+  - PATCH `/api/rolls/{id}/unload` - Set date_unloaded
+  - PATCH `/api/rolls/{id}/chemistry` - Associate chemistry batch
+  - PATCH `/api/rolls/{id}/rating` - Set stars rating
 
 ---
 
-## Deployment Options
+## MVP Scope
 
-### For Single User:
-
-**Option 1: Self-hosted (Recommended)**
-- Run on personal computer/NAS/Raspberry Pi
-- Access via local network (http://192.168.x.x:3000)
-- Use ngrok or Tailscale for remote access
-- **Pros**: Free, full control, data privacy
-- **Cons**: Requires keeping server running
-
-**Option 2: Cloud VPS (DigitalOcean, Linode)**
-- Small $5-6/month droplet
-- Deploy with Docker
-- Set up domain + SSL
-- **Pros**: Always accessible, professional
-- **Cons**: Monthly cost, slight overkill for single user
-
-**Option 3: Platform as a Service (Fly.io, Railway, Render)**
-- Free tier available for small apps
-- Automatic deployments from Git
-- **Pros**: Easy deployment, free/cheap
-- **Cons**: Cold starts on free tier, potential costs
-
-**Option 4: Hybrid - Frontend on Vercel/Netlify + Backend self-hosted**
-- Free frontend hosting
-- Backend on home network
-- **Pros**: Best of both worlds
-- **Cons**: More complex setup
-
----
-
-## Alternative Architectures (Considered)
-
-### Local-First App (Electron/Tauri + SQLite)
-**Pros**: 
-- Truly offline-first
-- No server needed
-- Desktop-native experience
-
-**Cons**:
-## Recommended Next Steps
-
-1. ✅ **Architecture validated** - Python + FastAPI + React + SQLite + Local
-2. **Set up backend**:
-   - Create Python virtual environment
-   - Install FastAPI, SQLAlchemy, Uvicorn, Alembic
-   - Set up project structure
-   - Define SQLAlchemy models (film_rolls, chemistry_batches)
-   - Create Alembic migrations
-   - Build basic CRUD endpoints
-3. **Set up frontend**:
-   - Initialize Vite + React project
-   - Install dnd-kit, Tailwind CSS, Framer Motion
-   - Create basic kanban board layout
-   - Test drag-and-drop functionality
-4. **Implement core backend logic**:
-   - Status calculation function
-   - C41 development time calculator
-## Questions Answered
-
-1. ✅ **Tech preference**: Python (FastAPI)
-2. ✅ **Deployment**: Local only
-3. ✅ **C41 calculation**: Only for C41, other chemistry types will use lookup table (future)
-4. ✅ **Image storage**: No images, but future shot metadata integration from mobile app
-5. ✅ **UX style**: Trello-style drag-and-drop Kanban board with auto-prompts
-6. ✅ **Status logic**: Flexible, inferred from field presence (not strict state machine)
-7. ✅ **Cost calculations**: Nice-to-have metrics, gracefully handle edge cases (show null/"N/A")
-8. ✅ **"Not mine" rolls**: Count toward chemistry usage, exclude film cost, show friend icon
-9. ✅ **rolls_offset**: Adjusts effective roll count for dev time calculation (stale chemistry)
-10. ✅ **Future features**: Out of scope for MVP (offline, sharing, advanced stats, PWA)
-
-## Phase 1 Scope (MVP - Keep It Simple)
-
-**In Scope**:
+**Completed**:
 - ✅ Film roll CRUD operations
-- ✅ Chemistry batch management
+- ✅ Chemistry batch management with C41 dev time calculations
 - ✅ Drag-and-drop Kanban board UI
-- ✅ Auto-status calculation
-- ✅ C41 development time calculator
-- ✅ Cost calculations
-- ✅ Import existing spreadsheet data
+- ✅ Auto-status calculation based on field presence
+- ✅ Cost calculations (dev_cost, total_cost, cost_per_shot)
+- ✅ Status transition endpoints with validation
+- ✅ Duplicate functionality for quick entry
+- ✅ Autocomplete for film stock names and order IDs
+
+**Remaining**:
+- [ ] Import existing spreadsheet data
+- [ ] Mobile responsive optimizations
+- [ ] Loading states and error handling improvements
+- [ ] Database backup automation
 
 **Out of Scope (Future)**:
 - ❌ Shot metadata integration
 - ❌ Camera tracking
 - ❌ Historical audit logs
 - ❌ Advanced statistics dashboard
-- ❌ Order management views
-
-**Tech Comfort**:
-- ✅ You have JavaScript experience → React will be manageable
-- ✅ Focus on Python backend (your strength)
-- ✅ Copy/adapt React drag-drop examples
+- ❌ PWA/offline support
 
 ---
 
@@ -594,11 +490,11 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 9.7 Add duplicate and delete actions similar to the ones for rolls
 
 ### Phase 10: Mobile Responsiveness
-- [ ] 10.1 Make kanban board responsive (stack columns on mobile)
-- [ ] 10.2 Ensure cards are touch-friendly (min 48px tap targets)
-- [ ] 10.3 Test drag-and-drop on mobile browser
-- [ ] 10.4 Optimize modals for mobile screens
-- [ ] 10.5 Add swipe gestures for quick actions (optional)
+- [X] 10.1 Make kanban board responsive (stack columns on mobile)
+- [X] 10.2 Ensure cards are touch-friendly (min 48px tap targets)
+- [X] 10.3 Test drag-and-drop on mobile browser
+- [X] 10.4 Optimize modals for mobile screens
+- [ ] 10.5 Add swipe gestures for quick actions (optional - deferred)
 
 ### Phase 11: Data Migration
 - [ ] 11.1 Export existing Numbers spreadsheet to CSV
@@ -615,100 +511,6 @@ Since you're not familiar with Node/TS, you have options:
 - [ ] 12.5 Set up auto-start on macOS (launchd, optional)
 - [ ] 12.6 Create backup script for database
 - [ ] 12.7 🎬 Start using the app!
-   - CRUD endpoints for chemistry
-   - Roll counter updates on association
-   - C41 timer widget
-7. **Import existing data**:
-   - Export Numbers spreadsheet to CSV
-   - Write Python import script
-   - Validate data integrity
-8. **Polish & mobile optimization**:
-   - Responsive design for mobile
-   - Touch-friendly interactions
-   - Animations and transitions
-9. **Future enhancements**:
-   - Shot metadata integration
-   - Statistics dashboard
-   - Data export/backup automation
-
-**Verdict**: Would still feel like spreadsheet, not worth the limitation
-
-### No-Code/Low-Code (Airtable, Notion, Baserow)
-**Pros**: 
-- Fast setup
-- Built-in UI
-
-**Cons**:
-- Limited automation logic (C41 calculation tricky)
-- Less flexibility
-- Potential monthly costs
-
-**Verdict**: Could work but custom calculations might be challenging
-
----
-
-## Technology Alternatives by Preference
-
-### If you prefer Python:
-- **Backend**: FastAPI + SQLAlchemy + SQLite
-- **Frontend**: Still React (or Vue) - Python not ideal for frontend
-- **Deployment**: Easier to self-host on Linux
-
-### If you want simplest possible:
-- **Stack**: SvelteKit (full-stack in one framework)
-- **Database**: SQLite
-- **Deployment**: Single deployment artifact
-
-### If you want bleeding-edge modern:
-- **Frontend**: Svelte 5 or Solid.js
-- **Backend**: Bun + Hono (super fast)
-- **Database**: Turso (SQLite in the cloud)
-- **ORM**: Drizzle
-
----
-
-## Recommended Next Steps
-
-1. **Validate architecture**: Confirm tech stack preferences
-2. **Set up development environment**: 
-   - Initialize Node.js + TypeScript project
-   - Set up Vite + React
-   - Configure Prisma + SQLite
-3. **Design database schema in detail**: Finalize field types, constraints
-4. **Create API contract**: Define REST endpoints
-5. **Build core backend**: Database models + basic CRUD
-6. **Build core frontend**: Roll list + chemistry list views
-7. **Implement business logic**: Status transitions, calculations
-8. **Import existing data**: Write migration script from Numbers export
-9. **Polish UI**: Make it mobile-friendly
-10. **Deploy**: Choose deployment option and ship it
-
----
-
-## Questions to Consider
-
-1. **Do you want to keep historical data?** (e.g., when roll status changes, log the change)
-2. **Image storage?** Do you want to attach scanned photos to rolls in the future?
-3. **Multiple chemistry types?** The C41 2% calculation - does this apply to all chemistry or just color?
-4. **Sharing?** Any chance you'd want to share this with photography friends later?
-5. **Offline support?** Critical to have offline access while shooting?
-6. **Data export?** Want periodic backups exported to CSV/JSON?
-
----
-
-## Cost Estimate
-
-**Development Time**: ~2-4 weeks part-time for MVP
-**Ongoing Costs**:
-- Self-hosted: $0 (electricity/internet you already pay)
-- Cloud hosted: $0-6/month
-- Domain (optional): $12/year
-
-**Total**: Likely free to run, mainly time investment upfront.
-
----
-
-*This plan prioritizes simplicity, maintainability, and your specific single-user use case while keeping the door open for future enhancements.*
 
 ---
 

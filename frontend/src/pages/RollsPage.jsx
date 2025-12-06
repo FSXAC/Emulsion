@@ -408,17 +408,17 @@ export default function RollsPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-3">
+    <div className="pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Film Rolls</h2>
-          <p className="text-sm text-gray-500">
+          <p className="text-xs sm:text-sm text-gray-500">
             Drag rolls between columns to update their status
           </p>
         </div>
         <button 
           onClick={() => setAddRollModal({ isOpen: true, initialData: null })}
-          className="btn-primary"
+          className="btn-primary whitespace-nowrap touch-friendly"
         >
           + Add Roll
         </button>
@@ -453,7 +453,8 @@ export default function RollsPage() {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex gap-3 overflow-x-auto pb-2">
+        {/* Mobile: Stack columns vertically, Desktop: Horizontal scroll */}
+        <div className="flex flex-col md:flex-row gap-3 md:gap-3 md:overflow-x-auto pb-2">
           {statusConfig.map(({ status, displayName, icon }) => (
             <StatusColumn
               key={status}
