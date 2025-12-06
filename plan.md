@@ -548,7 +548,7 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 5.3 Configure Tailwind CSS
 - [X] 5.4 Create basic app structure and routing
 - [X] 5.5 Set up API client (axios with base URL)
-- [ ] 5.6 Test frontend dev server runs **← NEXT**
+- [X] 5.6 Test frontend dev server runs
 
 ### Phase 6: Frontend - Kanban Board UI
 - [X] 6.1 Create FilmRollCard component

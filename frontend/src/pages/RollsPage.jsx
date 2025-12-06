@@ -104,32 +104,66 @@ export default function RollsPage() {
     try {
       let updatedRoll;
 
-      // Trigger appropriate API call based on target status
-      switch (targetStatus) {
-        case 'LOADED':
-          // Set date_loaded to today
-          updatedRoll = await loadRoll(roll.id, new Date().toISOString().split('T')[0]);
-          break;
+      // Determine if this is a forward or backward transition
+      const statusOrder = ['NEW', 'LOADED', 'EXPOSED', 'DEVELOPED', 'SCANNED'];
+      const currentIndex = statusOrder.indexOf(roll.status);
+      const targetIndex = statusOrder.indexOf(targetStatus);
+      const isBackward = targetIndex < currentIndex;
 
-        case 'EXPOSED':
-          // Set date_unloaded to today
-          updatedRoll = await unloadRoll(roll.id, new Date().toISOString().split('T')[0]);
-          break;
+      // Handle backward transitions (reset fields)
+      if (isBackward) {
+        const fieldsToUpdate = {};
+        
+        // Reset fields based on target status
+        if (targetIndex < statusOrder.indexOf('SCANNED')) {
+          fieldsToUpdate.stars = null;
+        }
+        if (targetIndex < statusOrder.indexOf('DEVELOPED')) {
+          fieldsToUpdate.chemistry_id = null;
+        }
+        if (targetIndex < statusOrder.indexOf('EXPOSED')) {
+          fieldsToUpdate.date_unloaded = null;
+        }
+        if (targetIndex < statusOrder.indexOf('LOADED')) {
+          fieldsToUpdate.date_loaded = null;
+        }
 
-        case 'DEVELOPED':
-          // TODO: Show chemistry picker modal
-          // For now, we'll skip this transition (requires chemistry_id)
-          console.log('Chemistry assignment requires modal - not implemented yet');
-          return;
+        // Use updateRoll to clear fields
+        const { updateRoll } = await import('../services/rolls');
+        updatedRoll = await updateRoll(roll.id, fieldsToUpdate);
+      } else {
+        // Handle forward transitions
+        switch (targetStatus) {
+          case 'LOADED':
+            // Set date_loaded to today
+            updatedRoll = await loadRoll(roll.id, new Date().toISOString().split('T')[0]);
+            break;
 
-        case 'SCANNED':
-          // TODO: Show rating modal
-          // For now, set default 3 stars
-          updatedRoll = await rateRoll(roll.id, 3);
-          break;
+          case 'EXPOSED':
+            // Set date_unloaded to today
+            updatedRoll = await unloadRoll(roll.id, new Date().toISOString().split('T')[0]);
+            break;
 
-        default:
-          return;
+          case 'DEVELOPED':
+            // TODO: Show chemistry picker modal
+            // For now, we'll skip this transition (requires chemistry_id)
+            alert('⚠️ Chemistry assignment requires chemistry picker modal (not yet implemented).\n\nThis will be added in Phase 7.');
+            return;
+
+          case 'SCANNED':
+            // TODO: Show rating modal for stars selection
+            // For now, prompt for star rating
+            const stars = prompt('Rate this roll (1-5 stars):', '3');
+            if (!stars || isNaN(stars) || stars < 1 || stars > 5) {
+              alert('Invalid rating. Please enter 1-5 stars.');
+              return;
+            }
+            updatedRoll = await rateRoll(roll.id, parseInt(stars));
+            break;
+
+          default:
+            return;
+        }
       }
 
       // Update local state with the updated roll
