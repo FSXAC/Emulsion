@@ -40,38 +40,72 @@ npm run dev
 
 Frontend runs at: **http://localhost:5173**
 
+## Features
+
+### Film Roll Management
+- **Kanban-style board** with drag-and-drop status transitions
+- Track rolls from NEW → LOADED → EXPOSED → DEVELOPED → SCANNED
+- Film stock metadata (name, format, exposures, order ID)
+- Push/pull processing tracking
+- Cost calculations (film cost, dev cost, per-shot cost)
+- 5-star rating system
+- Notes and custom fields
+- "Not mine" flag for friend's rolls
+- Duplicate functionality for quick entry
+
+### Chemistry Batch Management
+- Track chemistry batches with mix and retirement dates
+- Automatic roll counter and cost-per-roll calculation
+- **C41 development time calculator** (3:30 base + 2% per roll)
+- Manual offset adjustment for chemistry usage
+- Active/retired batch organization with pagination
+- Link to view all rolls using each batch
+- Duplicate and retire batch actions
+
+### User Experience
+- **Touch-friendly** mobile-responsive design
+- **Drag-and-drop** with visual feedback
+- **Modal dialogs** for date/chemistry/rating entry
+- **Autocomplete** for film stock names and order IDs
+- **Loading states** with skeleton screens
+- **Toast notifications** for user actions
+- **Error handling** with retry options
+- **Pagination** for large datasets
+
 ## Current Progress
 
-### ✅ Completed (Phases 1-5)
+### ✅ Completed (MVP Ready!)
 
-**Backend:**
+**Backend (Phases 1-4):**
 - SQLAlchemy models with computed properties (status, costs, C41 dev time)
 - CRUD endpoints for film rolls and chemistry batches
 - PATCH endpoints for status transitions (load, unload, assign chemistry, rate)
 - Automatic chemistry roll count updates
+- Comprehensive validation and error handling
 - All endpoints tested and working
 
-**Frontend:**
-- Vite + React project initialized
-- Dependencies installed (dnd-kit, axios, tailwindcss, framer-motion, react-router-dom)
-- Tailwind CSS configured with custom film photography palette
-- React Router configured with Layout, RollsPage, ChemistryPage
-- API client services created (`services/api.js`, `services/rolls.js`, `services/chemistry.js`)
+**Frontend (Phases 5-11):**
+- React + Vite with Tailwind CSS styling
+- Drag-and-drop Kanban board with dnd-kit
+- Film roll and chemistry CRUD operations
+- Status transition modals (date picker, chemistry picker, rating)
+- Autocomplete for film stocks and order IDs
+- Duplicate functionality for quick data entry
+- Chemistry page with active/retired sections
+- Pagination for NEW and SCANNED rolls, active/retired batches
+- Data migration scripts from spreadsheet
+- Loading states with skeleton screens
+- Comprehensive error handling and validation
 
-### 🚧 Next Steps (Phase 6: Kanban Board UI)
+### 🎯 Polish & Launch (Phase 12)
 
-**Task 6.1:** Create FilmRollCard component
-- Display film stock name, format, exposures, dates, costs, chemistry, rating
-- Touch-friendly card design with Tailwind classes
-
-**Task 6.2:** Create StatusColumn component
-- Column for each status (NEW, LOADED, EXPOSED, DEVELOPED, SCANNED)
-- Drop zone visual feedback
-
-**Task 6.3-6.6:** Implement drag-and-drop with dnd-kit
-- Set up DndContext with sensors
-- Handle drag events and trigger PATCH endpoints
-- Fetch and display rolls grouped by status
+- [X] **12.1** Loading states and skeleton screens
+- [X] **12.2** Error handling and validation
+- [ ] **12.3** Keyboard shortcuts (optional)
+- [ ] **12.4** Basic user documentation
+- [ ] **12.5** Auto-start on macOS (optional)
+- [ ] **12.6** Database backup script
+- [ ] **12.7** 🎬 Start using the app!
 
 ## API Endpoints
 
@@ -110,12 +144,47 @@ Status computed from field presence:
 - **DEVELOPED**: Has `chemistry_id`
 - **SCANNED**: Has `stars > 0`
 
-## Resuming Development
+## Project Structure
 
-1. **Start servers** (see commands above)
-2. **Current focus:** Phase 6 - Kanban Board UI
-3. **Next task:** Create FilmRollCard component
-4. **Reference:** See `plan.md` for full architecture and task list
+```
+emulsion/
+├── backend/
+│   ├── app/
+│   │   ├── api/           # API endpoints
+│   │   ├── core/          # Config & database
+│   │   ├── models/        # SQLAlchemy models
+│   │   └── main.py        # FastAPI app
+│   ├── data/              # SQLite database
+│   ├── requirements.txt
+│   └── venv/
+├── frontend/
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   ├── pages/         # RollsPage, ChemistryPage
+│   │   ├── services/      # API clients
+│   │   ├── utils/         # Helpers
+│   │   └── App.jsx
+│   ├── package.json
+│   └── vite.config.js
+├── migration/             # Data migration scripts
+├── plan.md               # Full architecture plan
+└── README.md
+```
+
+## Key Components
+
+**Frontend:**
+- `FilmRollCard` - Drag-and-drop film roll display
+- `StatusColumn` - Kanban column with drop zones
+- `AddRollForm` / `EditRollForm` - Roll management
+- `AddChemistryForm` / `EditChemistryForm` - Chemistry management
+- `SkeletonCard` - Loading state placeholder
+- `ErrorMessage` - Consistent error display
+
+**Backend:**
+- `FilmRoll` model - Status, cost, duration calculated properties
+- `ChemistryBatch` model - Roll count, C41 dev time calculation
+- CRUD + PATCH endpoints for all operations
 
 ## Testing
 
