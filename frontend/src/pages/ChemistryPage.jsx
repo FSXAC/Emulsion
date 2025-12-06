@@ -239,12 +239,14 @@ export default function ChemistryPage() {
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     {/* Date Mixed */}
-                    <div>
-                      <span className="text-gray-500">Mixed:</span>
-                      <span className="ml-2 font-medium text-gray-900">
-                        {formatDate(batch.date_mixed)}
-                      </span>
-                    </div>
+                    {batch.date_mixed && (
+                      <div>
+                        <span className="text-gray-500">Mixed:</span>
+                        <span className="ml-2 font-medium text-gray-900">
+                          {formatDate(batch.date_mixed)}
+                        </span>
+                      </div>
+                    )}
 
                     {/* Date Retired */}
                     {batch.date_retired && (

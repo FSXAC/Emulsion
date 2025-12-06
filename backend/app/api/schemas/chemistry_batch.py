@@ -11,7 +11,7 @@ class ChemistryBatchBase(BaseModel):
     
     name: str = Field(..., min_length=1, max_length=200, description="Chemistry batch name")
     chemistry_type: str = Field(..., min_length=1, max_length=50, description="Chemistry type (C41, E6, BW, etc.)")
-    date_mixed: date = Field(..., description="Date chemistry was mixed")
+    date_mixed: Optional[date] = Field(None, description="Date chemistry was mixed (optional for unmixed batches)")
     date_retired: Optional[date] = Field(None, description="Date chemistry was retired")
     developer_cost: Decimal = Field(..., ge=0, description="Developer cost")
     fixer_cost: Decimal = Field(..., ge=0, description="Fixer cost")

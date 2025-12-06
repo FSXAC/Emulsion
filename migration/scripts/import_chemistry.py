@@ -111,13 +111,8 @@ def import_chemistry_batches(csv_path: str, dry_run: bool = False):
                         print(f"Row {row_num}: Invalid chemistry_type '{chemistry_type}', using 'OTHER'")
                         chemistry_type = 'OTHER'
                     
+                    # Optional fields (date_mixed can be null for unmixed chemistry)
                     date_mixed = parse_date(row.get('date_mixed', ''))
-                    if not date_mixed:
-                        print(f"Row {row_num}: Skipping - missing or invalid date_mixed")
-                        skipped += 1
-                        continue
-                    
-                    # Optional fields
                     date_retired = parse_date(row.get('date_retired', ''))
                     developer_cost = parse_decimal(row.get('developer_cost', '0'))
                     fixer_cost = parse_decimal(row.get('fixer_cost', '0'))

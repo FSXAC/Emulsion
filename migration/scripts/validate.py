@@ -41,8 +41,6 @@ def validate_chemistry_batches(db):
         # Check required fields
         if not batch.name:
             errors.append(f"Batch {batch.id}: Missing name")
-        if not batch.date_mixed:
-            errors.append(f"Batch {batch.id}: Missing date_mixed")
         
         # Check costs
         if batch.batch_cost <= 0:

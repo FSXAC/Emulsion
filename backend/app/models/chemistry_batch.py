@@ -32,7 +32,7 @@ class ChemistryBatch(Base, TimestampMixin):
     )  # C41, E6, BW, etc.
 
     # Lifecycle dates
-    date_mixed: Mapped[date] = mapped_column(Date, nullable=False)
+    date_mixed: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     date_retired: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
 
     # Costs

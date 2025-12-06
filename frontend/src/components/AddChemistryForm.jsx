@@ -56,7 +56,6 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
     
     if (!formData.name.trim()) newErrors.name = 'Chemistry batch name is required';
     if (!formData.chemistry_type.trim()) newErrors.chemistry_type = 'Chemistry type is required';
-    if (!formData.date_mixed) newErrors.date_mixed = 'Date mixed is required';
     
     // Cost validation - at least one cost must be provided
     const devCost = parseFloat(formData.developer_cost) || 0;
@@ -98,7 +97,7 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
       const submitData = {
         name: formData.name.trim(),
         chemistry_type: formData.chemistry_type,
-        date_mixed: formData.date_mixed,
+        date_mixed: formData.date_mixed || null,
         developer_cost: formData.developer_cost ? parseFloat(formData.developer_cost) : 0,
         fixer_cost: formData.fixer_cost ? parseFloat(formData.fixer_cost) : 0,
         other_cost: formData.other_cost ? parseFloat(formData.other_cost) : 0,
@@ -199,7 +198,7 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             {/* Date Mixed */}
             <div>
               <label htmlFor="date_mixed" className="block text-sm font-medium text-gray-700 mb-1">
-                Date Mixed *
+                Date Mixed
               </label>
               <input
                 type="date"

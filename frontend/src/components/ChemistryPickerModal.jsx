@@ -156,9 +156,11 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
                             </span>
                           </div>
                           
-                          <div>
-                            <span className="font-medium">Mixed:</span> {formatDate(batch.date_mixed)}
-                          </div>
+                          {batch.date_mixed && (
+                            <div>
+                              <span className="font-medium">Mixed:</span> {formatDate(batch.date_mixed)}
+                            </div>
+                          )}
                           
                           {batch.rolls_developed !== null && (
                             <div>

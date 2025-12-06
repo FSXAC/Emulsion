@@ -63,7 +63,7 @@ Expected columns:
 Expected columns:
 - `name` - String (e.g., "C41 Batch #3")
 - `chemistry_type` - String (C41, E6, BW, ECN2, OTHER)
-- `date_mixed` - Date (format: YYYY-MM-DD)
+- `date_mixed` - Date (optional, format: YYYY-MM-DD) - leave empty for unmixed chemistry
 - `date_retired` - Date (optional, format: YYYY-MM-DD)
 - `developer_cost` - Decimal (e.g., 15.00)
 - `fixer_cost` - Decimal (e.g., 8.00)
