@@ -27,6 +27,12 @@ export default function ChemistryPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [duplicateData, setDuplicateData] = useState(null);
+  
+  // Pagination state
+  const [visibleCounts, setVisibleCounts] = useState({
+    active: 4,
+    retired: 4,
+  });
 
   // Fetch chemistry batches on mount
   useEffect(() => {
@@ -160,6 +166,31 @@ export default function ChemistryPage() {
     return `$${numCost.toFixed(2)}`;
   };
 
+  // Separate batches into active and retired
+  const activeBatches = batches.filter(batch => batch.is_active);
+  const retiredBatches = batches.filter(batch => !batch.is_active);
+
+  // Apply pagination
+  const visibleActiveBatches = activeBatches.slice(0, visibleCounts.active);
+  const visibleRetiredBatches = retiredBatches.slice(0, visibleCounts.retired);
+
+  const hasMoreActive = activeBatches.length > visibleCounts.active;
+  const hasMoreRetired = retiredBatches.length > visibleCounts.retired;
+
+  const loadMoreActive = () => {
+    setVisibleCounts(prev => ({
+      ...prev,
+      active: prev.active + 8,
+    }));
+  };
+
+  const loadMoreRetired = () => {
+    setVisibleCounts(prev => ({
+      ...prev,
+      retired: prev.retired + 8,
+    }));
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -182,7 +213,7 @@ export default function ChemistryPage() {
 
   return (
     <div className="pb-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Chemistry Batches</h2>
           <p className="text-xs sm:text-sm text-gray-500">
@@ -212,130 +243,211 @@ export default function ChemistryPage() {
           </button>
         </div>
       ) : (
-        <div className="grid gap-4">
-          {batches.map((batch) => (
-            <div
-              key={batch.id}
-              className={`bg-white rounded-lg shadow-md border-2 p-4 transition-all hover:shadow-lg ${
-                batch.is_active ? 'border-purple-200' : 'border-gray-200 opacity-60'
-              }`}
-            >
-              <div className="flex items-start justify-between">
-                {/* Batch Info */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-bold text-gray-900">{batch.name}</h3>
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      batch.is_active 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      {batch.is_active ? 'Active' : 'Retired'}
-                    </span>
-                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-700">
-                      {batch.chemistry_type}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    {/* Date Mixed */}
-                    {batch.date_mixed && (
-                      <div>
-                        <span className="text-gray-500">Mixed:</span>
-                        <span className="ml-2 font-medium text-gray-900">
-                          {formatDate(batch.date_mixed)}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Date Retired */}
-                    {batch.date_retired && (
-                      <div>
-                        <span className="text-gray-500">Retired:</span>
-                        <span className="ml-2 font-medium text-gray-900">
-                          {formatDate(batch.date_retired)}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Rolls Developed */}
-                    <div>
-                      <span className="text-gray-500">Rolls:</span>
-                      <span className="ml-2 font-medium text-gray-900">
-                        {batch.rolls_developed || 0}
-                      </span>
-                    </div>
-
-                    {/* Cost per Roll */}
-                    <div>
-                      <span className="text-gray-500">Cost/Roll:</span>
-                      <span className="ml-2 font-medium text-green-700">
-                        {formatCost(batch.cost_per_roll)}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* C41 Development Time */}
-                  {batch.chemistry_type === 'C41' && batch.development_time_formatted && (
-                    <div className="mt-3 p-2 bg-purple-50 border border-purple-200 rounded">
-                      <span className="text-sm text-gray-700">
-                        ⏱️ C41 Development Time: 
-                        <span className="ml-2 font-bold text-purple-700">
-                          {batch.development_time_formatted}
-                        </span>
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Notes */}
-                  {batch.notes && (
-                    <div className="mt-2 text-xs text-gray-600 italic">
-                      {batch.notes}
-                    </div>
-                  )}
-                </div>
-
-                {/* Batch Cost */}
-                <div className="text-right ml-4">
-                  <div className="text-xs text-gray-500 mb-1">Total Cost</div>
-                  <div className="text-2xl font-bold text-purple-700">
-                    {formatCost(batch.batch_cost)}
-                  </div>
-                </div>
+        <div className="space-y-6">
+          {/* Active Batches Section */}
+          {activeBatches.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <h3 className="text-lg font-semibold text-gray-900">Active</h3>
+                <span className="text-sm text-gray-500">({activeBatches.length})</span>
               </div>
-
-              {/* Actions */}
-              <div className="mt-3 pt-3 border-t border-gray-200">
-                <div className="flex flex-col gap-2">
-                  {/* Edit button */}
-                  <button
+              <div className="grid gap-3">
+                {visibleActiveBatches.map((batch) => (
+                  <div
+                    key={batch.id}
                     onClick={() => handleEditBatch(batch)}
-                    className="text-sm text-film-cyan hover:text-film-cyan/80 hover:underline text-left transition-colors font-medium"
+                    className="bg-white rounded-2xl shadow-sm hover:shadow-md p-4 transition-all duration-200 border border-[#D9D9D9] hover:border-film-cyan cursor-pointer"
                   >
-                    ✏️ Edit batch
-                  </button>
-                  
-                  {/* Link to view rolls using this batch */}
-                  <Link
-                    to={`/rolls?chemistry=${batch.id}`}
-                    className="text-sm text-film-cyan hover:text-film-cyan/80 hover:underline transition-colors"
-                  >
-                    View {batch.rolls_developed || 0} {batch.rolls_developed === 1 ? 'roll' : 'rolls'} →
-                  </Link>
-                  
-                  {/* Retire button (only show for active batches) */}
-                  {batch.is_active && (
-                    <button
-                      onClick={() => handleRetireBatch(batch.id, batch.name)}
-                      className="text-sm text-gray-600 hover:text-gray-800 hover:underline text-left transition-colors"
-                    >
-                      Retire batch
-                    </button>
-                  )}
-                </div>
+                    {/* Top Section: Name, Type & Cost */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-base font-bold text-gray-900">{batch.name}</h3>
+                          <span className="text-[11px] text-gray-700 bg-gray-100 rounded px-2 py-1">
+                            {batch.chemistry_type}
+                          </span>
+                        </div>
+                        
+                        {/* Date Mixed */}
+                        {batch.date_mixed && (
+                          <div className="text-xs text-gray-600">
+                            Mixed {formatDate(batch.date_mixed)}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Batch Cost */}
+                      <div className="text-right">
+                        <div className="text-xs text-gray-500 mb-0.5">Total</div>
+                        <div className="text-xl font-bold text-purple-700">
+                          {formatCost(batch.batch_cost)}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Stats Block */}
+                    <div className="bg-gray-50 rounded-xl px-3 py-2 space-y-2">
+                      {/* Rolls + Cost per Roll */}
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">
+                          {batch.rolls_developed || 0} {batch.rolls_developed === 1 ? 'roll' : 'rolls'}
+                        </span>
+                        <span className="font-semibold text-gray-800">
+                          {formatCost(batch.cost_per_roll)} <span className="text-xs text-gray-500 font-normal">per roll</span>
+                        </span>
+                      </div>
+
+                      {/* C41 Development Time */}
+                      {batch.chemistry_type === 'C41' && batch.development_time_formatted && (
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span>⏱️ Dev Time</span>
+                          <span className="font-bold text-purple-700">
+                            {batch.development_time_formatted}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Notes */}
+                    {batch.notes && (
+                      <div className="mt-3 bg-gray-50 rounded-xl px-3 py-2 text-xs text-gray-600 italic leading-relaxed">
+                        {batch.notes}
+                      </div>
+                    )}
+
+                    {/* Quick Actions */}
+                    <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
+                      <Link
+                        to={`/rolls?chemistry=${batch.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-xs text-film-cyan hover:text-film-cyan/80 hover:underline transition-colors"
+                      >
+                        View rolls →
+                      </Link>
+                      {batch.is_active && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRetireBatch(batch.id, batch.name);
+                          }}
+                          className="text-xs text-gray-600 hover:text-gray-800 hover:underline transition-colors"
+                        >
+                          Retire
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
+
+              {/* Load More Button for Active */}
+              {hasMoreActive && (
+                <button
+                  onClick={loadMoreActive}
+                  className="w-full mt-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors"
+                >
+                  Load more active batches ({activeBatches.length - visibleCounts.active} remaining)
+                </button>
+              )}
             </div>
-          ))}
+          )}
+
+          {/* Retired Batches Section */}
+          {retiredBatches.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <h3 className="text-lg font-semibold text-gray-900">Retired</h3>
+                <span className="text-sm text-gray-500">({retiredBatches.length})</span>
+              </div>
+              <div className="grid gap-3">
+                {visibleRetiredBatches.map((batch) => (
+                  <div
+                    key={batch.id}
+                    onClick={() => handleEditBatch(batch)}
+                    className="bg-white rounded-2xl shadow-sm hover:shadow-md p-4 transition-all duration-200 border border-gray-200 cursor-pointer opacity-70 hover:opacity-100"
+                  >
+                    {/* Top Section: Name, Type & Cost */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-base font-bold text-gray-900">{batch.name}</h3>
+                          <span className="text-[11px] text-gray-700 bg-gray-100 rounded px-2 py-1">
+                            {batch.chemistry_type}
+                          </span>
+                        </div>
+                        
+                        {/* Dates */}
+                        <div className="text-xs text-gray-600">
+                          {batch.date_mixed && `Mixed ${formatDate(batch.date_mixed)}`}
+                          {batch.date_mixed && batch.date_retired && ' • '}
+                          {batch.date_retired && `Retired ${formatDate(batch.date_retired)}`}
+                        </div>
+                      </div>
+
+                      {/* Batch Cost */}
+                      <div className="text-right">
+                        <div className="text-xs text-gray-500 mb-0.5">Total</div>
+                        <div className="text-xl font-bold text-gray-600">
+                          {formatCost(batch.batch_cost)}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Stats Block */}
+                    <div className="bg-gray-50 rounded-xl px-3 py-2 space-y-2">
+                      {/* Rolls + Cost per Roll */}
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">
+                          {batch.rolls_developed || 0} {batch.rolls_developed === 1 ? 'roll' : 'rolls'}
+                        </span>
+                        <span className="font-semibold text-gray-800">
+                          {formatCost(batch.cost_per_roll)} <span className="text-xs text-gray-500 font-normal">per roll</span>
+                        </span>
+                      </div>
+
+                      {/* C41 Development Time */}
+                      {batch.chemistry_type === 'C41' && batch.development_time_formatted && (
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span>⏱️ Dev Time</span>
+                          <span className="font-bold text-purple-700">
+                            {batch.development_time_formatted}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Notes */}
+                    {batch.notes && (
+                      <div className="mt-3 bg-gray-50 rounded-xl px-3 py-2 text-xs text-gray-600 italic leading-relaxed">
+                        {batch.notes}
+                      </div>
+                    )}
+
+                    {/* Quick Actions */}
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <Link
+                        to={`/rolls?chemistry=${batch.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-xs text-film-cyan hover:text-film-cyan/80 hover:underline transition-colors"
+                      >
+                        View rolls →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Load More Button for Retired */}
+              {hasMoreRetired && (
+                <button
+                  onClick={loadMoreRetired}
+                  className="w-full mt-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors"
+                >
+                  Load more retired batches ({retiredBatches.length - visibleCounts.retired} remaining)
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 
