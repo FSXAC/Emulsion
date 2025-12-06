@@ -1,7 +1,7 @@
 const SkeletonCard = ({ variant = 'roll' }) => {
   if (variant === 'roll') {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-2 mb-2 w-[300px] border border-[#D9D9D9] animate-pulse">
+      <div className="bg-white rounded-2xl shadow-sm p-2 mb-2 border border-[#D9D9D9] animate-pulse">
         {/* Top Section: Thumbnail + Film Info */}
         <div className="flex gap-2 mb-2">
           {/* Left: Film Thumbnail Skeleton */}

@@ -85,7 +85,6 @@ const FilmRollCard = ({ roll, onClick }) => {
         p-2 mb-2 cursor-grab active:cursor-grabbing
         border border-[#D9D9D9] hover:border-film-cyan
         transition-all duration-200 ease-in-out
-        w-[300px]
         ${isDragging ? 'opacity-50 shadow-2xl' : ''}
       `}
     >
