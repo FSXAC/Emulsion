@@ -1,5 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { getFilmStockImage } from '../utils/filmStockImages';
 
 const FilmRollCard = ({ roll, onClick }) => {
   const {
@@ -61,10 +62,10 @@ const FilmRollCard = ({ roll, onClick }) => {
   };
 
   // Render star rating
-  const renderStars = (stars) => {
-    if (!stars || stars === 0) return null;
-    return '⭐'.repeat(stars);
-  };
+  // const renderStars = (stars) => {
+  //   if (!stars || stars === 0) return null;
+  //   return '⭐'.repeat(stars);
+  // };
 
   return (
     <div
@@ -84,9 +85,13 @@ const FilmRollCard = ({ roll, onClick }) => {
     >
       {/* Top Section: Thumbnail + Film Info */}
       <div className="flex gap-2 mb-2">
-        {/* Left: Film Thumbnail Placeholder */}
-        <div className="flex-shrink-0 w-24 h-28 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-xs">
-          {roll.film_format === '35mm' ? '📷' : '🎞️'}
+        {/* Left: Film Thumbnail */}
+        <div className="flex-shrink-0 w-24 h-28 p-2 pl-0 overflow-hidden">
+          <img 
+            src={getFilmStockImage(roll.film_stock_name, roll.film_format)}
+            alt={roll.film_stock_name}
+            className="w-full h-full object-cover"
+          />
         </div>
 
         {/* Right: Film Info Block */}
