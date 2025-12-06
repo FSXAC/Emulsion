@@ -45,7 +45,7 @@ export default function RollsPage() {
   const [chemistryModal, setChemistryModal] = useState({ isOpen: false, roll: null });
   const [ratingModal, setRatingModal] = useState({ isOpen: false, roll: null });
   const [editRollModal, setEditRollModal] = useState({ isOpen: false, roll: null });
-  const [addRollModal, setAddRollModal] = useState({ isOpen: false });
+  const [addRollModal, setAddRollModal] = useState({ isOpen: false, initialData: null });
 
   // Status configuration
   const statusConfig = [
@@ -345,6 +345,16 @@ export default function RollsPage() {
     }
   };
 
+  // Handle duplicate roll (from edit form)
+  const handleDuplicateRoll = (duplicateData) => {
+    // Close edit modal and open add modal with pre-filled data
+    setEditRollModal({ isOpen: false, roll: null });
+    // We need to pass the duplicate data to AddRollForm
+    // For now, just open AddRollForm and show success message
+    setAddRollModal({ isOpen: true, initialData: duplicateData });
+    showToast('📋 Opening form to duplicate roll');
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -375,7 +385,7 @@ export default function RollsPage() {
           </p>
         </div>
         <button 
-          onClick={() => setAddRollModal({ isOpen: true })}
+          onClick={() => setAddRollModal({ isOpen: true, initialData: null })}
           className="btn-primary"
         >
           + Add Roll
@@ -442,13 +452,15 @@ export default function RollsPage() {
         onClose={() => setEditRollModal({ isOpen: false, roll: null })}
         onSubmit={handleEditRoll}
         onDelete={handleDeleteRoll}
+        onDuplicate={handleDuplicateRoll}
         roll={editRollModal.roll}
       />
 
       <AddRollForm
         isOpen={addRollModal.isOpen}
-        onClose={() => setAddRollModal({ isOpen: false })}
+        onClose={() => setAddRollModal({ isOpen: false, initialData: null })}
         onSubmit={handleAddRoll}
+        initialData={addRollModal.initialData}
       />
     </div>
   );

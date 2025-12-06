@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import AutocompleteInput from './AutocompleteInput';
 import { getRolls } from '../services/rolls';
 
-const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, roll }) => {
+const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }) => {
   const [formData, setFormData] = useState({
     order_id: '',
     film_stock_name: '',
@@ -126,6 +126,24 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, roll }) => {
     } catch (err) {
       console.error('Delete error:', err);
     }
+  };
+
+  const handleDuplicate = () => {
+    if (!roll || !onDuplicate) return;
+    
+    // Copy relevant fields for duplication
+    const duplicateData = {
+      order_id: roll.order_id,
+      film_stock_name: roll.film_stock_name,
+      film_format: roll.film_format,
+      expected_exposures: roll.expected_exposures,
+      film_cost: roll.film_cost,
+      push_pull_stops: roll.push_pull_stops,
+      not_mine: roll.not_mine,
+    };
+    
+    onDuplicate(duplicateData);
+    handleClose();
   };
 
   // Calculate estimated cost per shot
@@ -343,36 +361,28 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, roll }) => {
           {/* Actions */}
           <div className="mt-6 pt-4 border-t border-gray-200">
             {/* Delete Confirmation */}
-            {showDeleteConfirm ? (
-              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm font-medium text-red-800 mb-3">
-                  ⚠️ Are you sure you want to delete this roll? This action cannot be undone.
+            {showDeleteConfirm && (
+              <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                <p className="text-xs text-gray-700 mb-2">
+                  Are you sure you want to delete this roll? This action cannot be undone.
                 </p>
-                <div className="flex gap-2">
+                <div className="flex gap-2 justify-end">
                   <button
                     type="button"
                     onClick={() => setShowDeleteConfirm(false)}
-                    className="flex-1 px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm rounded-lg font-medium transition-colors"
+                    className="px-3 py-1 text-xs text-gray-600 hover:text-gray-800 hover:underline transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     onClick={handleDelete}
-                    className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg font-medium transition-colors"
+                    className="px-3 py-1 text-xs text-red-600 hover:text-red-700 font-medium hover:underline transition-colors"
                   >
-                    Yes, Delete
+                    Yes, delete
                   </button>
                 </div>
               </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(true)}
-                className="w-full mb-3 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 rounded-lg font-medium transition-colors text-sm"
-              >
-                🗑️ Delete Roll
-              </button>
             )}
 
             {/* Save/Cancel Actions */}
@@ -384,6 +394,15 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, roll }) => {
               >
                 Cancel
               </button>
+              {roll && roll.status === 'NEW' && onDuplicate && (
+                <button
+                  type="button"
+                  onClick={handleDuplicate}
+                  className="flex-1 px-4 py-2 bg-film-amber hover:bg-film-amber/90 text-white rounded-lg font-medium transition-colors"
+                >
+                  📋 Duplicate
+                </button>
+              )}
               <button
                 type="submit"
                 className="flex-1 px-4 py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors"
@@ -391,6 +410,19 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, roll }) => {
                 Save Changes
               </button>
             </div>
+
+            {/* Delete Link - De-emphasized */}
+            {!showDeleteConfirm && (
+              <div className="mt-3 text-center">
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="text-xs text-red-600 hover:text-red-700 hover:underline transition-colors"
+                >
+                  Delete this roll
+                </button>
+              </div>
+            )}
           </div>
         </form>
       </div>

@@ -580,8 +580,9 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 8.9 Show live cost calculations in forms
 
 ### Phase 8A: Additional Requested Features
-- [ ] Duplicate button for film rolls in the NEW stage. This is so that we can quickly add multiple rolls from the same order. Fields such as order ID, film stock type, expected exposured should be copied.
-- 
+- [X] 8.a.1 Duplicate button for film rolls in the NEW stage. This is so that we can quickly add multiple rolls from the same order. Fields such as order ID, film stock type, expected exposured should be copied.
+- [X] 8.a.2 De-emphasize the delete roll button in edit film roll form, make it a link-style text button. 
+- [X] 8.a.3 Do not show push/pull badge if it's 0.0 stops.
 
 ### Phase 9: Frontend - Chemistry Management
 - [ ] 9.1 Create Chemistry page/view

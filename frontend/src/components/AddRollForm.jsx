@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import AutocompleteInput from './AutocompleteInput';
 import { getRolls } from '../services/rolls';
 
-const AddRollForm = ({ isOpen, onClose, onSubmit }) => {
+const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
   const [formData, setFormData] = useState({
     order_id: '',
     film_stock_name: '',
@@ -17,6 +17,34 @@ const AddRollForm = ({ isOpen, onClose, onSubmit }) => {
   const [errors, setErrors] = useState({});
   const [filmStockSuggestions, setFilmStockSuggestions] = useState([]);
   const [orderIdSuggestions, setOrderIdSuggestions] = useState([]);
+
+  // Populate form with initial data when provided (for duplication)
+  useEffect(() => {
+    if (isOpen && initialData) {
+      setFormData({
+        order_id: initialData.order_id || '',
+        film_stock_name: initialData.film_stock_name || '',
+        film_format: initialData.film_format || '35mm',
+        expected_exposures: initialData.expected_exposures || 36,
+        film_cost: initialData.film_cost || '',
+        push_pull_stops: initialData.push_pull_stops || 0,
+        not_mine: initialData.not_mine || false,
+        notes: '', // Don't copy notes
+      });
+    } else if (isOpen && !initialData) {
+      // Reset to defaults when opening without initial data
+      setFormData({
+        order_id: '',
+        film_stock_name: '',
+        film_format: '35mm',
+        expected_exposures: 36,
+        film_cost: '',
+        push_pull_stops: 0,
+        not_mine: false,
+        notes: '',
+      });
+    }
+  }, [isOpen, initialData]);
 
   // Fetch suggestions when modal opens
   useEffect(() => {
