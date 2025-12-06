@@ -117,11 +117,21 @@ export default function RollsPage() {
     const { active, over } = event;
     setActiveRoll(null);
 
-    if (!over || active.id === over.id) return;
+    // Validate drop target
+    if (!over) return;
+    
+    // Get the target status - check if it's a column or a card
+    let targetStatus;
+    if (over.data?.current?.type === 'status-column') {
+      targetStatus = over.data.current.status;
+    } else if (statusConfig.some(s => s.status === over.id)) {
+      targetStatus = over.id;
+    } else {
+      // Dropped on a card or invalid target - don't do anything
+      return;
+    }
 
     const roll = rolls.find((r) => r.id === active.id);
-    const targetStatus = over.id;
-
     if (!roll || roll.status === targetStatus) return;
 
     try {
@@ -235,12 +245,11 @@ export default function RollsPage() {
     if (!roll) return;
 
     try {
-      const updatedRoll = await assignChemistry(roll.id, chemistryId);
+      await assignChemistry(roll.id, chemistryId);
       
-      // Update local state
-      setRolls((prevRolls) =>
-        prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
-      );
+      // Refresh all rolls to update cost calculations
+      // (chemistry cost is amortized across all rolls using that batch)
+      await fetchRolls();
       
       showToast('🧪 Chemistry batch assigned successfully');
     } catch (err) {
