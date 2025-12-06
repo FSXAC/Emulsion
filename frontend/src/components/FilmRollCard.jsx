@@ -52,109 +52,146 @@ const FilmRollCard = ({ roll, onClick }) => {
       {...listeners}
       onClick={handleClick}
       className={`
-        bg-white rounded-lg shadow-md hover:shadow-lg
-        p-3 mb-2 cursor-grab active:cursor-grabbing
-        border border-gray-200 hover:border-film-cyan
+        bg-white rounded-2xl shadow-sm hover:shadow-md
+        p-2 mb-2 cursor-grab active:cursor-grabbing
+        border border-[#D9D9D9] hover:border-film-cyan
         transition-all duration-200 ease-in-out
-        touch-friendly
+        w-[300px]
         ${isDragging ? 'opacity-50 shadow-2xl' : ''}
       `}
     >
-      {/* Film Stock Name */}
-      <div className="font-bold text-gray-900 text-base mb-2 leading-tight">
-        {roll.film_stock_name}
+      {/* Top Section: Thumbnail + Film Info */}
+      <div className="flex gap-2 mb-2">
+        {/* Left: Film Thumbnail Placeholder */}
+        <div className="flex-shrink-0 w-24 h-28 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-xs">
+          {roll.film_format === '35mm' ? '📷' : '🎞️'}
+        </div>
+
+        {/* Right: Film Info Block */}
+        <div className="flex-1 flex flex-col justify-between">
+          <div className="flex flex-col gap-0">
+            {/* Film Stock Name */}
+            <div className="font-bold text-gray-900 text-base leading-tight">
+              {roll.film_stock_name}
+            </div>
+
+            {/* Format + Exposures */}
+            <div className="text-xs text-gray-600 flex items-center gap-1.5">
+            <span>{roll.film_format}</span>
+            <span className="text-gray-400">•</span>
+            <span>{roll.expected_exposures} exp</span>
+            {roll.actual_exposures && roll.actual_exposures !== roll.expected_exposures && (
+              <span className={`font-bold ${roll.actual_exposures >= roll.expected_exposures ? 'text-green-600' : 'text-orange-600'}`}>
+              ({roll.actual_exposures})
+              </span>
+            )}
+            </div>
+
+            {/* Order Tag & Not Mine Flag Row */}
+            {(roll.order_id || roll.not_mine) && (
+              <div className="flex items-center gap-2 flex-wrap mt-1">
+                {roll.order_id && (
+                  <div className="text-[11px] text-gray-700 bg-gray-100 rounded px-2 py-1">
+                    Order #{roll.order_id}
+                  </div>
+                )}
+                {roll.not_mine && (
+                  <div className="text-[11px] text-gray-700 bg-gray-100 rounded px-2 py-1">
+                    👥 Friend's
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Rating + Push/Pull Row */}
+          <div className="flex items-center justify-between">
+            {/* Left: Star Rating */}
+            <div className="flex items-center gap-0.5 text-base">
+              {roll.stars > 0 ? (
+                <>
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <span key={i} className='text-gray-800'>
+                      {i < roll.stars ? '★' : '•'}
+                    </span>
+                  ))}
+                </>
+              ) : (
+                <span className="text-gray-400 text-xs">Unrated</span>
+              )}
+            </div>
+
+            {/* Right: Push/Pull Tag */}
+            {roll.push_pull_stops && Math.abs(roll.push_pull_stops) > 0 && (
+              <div className="text-[11px] text-gray-700 bg-gray-100 rounded px-2 py-1">
+                {roll.push_pull_stops > 0 ? '+' : ''}{roll.push_pull_stops} ⚡
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Format & Exposures */}
-      <div className="text-sm text-gray-600 mb-3 flex items-center gap-2">
-        <span className="inline-flex items-center gap-1">
-          <span className="text-gray-400">📸</span>
-          {roll.film_format}
-        </span>
-        <span className="text-gray-400">•</span>
-        <span>{roll.expected_exposures} exp</span>
-        {roll.actual_exposures && roll.actual_exposures !== roll.expected_exposures && (
-          <span className="text-film-amber font-medium">({roll.actual_exposures})</span>
+      {/* Cost + Date Stats Block */}
+      <div className="bg-gray-50 rounded-xl px-2 py-2 mb-2 space-y-2">
+        {/* Top Row: Dates + Per Shot Cost */}
+        {(roll.date_loaded || roll.date_unloaded || roll.cost_per_shot !== null) && (
+          <div className="flex items-center justify-between text-sm">
+            <div className="text-gray-800">
+              {roll.date_loaded && roll.date_unloaded ? (
+                <>
+                  <span className="font-bold">{formatDate(roll.date_loaded)}</span>
+                  <span className="text-xs text-gray-500 font-normal mx-1">→</span>
+                  <span className="font-bold">{formatDate(roll.date_unloaded)}</span>
+                </>
+              ) : roll.date_loaded ? (
+                <span className="font-bold">{formatDate(roll.date_loaded)}</span>
+              ) : (
+                <span className="text-gray-400">No dates</span>
+              )}
+            </div>
+            {roll.cost_per_shot !== null && (
+              <div className="font-semibold text-gray-800">
+                {formatCost(roll.cost_per_shot)} <span className="text-xs text-gray-500 font-normal">per shot</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Second Row: Days Loaded + Cost Breakdown */}
+        {(roll.duration_days !== null || roll.film_cost !== null || roll.dev_cost !== null) && (
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <div>
+              {roll.duration_days !== null && roll.duration_days !== undefined ? (
+                <>
+                  {roll.duration_days} {roll.duration_days === 1 ? 'day' : 'days'} loaded
+                </>
+              ) : (
+                <span className="text-gray-400">—</span>
+              )}
+            </div>
+            {(roll.film_cost !== null || roll.dev_cost !== null) && (
+              <div>
+                {roll.film_cost !== null && `${formatCost(roll.film_cost)} film`}
+                {roll.film_cost !== null && roll.dev_cost !== null && ' + '}
+                {roll.dev_cost !== null && `${formatCost(roll.dev_cost)} dev`}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Show total cost if dates/breakdown aren't present */}
+        {roll.total_cost !== null && !roll.cost_per_shot && (
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-600">Total</span>
+            <span className="font-bold text-gray-800">{formatCost(roll.total_cost)}</span>
+          </div>
         )}
       </div>
 
-      {/* Order ID */}
-      {roll.order_id && (
-        <div className="text-xs text-gray-500 bg-gray-50 rounded px-2 py-1 inline-block mb-3">
-          Order #{roll.order_id}
-        </div>
-      )}
-
-      {/* Not Mine Flag */}
-      {roll.not_mine && (
-        <div className="inline-flex items-center gap-1 px-2 py-1 mb-3 text-xs bg-film-cyan/10 text-film-cyan border border-film-cyan/30 rounded-full font-medium">
-          👥 Friend's roll
-        </div>
-      )}
-
-      {/* Dates */}
-      {(roll.date_loaded || roll.date_unloaded) && (
-        <div className="text-sm text-gray-700 mb-3 bg-gray-50 rounded px-3 py-2">
-          <div className="flex items-center gap-2">
-            <span>📅</span>
-            <span className="font-medium">{formatDate(roll.date_loaded)}</span>
-            {roll.date_unloaded && (
-              <>
-                <span className="text-gray-400">→</span>
-                <span className="font-medium">{formatDate(roll.date_unloaded)}</span>
-              </>
-            )}
-          </div>
-          {roll.duration_days !== null && roll.duration_days !== undefined && (
-            <div className="text-xs text-gray-500 mt-1">
-              {roll.duration_days} {roll.duration_days === 1 ? 'day' : 'days'} loaded
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Costs */}
-      {roll.total_cost !== null && (
-        <div className="text-sm mb-3 bg-green-50 border border-green-200 rounded px-3 py-2">
-          <div className="flex items-center justify-between">
-            <span className="text-gray-600">💰 Total</span>
-            <span className="font-bold text-green-700">{formatCost(roll.total_cost)}</span>
-          </div>
-          {roll.cost_per_shot !== null && (
-            <div className="flex items-center justify-between mt-1 text-xs">
-              <span className="text-gray-500">Per shot</span>
-              <span className="text-gray-700">{formatCost(roll.cost_per_shot)}</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Chemistry */}
-      {roll.chemistry_id && (
-        <div className="text-sm text-gray-700 mb-3 bg-purple-50 border border-purple-200 rounded px-3 py-2 inline-flex items-center gap-2">
-          <span>🧪</span>
-          <span className="text-purple-700 font-medium">Developed</span>
-        </div>
-      )}
-
-      {/* Push/Pull */}
-      {roll.push_pull_stops && Math.abs(roll.push_pull_stops) > 0 && (
-        <div className="inline-flex items-center gap-1 px-2 py-1 mb-2 text-xs bg-film-red/10 text-film-red border border-film-red/30 rounded font-bold">
-          ⚡ {roll.push_pull_stops > 0 ? '+' : ''}{roll.push_pull_stops} stop{Math.abs(roll.push_pull_stops) !== 1 ? 's' : ''}
-        </div>
-      )}
-
-      {/* Rating */}
-      {roll.stars > 0 && (
-        <div className="text-xl mt-2 pt-2 border-t border-gray-200">
-          {renderStars(roll.stars)}
-        </div>
-      )}
-
-      {/* Notes preview */}
+      {/* Comments Block */}
       {roll.notes && (
-        <div className="text-xs text-gray-500 mt-3 pt-3 border-t border-gray-100 italic line-clamp-2">
-          💭 {roll.notes}
+        <div className="bg-gray-50 rounded-xl px-2 py-2 text-xs text-gray-600 italic leading-relaxed">
+          {roll.notes}
         </div>
       )}
     </div>
