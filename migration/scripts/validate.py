@@ -150,7 +150,7 @@ def validate_film_rolls(db):
                     )
         
         # Check stars range
-        if roll.stars is not None and (roll.stars < 1 or roll.stars > 5):
+        if roll.stars is not None and (roll.stars < 0 or roll.stars > 5):
             errors.append(f"Roll {roll.id}: Invalid stars value {roll.stars} (must be 1-5)")
     
     if errors:

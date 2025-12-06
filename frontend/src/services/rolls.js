@@ -6,7 +6,7 @@ import api from './api';
  */
 
 // List all film rolls with optional filtering and pagination
-export const getRolls = async ({ skip = 0, limit = 100, status = null, orderId = null } = {}) => {
+export const getRolls = async ({ skip = 0, limit = 999, status = null, orderId = null } = {}) => {
   const params = { skip, limit };
   if (status) params.status = status;
   if (orderId) params.order_id = orderId;
