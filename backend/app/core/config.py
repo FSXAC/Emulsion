@@ -21,17 +21,14 @@ class Settings(BaseSettings):
     # Default to backend/data/emulsion.db
     database_url: str = "sqlite:///" + str(Path(__file__).parent.parent.parent / "data" / "emulsion.db")
     
-    # CORS - Allow all local origins (for development and production)
-    # In production on same origin (localhost:8000), CORS is not needed
-    # But this allows dev server and network access
+    # CORS - Allow local development and production origins
+    # The wildcard allows network access from other devices on local network
     cors_origins: list[str] = [
         "http://localhost:5173",  # Vite dev server
-        "http://localhost:3000",  # Alternative dev server
         "http://localhost:8000",  # Production server
         "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000",
         "http://127.0.0.1:8000",
-        "*",  # Allow all origins for local network access
+        "*",  # Allow network access (e.g., http://192.168.x.x:8000)
     ]
     
     model_config = SettingsConfigDict(

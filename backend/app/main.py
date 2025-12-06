@@ -37,17 +37,16 @@ app.add_middleware(
 # Include API routes FIRST (before catch-all routes)
 app.include_router(api_router)
 
-# Serve frontend static files (production mode)
+# Production mode: serve frontend static files and handle SPA routing
 frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "dist"
 if frontend_dist.exists():
-    # Mount static assets with specific path
+    from fastapi import HTTPException, Request
+    from fastapi.responses import JSONResponse
+    
+    # Mount static assets (CSS, JS, images, etc.)
     assets_path = frontend_dist / "assets"
     if assets_path.exists():
         app.mount("/assets", StaticFiles(directory=str(assets_path)), name="assets")
-    
-    from fastapi import HTTPException, Request
-    from fastapi.responses import JSONResponse
-    from starlette.exceptions import HTTPException as StarletteHTTPException
     
     @app.get("/", include_in_schema=False)
     async def serve_root():
@@ -56,14 +55,19 @@ if frontend_dist.exists():
     
     @app.exception_handler(404)
     async def custom_404_handler(request: Request, exc: HTTPException):
-        """Handle 404 errors - serve frontend for non-API routes, otherwise return 404"""
+        """
+        Custom 404 handler that supports SPA routing.
+        
+        - API routes get JSON 404 responses
+        - All other routes serve index.html (for client-side routing)
+        """
         path = request.url.path
         
-        # If it's an API route, return proper 404 JSON
+        # Return JSON 404 for API and documentation routes
         if path.startswith("/api/") or path.startswith("/docs") or path.startswith("/redoc") or path.startswith("/openapi.json"):
             return JSONResponse(status_code=404, content={"detail": "Not Found"})
         
-        # For all other routes, serve the frontend (SPA routing)
+        # Serve index.html for all other routes (SPA client-side routing)
         return FileResponse(frontend_dist / "index.html")
 else:
     @app.get("/")
