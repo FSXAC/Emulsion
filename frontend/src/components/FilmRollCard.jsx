@@ -46,19 +46,25 @@ const FilmRollCard = ({ roll, onClick }) => {
       return roll.cost_per_shot;
     }
     
-    // Calculate on frontend
+    // Calculate on frontend otherwise
     const exposures = roll.actual_exposures || roll.expected_exposures;
     if (!exposures || exposures === 0) return null;
     
-    const filmCost = roll.film_cost || 0;
-    const devCost = roll.dev_cost || 0;
+    // Parse costs as numbers, handling string values
+    const filmCost = typeof roll.film_cost === 'string' ? parseFloat(roll.film_cost) || 0 : roll.film_cost || 0;
+    const devCost = typeof roll.dev_cost === 'string' ? parseFloat(roll.dev_cost) || 0 : roll.dev_cost || 0;
     
     // For "not mine" rolls, only count dev cost
     const totalCost = roll.not_mine ? devCost : (filmCost + devCost);
     
     if (totalCost === 0) return null;
+
+    const costPerShot = totalCost / exposures;
     
-    return totalCost / exposures;
+    // Safety check for NaN
+    if (isNaN(costPerShot)) return null;
+
+    return costPerShot;
   };
 
   // Render star rating
@@ -203,14 +209,6 @@ const FilmRollCard = ({ roll, onClick }) => {
                 {roll.dev_cost !== null && `${formatCost(roll.dev_cost)} dev`}
               </div>
             )}
-          </div>
-        )}
-
-        {/* Show total cost if dates/breakdown aren't present */}
-        {roll.total_cost !== null && calculateCostPerShot() === null && (
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">Total</span>
-            <span className="font-bold text-gray-800">{formatCost(roll.total_cost)}</span>
           </div>
         )}
       </div>
