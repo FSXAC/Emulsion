@@ -143,7 +143,18 @@ export default function RollsPage() {
 
   // Group rolls by status
   const rollsByStatus = statusConfig.reduce((acc, { status }) => {
-    acc[status] = rolls.filter((roll) => roll.status === status);
+    const filteredRolls = rolls.filter((roll) => roll.status === status);
+    
+    // Sort SCANNED rolls by most recent unload date
+    if (status === 'SCANNED') {
+      filteredRolls.sort((a, b) => {
+        const dateA = a.date_unloaded ? new Date(a.date_unloaded) : new Date(0);
+        const dateB = b.date_unloaded ? new Date(b.date_unloaded) : new Date(0);
+        return dateB - dateA; // Most recent first
+      });
+    }
+    
+    acc[status] = filteredRolls;
     return acc;
   }, {});
 
