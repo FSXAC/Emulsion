@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import AutocompleteInput from './AutocompleteInput';
+import { getRolls } from '../services/rolls';
 
-const EditRollForm = ({ isOpen, onClose, onSubmit, roll }) => {
+const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, roll }) => {
   const [formData, setFormData] = useState({
     order_id: '',
     film_stock_name: '',
@@ -13,6 +15,33 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, roll }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [filmStockSuggestions, setFilmStockSuggestions] = useState([]);
+  const [orderIdSuggestions, setOrderIdSuggestions] = useState([]);
+
+  // Fetch suggestions when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchSuggestions();
+    }
+  }, [isOpen]);
+
+  const fetchSuggestions = async () => {
+    try {
+      const data = await getRolls({ limit: 1000 });
+      const rolls = Array.isArray(data) ? data : data.rolls || [];
+      
+      // Extract unique film stock names
+      const stockNames = [...new Set(rolls.map(r => r.film_stock_name).filter(Boolean))];
+      setFilmStockSuggestions(stockNames.sort());
+      
+      // Extract unique order IDs
+      const orderIds = [...new Set(rolls.map(r => r.order_id).filter(Boolean))];
+      setOrderIdSuggestions(orderIds.sort());
+    } catch (err) {
+      console.error('Failed to fetch suggestions:', err);
+    }
+  };
 
   // Populate form when roll changes
   useEffect(() => {
@@ -84,7 +113,29 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, roll }) => {
 
   const handleClose = () => {
     setErrors({});
+    setShowDeleteConfirm(false);
     onClose();
+  };
+
+  const handleDelete = async () => {
+    if (!roll) return;
+    
+    try {
+      await onDelete(roll.id);
+      handleClose();
+    } catch (err) {
+      console.error('Delete error:', err);
+    }
+  };
+
+  // Calculate estimated cost per shot
+  const calculateCostPerShot = () => {
+    const filmCost = parseFloat(formData.film_cost) || 0;
+    const exposures = parseInt(formData.expected_exposures) || 1;
+    if (filmCost > 0 && exposures > 0) {
+      return (filmCost / exposures).toFixed(3);
+    }
+    return null;
   };
 
   const handleBackdropClick = (e) => {
@@ -116,16 +167,16 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, roll }) => {
               <label htmlFor="order_id" className="block text-sm font-medium text-gray-700 mb-1">
                 Order ID *
               </label>
-              <input
-                type="text"
+              <AutocompleteInput
                 id="order_id"
                 name="order_id"
                 value={formData.order_id}
                 onChange={handleChange}
+                suggestions={orderIdSuggestions}
+                placeholder="e.g., 42"
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
                   errors.order_id ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="e.g., 42"
               />
               {errors.order_id && <p className="mt-1 text-xs text-red-600">{errors.order_id}</p>}
             </div>
@@ -135,16 +186,16 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, roll }) => {
               <label htmlFor="film_stock_name" className="block text-sm font-medium text-gray-700 mb-1">
                 Film Stock *
               </label>
-              <input
-                type="text"
+              <AutocompleteInput
                 id="film_stock_name"
                 name="film_stock_name"
                 value={formData.film_stock_name}
                 onChange={handleChange}
+                suggestions={filmStockSuggestions}
+                placeholder="e.g., Kodak Portra 400"
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
                   errors.film_stock_name ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="e.g., Kodak Portra 400"
               />
               {errors.film_stock_name && <p className="mt-1 text-xs text-red-600">{errors.film_stock_name}</p>}
             </div>
@@ -262,21 +313,84 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, roll }) => {
             />
           </div>
 
+          {/* Cost Preview */}
+          {formData.film_cost && formData.expected_exposures && (
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700">Film Cost:</span>
+                <span className="text-lg font-bold text-green-700">
+                  ${parseFloat(formData.film_cost).toFixed(2)}
+                </span>
+              </div>
+              {calculateCostPerShot() && (
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-600">
+                    Estimated cost per shot ({formData.expected_exposures} exposures):
+                  </span>
+                  <span className="text-sm font-semibold text-green-600">
+                    ${calculateCostPerShot()}/shot
+                  </span>
+                </div>
+              )}
+              {formData.not_mine && (
+                <p className="text-xs text-gray-500 mt-2 italic">
+                  👥 This cost will not be included in your totals (friend's roll)
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Actions */}
-          <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={handleClose}
-              className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-4 py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors"
-            >
-              Save Changes
-            </button>
+          <div className="mt-6 pt-4 border-t border-gray-200">
+            {/* Delete Confirmation */}
+            {showDeleteConfirm ? (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm font-medium text-red-800 mb-3">
+                  ⚠️ Are you sure you want to delete this roll? This action cannot be undone.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="flex-1 px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm rounded-lg font-medium transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg font-medium transition-colors"
+                  >
+                    Yes, Delete
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="w-full mb-3 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 rounded-lg font-medium transition-colors text-sm"
+              >
+                🗑️ Delete Roll
+              </button>
+            )}
+
+            {/* Save/Cancel Actions */}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors"
+              >
+                Save Changes
+              </button>
+            </div>
           </div>
         </form>
       </div>

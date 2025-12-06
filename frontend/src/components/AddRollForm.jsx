@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import AutocompleteInput from './AutocompleteInput';
+import { getRolls } from '../services/rolls';
 
 const AddRollForm = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -13,6 +15,32 @@ const AddRollForm = ({ isOpen, onClose, onSubmit }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const [filmStockSuggestions, setFilmStockSuggestions] = useState([]);
+  const [orderIdSuggestions, setOrderIdSuggestions] = useState([]);
+
+  // Fetch suggestions when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchSuggestions();
+    }
+  }, [isOpen]);
+
+  const fetchSuggestions = async () => {
+    try {
+      const data = await getRolls({ limit: 1000 });
+      const rolls = Array.isArray(data) ? data : data.rolls || [];
+      
+      // Extract unique film stock names
+      const stockNames = [...new Set(rolls.map(r => r.film_stock_name).filter(Boolean))];
+      setFilmStockSuggestions(stockNames.sort());
+      
+      // Extract unique order IDs
+      const orderIds = [...new Set(rolls.map(r => r.order_id).filter(Boolean))];
+      setOrderIdSuggestions(orderIds.sort());
+    } catch (err) {
+      console.error('Failed to fetch suggestions:', err);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -87,6 +115,16 @@ const AddRollForm = ({ isOpen, onClose, onSubmit }) => {
     }
   };
 
+  // Calculate estimated cost per shot
+  const calculateCostPerShot = () => {
+    const filmCost = parseFloat(formData.film_cost) || 0;
+    const exposures = parseInt(formData.expected_exposures) || 1;
+    if (filmCost > 0 && exposures > 0) {
+      return (filmCost / exposures).toFixed(3);
+    }
+    return null;
+  };
+
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto"
@@ -107,16 +145,16 @@ const AddRollForm = ({ isOpen, onClose, onSubmit }) => {
               <label htmlFor="order_id" className="block text-sm font-medium text-gray-700 mb-1">
                 Order ID *
               </label>
-              <input
-                type="text"
+              <AutocompleteInput
                 id="order_id"
                 name="order_id"
                 value={formData.order_id}
                 onChange={handleChange}
+                suggestions={orderIdSuggestions}
+                placeholder="e.g., 42"
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
                   errors.order_id ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="e.g., 42"
               />
               {errors.order_id && <p className="mt-1 text-xs text-red-600">{errors.order_id}</p>}
             </div>
@@ -126,16 +164,16 @@ const AddRollForm = ({ isOpen, onClose, onSubmit }) => {
               <label htmlFor="film_stock_name" className="block text-sm font-medium text-gray-700 mb-1">
                 Film Stock *
               </label>
-              <input
-                type="text"
+              <AutocompleteInput
                 id="film_stock_name"
                 name="film_stock_name"
                 value={formData.film_stock_name}
                 onChange={handleChange}
+                suggestions={filmStockSuggestions}
+                placeholder="e.g., Kodak Portra 400"
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
                   errors.film_stock_name ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="e.g., Kodak Portra 400"
               />
               {errors.film_stock_name && <p className="mt-1 text-xs text-red-600">{errors.film_stock_name}</p>}
             </div>
@@ -252,6 +290,33 @@ const AddRollForm = ({ isOpen, onClose, onSubmit }) => {
               placeholder="Any additional notes about this roll..."
             />
           </div>
+
+          {/* Cost Preview */}
+          {formData.film_cost && formData.expected_exposures && (
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700">Film Cost:</span>
+                <span className="text-lg font-bold text-green-700">
+                  ${parseFloat(formData.film_cost).toFixed(2)}
+                </span>
+              </div>
+              {calculateCostPerShot() && (
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-600">
+                    Estimated cost per shot ({formData.expected_exposures} exposures):
+                  </span>
+                  <span className="text-sm font-semibold text-green-600">
+                    ${calculateCostPerShot()}/shot
+                  </span>
+                </div>
+              )}
+              {formData.not_mine && (
+                <p className="text-xs text-gray-500 mt-2 italic">
+                  👥 This cost will not be included in your totals (friend's roll)
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200">

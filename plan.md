@@ -569,12 +569,19 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 7.8 Add toast notifications for success/errors
 
 ### Phase 8: Frontend - Forms
-- [ ] 8.1 Create AddRollForm component
-- [ ] 8.2 Create EditRollForm component
-- [ ] 8.3 Create AddChemistryForm component
-- [ ] 8.4 Implement autocomplete for film stock names
-- [ ] 8.5 Implement autocomplete for order IDs
-- [ ] 8.6 Show live cost calculations in forms
+- [X] 8.1 Create AddRollForm component
+- [X] 8.2 Create EditRollForm component
+- [X] 8.3 Create AddChemistryForm component
+- [X] 8.4 Add delete button to EditRollForm (dangerous action)
+- [X] 8.5 Wire AddRollForm to RollsPage "+ Add Roll" button
+- [ ] 8.6 Wire AddChemistryForm to Chemistry page (Phase 9)
+- [X] 8.7 Implement autocomplete for film stock names
+- [X] 8.8 Implement autocomplete for order IDs
+- [X] 8.9 Show live cost calculations in forms
+
+### Phase 8A: Additional Requested Features
+- [ ] Duplicate button for film rolls in the NEW stage. This is so that we can quickly add multiple rolls from the same order. Fields such as order ID, film stock type, expected exposured should be copied.
+- 
 
 ### Phase 9: Frontend - Chemistry Management
 - [ ] 9.1 Create Chemistry page/view

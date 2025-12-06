@@ -16,7 +16,8 @@ import DatePickerModal from '../components/DatePickerModal';
 import ChemistryPickerModal from '../components/ChemistryPickerModal';
 import RatingModal from '../components/RatingModal';
 import EditRollForm from '../components/EditRollForm';
-import { getRolls, updateRoll, loadRoll, unloadRoll, assignChemistry, rateRoll } from '../services/rolls';
+import AddRollForm from '../components/AddRollForm';
+import { getRolls, createRoll, updateRoll, deleteRoll, loadRoll, unloadRoll, assignChemistry, rateRoll } from '../services/rolls';
 
 // Simple toast notification function
 const showToast = (message, type = 'success') => {
@@ -44,6 +45,7 @@ export default function RollsPage() {
   const [chemistryModal, setChemistryModal] = useState({ isOpen: false, roll: null });
   const [ratingModal, setRatingModal] = useState({ isOpen: false, roll: null });
   const [editRollModal, setEditRollModal] = useState({ isOpen: false, roll: null });
+  const [addRollModal, setAddRollModal] = useState({ isOpen: false });
 
   // Status configuration
   const statusConfig = [
@@ -311,6 +313,38 @@ export default function RollsPage() {
     }
   };
 
+  // Handle delete roll
+  const handleDeleteRoll = async (rollId) => {
+    try {
+      await deleteRoll(rollId);
+      
+      // Remove from local state
+      setRolls((prevRolls) => prevRolls.filter((r) => r.id !== rollId));
+      
+      showToast('🗑️ Roll deleted successfully');
+    } catch (err) {
+      console.error('Failed to delete roll:', err);
+      showToast(`Failed to delete roll: ${err.message}`, 'error');
+      throw err; // Re-throw to let form handle it
+    }
+  };
+
+  // Handle add roll form submission
+  const handleAddRoll = async (formData) => {
+    try {
+      const newRoll = await createRoll(formData);
+      
+      // Add to local state
+      setRolls((prevRolls) => [...prevRolls, newRoll]);
+      
+      showToast('🎞️ Roll added successfully');
+    } catch (err) {
+      console.error('Failed to create roll:', err);
+      showToast(`Failed to create roll: ${err.message}`, 'error');
+      throw err; // Re-throw to let form handle it
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -340,7 +374,12 @@ export default function RollsPage() {
             Drag rolls between columns to update their status
           </p>
         </div>
-        <button className="btn-primary">+ Add Roll</button>
+        <button 
+          onClick={() => setAddRollModal({ isOpen: true })}
+          className="btn-primary"
+        >
+          + Add Roll
+        </button>
       </div>
 
       <DndContext
@@ -402,7 +441,14 @@ export default function RollsPage() {
         isOpen={editRollModal.isOpen}
         onClose={() => setEditRollModal({ isOpen: false, roll: null })}
         onSubmit={handleEditRoll}
+        onDelete={handleDeleteRoll}
         roll={editRollModal.roll}
+      />
+
+      <AddRollForm
+        isOpen={addRollModal.isOpen}
+        onClose={() => setAddRollModal({ isOpen: false })}
+        onSubmit={handleAddRoll}
       />
     </div>
   );
