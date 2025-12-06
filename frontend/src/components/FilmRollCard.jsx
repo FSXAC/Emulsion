@@ -38,6 +38,28 @@ const FilmRollCard = ({ roll, onClick }) => {
     return `$${numCost.toFixed(2)}`;
   };
 
+  // Calculate cost per shot if not provided by backend
+  const calculateCostPerShot = () => {
+    // Use backend value if available
+    if (roll.cost_per_shot !== null && roll.cost_per_shot !== undefined) {
+      return roll.cost_per_shot;
+    }
+    
+    // Calculate on frontend
+    const exposures = roll.actual_exposures || roll.expected_exposures;
+    if (!exposures || exposures === 0) return null;
+    
+    const filmCost = roll.film_cost || 0;
+    const devCost = roll.dev_cost || 0;
+    
+    // For "not mine" rolls, only count dev cost
+    const totalCost = roll.not_mine ? devCost : (filmCost + devCost);
+    
+    if (totalCost === 0) return null;
+    
+    return totalCost / exposures;
+  };
+
   // Render star rating
   const renderStars = (stars) => {
     if (!stars || stars === 0) return null;
@@ -134,7 +156,7 @@ const FilmRollCard = ({ roll, onClick }) => {
       {/* Cost + Date Stats Block */}
       <div className="bg-gray-50 rounded-xl px-2 py-2 mb-2 space-y-2">
         {/* Top Row: Dates + Per Shot Cost */}
-        {(roll.date_loaded || roll.date_unloaded || roll.cost_per_shot !== null) && (
+        {(roll.date_loaded || roll.date_unloaded || calculateCostPerShot() !== null) && (
           <div className="flex items-center justify-between text-sm">
             <div className="text-gray-800">
               {roll.date_loaded && roll.date_unloaded ? (
@@ -149,9 +171,9 @@ const FilmRollCard = ({ roll, onClick }) => {
                 <span className="text-gray-400">No dates</span>
               )}
             </div>
-            {roll.cost_per_shot !== null && (
+            {calculateCostPerShot() !== null && (
               <div className="font-semibold text-gray-800">
-                {formatCost(roll.cost_per_shot)} <span className="text-xs text-gray-500 font-normal">per shot</span>
+                {formatCost(calculateCostPerShot())} <span className="text-xs text-gray-500 font-normal">per shot</span>
               </div>
             )}
           </div>
@@ -180,7 +202,7 @@ const FilmRollCard = ({ roll, onClick }) => {
         )}
 
         {/* Show total cost if dates/breakdown aren't present */}
-        {roll.total_cost !== null && !roll.cost_per_shot && (
+        {roll.total_cost !== null && calculateCostPerShot() === null && (
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600">Total</span>
             <span className="font-bold text-gray-800">{formatCost(roll.total_cost)}</span>
