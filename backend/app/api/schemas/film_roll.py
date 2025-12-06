@@ -47,10 +47,25 @@ class FilmRollUpdate(BaseModel):
     notes: Optional[str] = None
 
 
-class FilmRollResponse(FilmRollBase):
+class FilmRollResponse(BaseModel):
     """Schema for film roll response with computed fields."""
     
     id: str
+    order_id: str
+    film_stock_name: str
+    film_format: str
+    expected_exposures: int
+    actual_exposures: Optional[int] = None
+    date_loaded: Optional[date] = None
+    date_unloaded: Optional[date] = None
+    push_pull_stops: Optional[Decimal] = None
+    chemistry_id: Optional[str] = None
+    stars: Optional[int] = Field(None, ge=0, le=5, description="Rating (0-5 stars, 0 means unrated)")
+    film_cost: Decimal
+    not_mine: bool
+    notes: Optional[str] = None
+    
+    # Computed fields
     status: str = Field(..., description="Derived status (NEW, LOADED, EXPOSED, DEVELOPED, SCANNED)")
     dev_cost: Optional[Decimal] = Field(None, description="Development cost from chemistry")
     total_cost: Optional[Decimal] = Field(None, description="Total cost (film + dev)")

@@ -551,15 +551,15 @@ Since you're not familiar with Node/TS, you have options:
 - [ ] 5.6 Test frontend dev server runs **← NEXT**
 
 ### Phase 6: Frontend - Kanban Board UI
-- [ ] 6.1 Create FilmRollCard component
-- [ ] 6.2 Create StatusColumn component (New, Loaded, Exposed, etc.)
-- [ ] 6.3 Set up dnd-kit drag-and-drop context
-- [ ] 6.4 Implement drag-and-drop between columns
-- [ ] 6.5 Fetch rolls from API and display in columns
-- [ ] 6.6 Test drag-drop UI works (no API calls yet)
+- [X] 6.1 Create FilmRollCard component
+- [X] 6.2 Create StatusColumn component (New, Loaded, Exposed, etc.)
+- [X] 6.3 Set up dnd-kit drag-and-drop context
+- [X] 6.4 Implement drag-and-drop between columns
+- [X] 6.5 Fetch rolls from API and display in columns
+- [X] 6.6 Test drag-drop UI works
 
 ### Phase 7: Frontend - Actions & Modals
-- [ ] 7.1 Create DatePickerModal component
+- [ ] 7.1 Create DatePickerModal component **← NEXT**
 - [ ] 7.2 Create ChemistryPickerModal component
 - [ ] 7.3 Create RatingModal component (star selector)
 - [ ] 7.4 Wire up drag-to-load action (calls PATCH /load)
