@@ -15,6 +15,8 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [filmStockSuggestions, setFilmStockSuggestions] = useState([]);
   const [orderIdSuggestions, setOrderIdSuggestions] = useState([]);
@@ -95,6 +97,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
     
     if (!validate()) return;
 
+    setIsSubmitting(true);
     try {
       // Convert string values to proper types
       const submitData = {
@@ -108,6 +111,9 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
       handleClose();
     } catch (err) {
       console.error('Form submission error:', err);
+      setErrors({ submit: err.message || 'Failed to update roll. Please try again.' });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -120,11 +126,16 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
   const handleDelete = async () => {
     if (!roll) return;
     
+    setIsDeleting(true);
     try {
       await onDelete(roll.id);
       handleClose();
     } catch (err) {
       console.error('Delete error:', err);
+      setErrors({ submit: err.message || 'Failed to delete roll. Please try again.' });
+      setShowDeleteConfirm(false);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -363,7 +374,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
           <div className="mt-6 pt-4 border-t border-gray-200">
             {/* Delete Confirmation */}
             {showDeleteConfirm && (
-              <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-xs text-gray-700 mb-2">
                   Are you sure you want to delete this roll? This action cannot be undone.
                 </p>
@@ -372,17 +383,26 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
                     type="button"
                     onClick={() => setShowDeleteConfirm(false)}
                     className="px-3 py-1 text-xs text-gray-600 hover:text-gray-800 hover:underline transition-colors"
+                    disabled={isDeleting}
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     onClick={handleDelete}
-                    className="px-3 py-1 text-xs text-red-600 hover:text-red-700 font-medium hover:underline transition-colors"
+                    className="px-3 py-1 text-xs text-red-600 hover:text-red-700 font-medium hover:underline transition-colors disabled:opacity-50"
+                    disabled={isDeleting}
                   >
-                    Yes, delete
+                    {isDeleting ? 'Deleting...' : 'Yes, delete'}
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* Submit Error */}
+            {errors.submit && (
+              <div className="text-red-600 text-sm text-center p-2 bg-red-50 rounded">
+                {errors.submit}
               </div>
             )}
 
@@ -392,6 +412,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
                 type="button"
                 onClick={handleClose}
                 className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
+                disabled={isSubmitting || isDeleting}
               >
                 Cancel
               </button>
@@ -399,16 +420,18 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
                 <button
                   type="button"
                   onClick={handleDuplicate}
-                  className="flex-1 px-4 py-2 bg-film-amber hover:bg-film-amber/90 text-white rounded-lg font-medium transition-colors"
+                  className="flex-1 px-4 py-2 bg-film-amber hover:bg-film-amber/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSubmitting || isDeleting}
                 >
                   📋 Duplicate
                 </button>
               )}
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors"
+                className="flex-1 px-4 py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmitting || isDeleting}
               >
-                Save Changes
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
 
@@ -418,7 +441,8 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
                 <button
                   type="button"
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="text-xs text-red-600 hover:text-red-700 hover:underline transition-colors"
+                  className="text-xs text-red-600 hover:text-red-700 hover:underline transition-colors disabled:opacity-50"
+                  disabled={isSubmitting || isDeleting}
                 >
                   Delete this roll
                 </button>

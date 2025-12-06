@@ -15,6 +15,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [filmStockSuggestions, setFilmStockSuggestions] = useState([]);
   const [orderIdSuggestions, setOrderIdSuggestions] = useState([]);
 
@@ -106,6 +107,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
     
     if (!validate()) return;
 
+    setIsSubmitting(true);
     try {
       // Convert string values to proper types
       const submitData = {
@@ -119,6 +121,9 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
       handleClose();
     } catch (err) {
       console.error('Form submission error:', err);
+      setErrors({ submit: err.message || 'Failed to add roll. Please try again.' });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -347,20 +352,29 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
             </div>
           )}
 
+          {/* Submit Error */}
+          {errors.submit && (
+            <div className="text-red-600 text-sm text-center p-2 bg-red-50 rounded">
+              {errors.submit}
+            </div>
+          )}
+
           {/* Actions */}
           <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200">
             <button
               type="button"
               onClick={handleClose}
               className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
+              disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors"
+              className="flex-1 px-4 py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting}
             >
-              Add Roll
+              {isSubmitting ? 'Adding...' : 'Add Roll'}
             </button>
           </div>
         </form>

@@ -504,8 +504,8 @@ date_taken      : Timestamp
 - [X] 11.5 Verify all calculations match spreadsheet
 
 ### Phase 12: Polish & Launch
-- [ ] 12.1 Add loading states and skeleton screens
-- [ ] 12.2 Improve error handling and validation
+- [X] 12.1 Add loading states and skeleton screens
+- [X] 12.2 Improve error handling and validation
 - [ ] 12.3 Add keyboard shortcuts (optional)
 - [ ] 12.4 Write basic user documentation
 - [ ] 12.5 Set up auto-start on macOS (launchd, optional)

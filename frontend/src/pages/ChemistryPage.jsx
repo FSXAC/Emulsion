@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AddChemistryForm from '../components/AddChemistryForm';
 import EditChemistryForm from '../components/EditChemistryForm';
+import SkeletonCard from '../components/SkeletonCard';
+import ErrorMessage from '../components/ErrorMessage';
 import { getChemistry, createChemistry, updateChemistry, deleteChemistry } from '../services/chemistry';
 
 // Simple toast notification function
@@ -193,20 +195,43 @@ export default function ChemistryPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg text-gray-500">Loading chemistry batches...</div>
+      <div className="pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Chemistry Batches</h2>
+            <p className="text-xs sm:text-sm text-gray-500">
+              Loading your chemistry batches...
+            </p>
+          </div>
+        </div>
+        <div className="space-y-6">
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <h3 className="text-lg font-semibold text-gray-900">Active</h3>
+            </div>
+            <div className="grid gap-3">
+              <SkeletonCard variant="chemistry" />
+              <SkeletonCard variant="chemistry" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <h3 className="text-red-800 font-semibold mb-2">Error loading chemistry batches</h3>
-        <p className="text-red-600 mb-4">{error}</p>
-        <button onClick={fetchBatches} className="btn-primary">
-          Retry
-        </button>
+      <div className="pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Chemistry Batches</h2>
+          </div>
+        </div>
+        <ErrorMessage
+          title="Error loading chemistry batches"
+          message={error}
+          onRetry={fetchBatches}
+        />
       </div>
     );
   }

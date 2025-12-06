@@ -18,6 +18,8 @@ import ChemistryPickerModal from '../components/ChemistryPickerModal';
 import RatingModal from '../components/RatingModal';
 import EditRollForm from '../components/EditRollForm';
 import AddRollForm from '../components/AddRollForm';
+import SkeletonCard from '../components/SkeletonCard';
+import ErrorMessage from '../components/ErrorMessage';
 import { getRolls, createRoll, updateRoll, deleteRoll, loadRoll, unloadRoll, assignChemistry, rateRoll } from '../services/rolls';
 import { getChemistryBatch } from '../services/chemistry';
 
@@ -427,20 +429,47 @@ export default function RollsPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg text-gray-500">Loading rolls...</div>
+      <div className="pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Film Rolls</h2>
+            <p className="text-xs sm:text-sm text-gray-500">
+              Loading your film rolls...
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-col md:flex-row gap-3 md:gap-3 md:overflow-x-auto pb-2">
+          {statusConfig.map(({ status, displayName, icon }) => (
+            <div key={status} className="flex-shrink-0">
+              <div className="bg-gray-50 rounded-lg p-3 mb-2">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                  {icon} {displayName}
+                </h3>
+              </div>
+              <div className="space-y-2">
+                <SkeletonCard variant="roll" />
+                <SkeletonCard variant="roll" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <h3 className="text-red-800 font-semibold mb-2">Error loading rolls</h3>
-        <p className="text-red-600 mb-4">{error}</p>
-        <button onClick={fetchRolls} className="btn-primary">
-          Retry
-        </button>
+      <div className="pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Film Rolls</h2>
+          </div>
+        </div>
+        <ErrorMessage
+          title="Error loading film rolls"
+          message={error}
+          onRetry={fetchRolls}
+        />
       </div>
     );
   }
