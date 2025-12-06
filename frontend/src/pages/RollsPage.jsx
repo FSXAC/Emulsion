@@ -182,7 +182,7 @@ export default function RollsPage() {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex gap-4 overflow-x-auto pb-4">
+        <div className="flex gap-6 overflow-x-auto pb-6 px-2">
           {statusConfig.map(({ status, displayName, icon }) => (
             <StatusColumn
               key={status}
@@ -196,7 +196,7 @@ export default function RollsPage() {
 
         <DragOverlay>
           {activeRoll ? (
-            <div className="opacity-80 rotate-3 scale-105">
+            <div className="opacity-90 rotate-2 scale-105 shadow-2xl">
               <FilmRollCard roll={activeRoll} />
             </div>
           ) : null}
