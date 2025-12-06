@@ -574,7 +574,7 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 8.3 Create AddChemistryForm component
 - [X] 8.4 Add delete button to EditRollForm (dangerous action)
 - [X] 8.5 Wire AddRollForm to RollsPage "+ Add Roll" button
-- [ ] 8.6 Wire AddChemistryForm to Chemistry page (Phase 9)
+- [X] 8.6 Wire AddChemistryForm to Chemistry page (Phase 9)
 - [X] 8.7 Implement autocomplete for film stock names
 - [X] 8.8 Implement autocomplete for order IDs
 - [X] 8.9 Show live cost calculations in forms
@@ -585,12 +585,13 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 8.a.3 Do not show push/pull badge if it's 0.0 stops.
 
 ### Phase 9: Frontend - Chemistry Management
-- [ ] 9.1 Create Chemistry page/view
-- [ ] 9.2 Display list of chemistry batches
-- [ ] 9.3 Show roll count and C41 dev time for each batch
-- [ ] 9.4 Add C41 development timer widget
-- [ ] 9.5 Implement retire chemistry action
-- [ ] 9.6 Link to view rolls that used each batch
+- [X] 9.1 Create Chemistry page/view
+- [X] 9.2 Display list of chemistry batches
+- [X] 9.3 Show roll count and C41 dev time for each batch
+- [ ] 9.4 Add C41 development timer widget (DO NOT impl. in phase 9: defer to later phases)
+- [ ] 9.5 Edit Chemistry form and Implement retire chemistry action
+- [ ] ~~9.6 Link to view rolls that used each batch~~ (Cancelled; not needed)
+- [ ] 9.7 Add duplicate and delete actions similar to the ones for rolls
 
 ### Phase 10: Mobile Responsiveness
 - [ ] 10.1 Make kanban board responsive (stack columns on mobile)
