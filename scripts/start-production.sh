@@ -24,6 +24,14 @@ fi
 
 echo "🚀 Starting Emulsion server..."
 echo ""
+echo "📍 Current directory: $(pwd)"
+echo "💾 Database location: $PROJECT_ROOT/backend/data/emulsion.db"
+if [ -f "$PROJECT_ROOT/backend/data/emulsion.db" ]; then
+    echo "✅ Database file found"
+else
+    echo "⚠️  Database file not found - will be created on first run"
+fi
+echo ""
 echo "Access the app at:"
 echo "  - Local:   http://localhost:8000"
 echo "  - Network: http://$(ipconfig getifaddr en0 2>/dev/null || echo "192.168.1.244"):8000"
@@ -31,5 +39,5 @@ echo ""
 echo "Press Ctrl+C to stop the server"
 echo ""
 
-# Start the server
+# Start the server (from backend directory)
 uvicorn app.main:app --host 0.0.0.0 --port 8000

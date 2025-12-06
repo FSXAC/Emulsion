@@ -34,33 +34,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API routes
+# Include API routes FIRST (before catch-all routes)
 app.include_router(api_router)
 
 # Serve frontend static files (production mode)
 frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "dist"
 if frontend_dist.exists():
-    # Mount static assets
-    app.mount("/assets", StaticFiles(directory=str(frontend_dist / "assets")), name="assets")
+    # Mount static assets with specific path
+    assets_path = frontend_dist / "assets"
+    if assets_path.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_path)), name="assets")
+    
+    from fastapi import HTTPException, Request
+    from fastapi.responses import JSONResponse
+    from starlette.exceptions import HTTPException as StarletteHTTPException
     
     @app.get("/", include_in_schema=False)
     async def serve_root():
         """Serve the frontend index.html for root path"""
         return FileResponse(frontend_dist / "index.html")
     
-    @app.get("/{full_path:path}", include_in_schema=False)
-    async def serve_frontend(full_path: str):
-        """Serve frontend files or index.html for SPA routing"""
-        # Don't interfere with API routes
-        if full_path.startswith("api") or full_path.startswith("health"):
-            return
+    @app.exception_handler(404)
+    async def custom_404_handler(request: Request, exc: HTTPException):
+        """Handle 404 errors - serve frontend for non-API routes, otherwise return 404"""
+        path = request.url.path
         
-        # Check if file exists in dist
-        file_path = frontend_dist / full_path
-        if file_path.exists() and file_path.is_file():
-            return FileResponse(file_path)
+        # If it's an API route, return proper 404 JSON
+        if path.startswith("/api/") or path.startswith("/docs") or path.startswith("/redoc") or path.startswith("/openapi.json"):
+            return JSONResponse(status_code=404, content={"detail": "Not Found"})
         
-        # Otherwise serve index.html (SPA catch-all)
+        # For all other routes, serve the frontend (SPA routing)
         return FileResponse(frontend_dist / "index.html")
 else:
     @app.get("/")

@@ -17,11 +17,22 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     debug: bool = True
     
-    # Database - relative to project directory
-    database_url: str = "sqlite:///./data/emulsion.db"
+    # Database - use absolute path to avoid issues with working directory
+    # Default to backend/data/emulsion.db
+    database_url: str = "sqlite:///" + str(Path(__file__).parent.parent.parent / "data" / "emulsion.db")
     
-    # CORS
-    cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
+    # CORS - Allow all local origins (for development and production)
+    # In production on same origin (localhost:8000), CORS is not needed
+    # But this allows dev server and network access
+    cors_origins: list[str] = [
+        "http://localhost:5173",  # Vite dev server
+        "http://localhost:3000",  # Alternative dev server
+        "http://localhost:8000",  # Production server
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:8000",
+        "*",  # Allow all origins for local network access
+    ]
     
     model_config = SettingsConfigDict(
         env_file=".env",

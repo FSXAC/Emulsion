@@ -5,9 +5,16 @@ import axios from 'axios';
 // In development, point to backend server
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (
   import.meta.env.MODE === 'production' 
-    ? '/api'  // Relative URL for production
-    : 'http://localhost:8000/api'  // Backend dev server
+    ? ''  // Empty string - routes already have /api prefix from backend router
+    : 'http://localhost:8000'  // Backend dev server
 );
+
+// Log configuration for debugging
+console.log('[API Config]', {
+  mode: import.meta.env.MODE,
+  baseURL: API_BASE_URL,
+  envVar: import.meta.env.VITE_API_BASE_URL,
+});
 
 // Create axios instance with default config
 const api = axios.create({
@@ -18,12 +25,11 @@ const api = axios.create({
   timeout: 10000, // 10 second timeout
 });
 
-// Request interceptor for logging (development only)
+// Request interceptor for logging
 api.interceptors.request.use(
   (config) => {
-    if (import.meta.env.DEV) {
-      console.log(`[API] ${config.method.toUpperCase()} ${config.url}`, config.data || '');
-    }
+    // Always log in console for debugging (including production)
+    console.log(`[API] ${config.method.toUpperCase()} ${config.baseURL}${config.url}`, config.data || '');
     return config;
   },
   (error) => {
