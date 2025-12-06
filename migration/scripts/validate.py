@@ -22,8 +22,8 @@ from decimal import Decimal
 backend_path = Path(__file__).parent.parent.parent / "backend"
 sys.path.insert(0, str(backend_path))
 
-from sqlalchemy import func
-from app.core.database import SessionLocal, init_db
+from sqlalchemy import func, create_engine
+from sqlalchemy.orm import sessionmaker
 from app.models import FilmRoll, ChemistryBatch
 
 
@@ -202,12 +202,18 @@ def print_summary_stats(db):
     print(f"  Total film cost (yours): ${total_film_cost:.2f}")
 
 
-def validate_all():
+def validate_all(db_path: str):
     """Run all validation checks."""
     print("Starting data validation...")
+    print(f"Database: {db_path}")
     
-    # Initialize database
-    init_db()
+    if not Path(db_path).exists():
+        print(f"Error: Database file not found at {db_path}")
+        return False
+    
+    # Create engine and session for the specified database
+    engine = create_engine(f"sqlite:///{db_path}", echo=False)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     
     # Create session
     db = SessionLocal()
@@ -236,5 +242,17 @@ def validate_all():
 
 
 if __name__ == "__main__":
-    success = validate_all()
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Validate imported data")
+    parser.add_argument(
+        "--db-path",
+        required=True,
+        help="Path to the SQLite database file (e.g., ../../backend/data/emulsion.db)"
+    )
+    
+    args = parser.parse_args()
+    db_path = Path(args.db_path).resolve()
+    
+    success = validate_all(str(db_path))
     sys.exit(0 if success else 1)

@@ -17,6 +17,7 @@ class ChemistryBatchBase(BaseModel):
     fixer_cost: Decimal = Field(..., ge=0, description="Fixer cost")
     other_cost: Decimal = Field(default=Decimal("0.00"), ge=0, description="Other chemistry costs")
     rolls_offset: int = Field(default=0, description="Manual adjustment for roll count")
+    notes: Optional[str] = Field(None, description="Notes about the chemistry batch")
 
 
 class ChemistryBatchCreate(ChemistryBatchBase):
@@ -35,6 +36,7 @@ class ChemistryBatchUpdate(BaseModel):
     fixer_cost: Optional[Decimal] = Field(None, ge=0)
     other_cost: Optional[Decimal] = Field(None, ge=0)
     rolls_offset: Optional[int] = None
+    notes: Optional[str] = None
 
 
 class ChemistryBatchResponse(ChemistryBatchBase):

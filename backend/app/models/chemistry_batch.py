@@ -4,7 +4,7 @@ from datetime import date
 from decimal import Decimal
 from typing import Optional, List
 
-from sqlalchemy import Date, Integer, Numeric, String, select, func
+from sqlalchemy import Date, Integer, Numeric, String, Text, select, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, generate_uuid
@@ -44,6 +44,9 @@ class ChemistryBatch(Base, TimestampMixin):
 
     # Manual adjustment for roll count (e.g., to simulate stale chemistry)
     rolls_offset: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+    # Notes
+    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Relationships
     rolls: Mapped[List["FilmRoll"]] = relationship(

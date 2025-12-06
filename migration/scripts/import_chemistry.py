@@ -18,8 +18,8 @@ from pathlib import Path
 backend_path = Path(__file__).parent.parent.parent / "backend"
 sys.path.insert(0, str(backend_path))
 
-from sqlalchemy.orm import Session
-from app.core.database import SessionLocal, engine, init_db
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
 from app.models import Base, ChemistryBatch
 
 
@@ -75,17 +75,24 @@ def parse_integer(value_str):
         return 0
 
 
-def import_chemistry_batches(csv_path: str, dry_run: bool = False):
+def import_chemistry_batches(csv_path: str, db_path: str, dry_run: bool = False):
     """Import chemistry batches from CSV file."""
     
     print(f"{'[DRY RUN] ' if dry_run else ''}Starting chemistry batch import from {csv_path}")
+    print(f"Database: {db_path}")
     
     if not os.path.exists(csv_path):
         print(f"Error: CSV file not found at {csv_path}")
         return False
     
-    # Initialize database
-    init_db()
+    if not os.path.exists(db_path):
+        print(f"Error: Database file not found at {db_path}")
+        print(f"Please ensure the database exists or run the backend application first.")
+        return False
+    
+    # Create engine and session for the specified database
+    engine = create_engine(f"sqlite:///{db_path}", echo=False)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     
     # Create session
     db = SessionLocal()
@@ -95,16 +102,13 @@ def import_chemistry_batches(csv_path: str, dry_run: bool = False):
             reader = csv.DictReader(f)
             
             imported = 0
-            skipped = 0
             
             for row_num, row in enumerate(reader, start=2):  # Start at 2 (header is row 1)
                 try:
                     # Required fields
                     name = row.get('name', '').strip()
                     if not name:
-                        print(f"Row {row_num}: Skipping - missing name")
-                        skipped += 1
-                        continue
+                        raise ValueError(f"Missing required field 'name'")
                     
                     chemistry_type = row.get('chemistry_type', 'OTHER').strip().upper()
                     if chemistry_type not in ['C41', 'E6', 'BW', 'ECN2', 'OTHER']:
@@ -140,24 +144,22 @@ def import_chemistry_batches(csv_path: str, dry_run: bool = False):
                     
                     if not dry_run:
                         db.add(batch)
-                        db.flush()  # Flush to get the ID
+                        db.flush()  # Flush to detect errors but don't commit yet
                     
                     imported += 1
                     print(f"Row {row_num}: {'Would import' if dry_run else 'Imported'} batch '{name}' ({chemistry_type})")
                     
                 except Exception as e:
-                    print(f"Row {row_num}: Error - {str(e)}")
-                    skipped += 1
-                    continue
+                    print(f"\nRow {row_num}: Error - {str(e)}")
+                    print(f"\n❌ Import aborted due to error. Rolling back all changes.")
+                    db.rollback()
+                    return False
             
             if not dry_run:
                 db.commit()
                 print(f"\n✅ Successfully imported {imported} chemistry batches")
             else:
                 print(f"\n[DRY RUN] Would import {imported} chemistry batches")
-            
-            if skipped > 0:
-                print(f"⚠️  Skipped {skipped} rows due to errors")
             
             return True
             
@@ -179,6 +181,11 @@ if __name__ == "__main__":
         help="Path to chemistry batches CSV file"
     )
     parser.add_argument(
+        "--db-path",
+        required=True,
+        help="Path to the SQLite database file (e.g., ../../backend/data/emulsion.db)"
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Preview import without making changes"
@@ -186,8 +193,9 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    # Convert relative path to absolute
+    # Convert relative paths to absolute
     csv_path = Path(__file__).parent / args.csv_path
+    db_path = Path(args.db_path).resolve()
     
-    success = import_chemistry_batches(str(csv_path), args.dry_run)
+    success = import_chemistry_batches(str(csv_path), str(db_path), args.dry_run)
     sys.exit(0 if success else 1)

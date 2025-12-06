@@ -23,23 +23,22 @@ migration/
 2. Export film rolls sheet to CSV → save as `data/film_rolls.csv`
 3. Export chemistry batches sheet to CSV → save as `data/chemistry_batches.csv`
 
-### Phase 11.2: Import Film Rolls
+### Phase 11.2 + 11.3: Import Film Rolls and Chemistry
+
 ```bash
 cd migration/scripts
-python import_rolls.py
+
+# Import chemistry batches first (required before rolls)
+python import_chemistry.py --db-path ../../backend/data/emulsion.db
+
+# Import film rolls
+python import_rolls.py --db-path ../../backend/data/emulsion.db
+
+# Validate
+python validate.py --db-path ../../backend/data/emulsion.db
 ```
 
-### Phase 11.3: Import Chemistry Batches
-```bash
-cd migration/scripts
-python import_chemistry.py
-```
-
-### Phase 11.4: Validate Data
-```bash
-cd migration/scripts
-python validate.py
-```
+**Important**: You must specify `--db-path` to explicitly point to the database file. This ensures you're importing to the correct database.
 
 ## CSV Format Requirements
 

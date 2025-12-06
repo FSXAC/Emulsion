@@ -18,8 +18,8 @@ from pathlib import Path
 backend_path = Path(__file__).parent.parent.parent / "backend"
 sys.path.insert(0, str(backend_path))
 
-from sqlalchemy.orm import Session
-from app.core.database import SessionLocal, engine, init_db
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
 from app.models import Base, FilmRoll, ChemistryBatch
 
 
@@ -96,17 +96,24 @@ def find_chemistry_by_name(db: Session, chemistry_name: str):
     return batch.id if batch else None
 
 
-def import_film_rolls(csv_path: str, dry_run: bool = False):
+def import_film_rolls(csv_path: str, db_path: str, dry_run: bool = False):
     """Import film rolls from CSV file."""
     
     print(f"{'[DRY RUN] ' if dry_run else ''}Starting film roll import from {csv_path}")
+    print(f"Database: {db_path}")
     
     if not os.path.exists(csv_path):
         print(f"Error: CSV file not found at {csv_path}")
         return False
     
-    # Initialize database
-    init_db()
+    if not os.path.exists(db_path):
+        print(f"Error: Database file not found at {db_path}")
+        print(f"Please ensure the database exists or run import_chemistry.py first.")
+        return False
+    
+    # Create engine and session for the specified database
+    engine = create_engine(f"sqlite:///{db_path}", echo=False)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     
     # Create session
     db = SessionLocal()
@@ -116,7 +123,6 @@ def import_film_rolls(csv_path: str, dry_run: bool = False):
             reader = csv.DictReader(f)
             
             imported = 0
-            skipped = 0
             chemistry_warnings = set()
             
             for row_num, row in enumerate(reader, start=2):  # Start at 2 (header is row 1)
@@ -124,15 +130,12 @@ def import_film_rolls(csv_path: str, dry_run: bool = False):
                     # Required fields
                     order_id = row.get('order_id', '').strip()
                     if not order_id:
-                        print(f"Row {row_num}: Skipping - missing order_id")
-                        skipped += 1
-                        continue
+                        # Generate order_id for individually purchased rolls
+                        order_id = str(row_num)
                     
                     film_stock_name = row.get('film_stock_name', '').strip()
                     if not film_stock_name:
-                        print(f"Row {row_num}: Skipping - missing film_stock_name")
-                        skipped += 1
-                        continue
+                        raise ValueError(f"Missing required field 'film_stock_name'")
                     
                     film_format = row.get('film_format', '35mm').strip()
                     expected_exposures = parse_integer(row.get('expected_exposures', '36'))
@@ -142,9 +145,7 @@ def import_film_rolls(csv_path: str, dry_run: bool = False):
                     film_cost_str = row.get('film_cost', '')
                     film_cost = parse_decimal(film_cost_str)
                     if film_cost is None:
-                        print(f"Row {row_num}: Skipping - missing or invalid film_cost")
-                        skipped += 1
-                        continue
+                        raise ValueError(f"Missing or invalid required field 'film_cost'")
                     
                     # Optional fields
                     actual_exposures = parse_integer(row.get('actual_exposures', ''))
@@ -155,14 +156,21 @@ def import_film_rolls(csv_path: str, dry_run: bool = False):
                     not_mine = parse_boolean(row.get('not_mine', 'false'))
                     notes = row.get('notes', '').strip() or None
                     
-                    # Look up chemistry by name
+                    # Look up chemistry by name (skip "Lab" as it's not a tracked chemistry batch)
                     chemistry_name = row.get('chemistry_name', '').strip()
                     chemistry_id = None
+                    
                     if chemistry_name:
-                        chemistry_id = find_chemistry_by_name(db, chemistry_name)
-                        if chemistry_id is None and chemistry_name not in chemistry_warnings:
-                            print(f"Row {row_num}: Warning - chemistry batch '{chemistry_name}' not found")
-                            chemistry_warnings.add(chemistry_name)
+                        if chemistry_name.upper() == "LAB":
+                            # Lab development - add $20 flat fee to film cost
+                            film_cost += 20.0
+                            # chemistry_id remains None (not tracked in our system)
+                        else:
+                            # Look up chemistry batch by name
+                            chemistry_id = find_chemistry_by_name(db, chemistry_name)
+                            if chemistry_id is None and chemistry_name not in chemistry_warnings:
+                                print(f"Row {row_num}: Warning - chemistry batch '{chemistry_name}' not found")
+                                chemistry_warnings.add(chemistry_name)
                     
                     # Create film roll object
                     roll = FilmRoll(
@@ -183,25 +191,23 @@ def import_film_rolls(csv_path: str, dry_run: bool = False):
                     
                     if not dry_run:
                         db.add(roll)
-                        db.flush()  # Flush to get the ID
+                        db.flush()  # Flush to detect errors but don't commit yet
                     
                     imported += 1
                     status_preview = roll.status if not dry_run else "UNKNOWN"
                     print(f"Row {row_num}: {'Would import' if dry_run else 'Imported'} roll '{film_stock_name}' (Order: {order_id}, Status: {status_preview})")
                     
                 except Exception as e:
-                    print(f"Row {row_num}: Error - {str(e)}")
-                    skipped += 1
-                    continue
+                    print(f"\nRow {row_num}: Error - {str(e)}")
+                    print(f"\n❌ Import aborted due to error. Rolling back all changes.")
+                    db.rollback()
+                    return False
             
             if not dry_run:
                 db.commit()
                 print(f"\n✅ Successfully imported {imported} film rolls")
             else:
                 print(f"\n[DRY RUN] Would import {imported} film rolls")
-            
-            if skipped > 0:
-                print(f"⚠️  Skipped {skipped} rows due to errors")
             
             if chemistry_warnings:
                 print(f"\n⚠️  Chemistry batches not found: {', '.join(sorted(chemistry_warnings))}")
@@ -227,6 +233,11 @@ if __name__ == "__main__":
         help="Path to film rolls CSV file"
     )
     parser.add_argument(
+        "--db-path",
+        required=True,
+        help="Path to the SQLite database file (e.g., ../../backend/data/emulsion.db)"
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Preview import without making changes"
@@ -234,8 +245,9 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    # Convert relative path to absolute
+    # Convert relative paths to absolute
     csv_path = Path(__file__).parent / args.csv_path
+    db_path = Path(args.db_path).resolve()
     
-    success = import_film_rolls(str(csv_path), args.dry_run)
+    success = import_film_rolls(str(csv_path), str(db_path), args.dry_run)
     sys.exit(0 if success else 1)
