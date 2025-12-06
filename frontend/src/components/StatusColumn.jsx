@@ -20,19 +20,25 @@ const StatusColumn = ({ status, rolls, displayName, icon }) => {
       <div 
         ref={setNodeRef}
         className={`
-          mb-4 px-4 py-3 rounded-lg shadow-sm border-2 transition-all duration-200
+          mb-4 px-6 py-4 rounded-lg shadow-md border-2 transition-all duration-200 cursor-pointer
+          min-h-[80px] flex flex-col justify-center
           ${isOver 
-            ? 'bg-film-cyan border-film-cyan shadow-lg scale-105' 
-            : 'bg-gradient-to-r from-gray-50 to-white border-gray-200'
+            ? 'bg-film-cyan border-film-cyan shadow-2xl ring-4 ring-film-cyan/30' 
+            : 'bg-gradient-to-r from-gray-100 to-gray-50 border-gray-300 hover:border-gray-400 hover:shadow-lg'
           }
         `}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className={`text-3xl ${isOver ? 'animate-bounce' : ''}`}>{icon}</span>
-            <h3 className={`font-bold text-lg ${isOver ? 'text-white' : 'text-gray-900'}`}>
-              {displayName}
-            </h3>
+            <span className="text-3xl">{icon}</span>
+            <div>
+              <h3 className={`font-bold text-lg ${isOver ? 'text-white' : 'text-gray-900'}`}>
+                {displayName}
+              </h3>
+              <p className={`text-xs ${isOver ? 'text-white/90' : 'text-gray-500'}`}>
+                {isOver ? '✓ Drop here to move roll' : 'Drop zone'}
+              </p>
+            </div>
           </div>
           <span className={`text-sm font-semibold px-3 py-1 rounded-full min-w-[2rem] text-center ${
             isOver ? 'bg-white text-film-cyan' : 'text-white bg-gray-700'
@@ -40,16 +46,11 @@ const StatusColumn = ({ status, rolls, displayName, icon }) => {
             {rolls.length}
           </span>
         </div>
-        {isOver && (
-          <div className="mt-2 text-sm text-white font-medium text-center">
-            Drop here to move roll
-          </div>
-        )}
       </div>
 
       {/* Cards Area (NOT a drop zone) */}
       <div
-        className="flex-1 min-h-[500px] p-4 rounded-xl bg-gray-50 border-2 border-gray-200 border-dashed"
+        className="flex-1 min-h-[500px] p-4 rounded-xl bg-white border border-gray-200"
       >
         <SortableContext
           items={rolls.map((roll) => roll.id)}
