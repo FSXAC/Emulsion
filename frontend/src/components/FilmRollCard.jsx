@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-const FilmRollCard = ({ roll }) => {
+const FilmRollCard = ({ roll, onClick }) => {
   const {
     attributes,
     listeners,
@@ -15,6 +15,13 @@ const FilmRollCard = ({ roll }) => {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+  };
+
+  const handleClick = (e) => {
+    // Only trigger onClick if not currently dragging
+    if (!isDragging && onClick) {
+      onClick(roll);
+    }
   };
 
   // Format date helper
@@ -43,6 +50,7 @@ const FilmRollCard = ({ roll }) => {
       style={style}
       {...attributes}
       {...listeners}
+      onClick={handleClick}
       className={`
         bg-white rounded-lg shadow-md hover:shadow-lg
         p-3 mb-2 cursor-grab active:cursor-grabbing

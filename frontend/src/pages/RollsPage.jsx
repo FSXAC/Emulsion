@@ -15,7 +15,8 @@ import FilmRollCard from '../components/FilmRollCard';
 import DatePickerModal from '../components/DatePickerModal';
 import ChemistryPickerModal from '../components/ChemistryPickerModal';
 import RatingModal from '../components/RatingModal';
-import { getRolls, loadRoll, unloadRoll, assignChemistry, rateRoll } from '../services/rolls';
+import EditRollForm from '../components/EditRollForm';
+import { getRolls, updateRoll, loadRoll, unloadRoll, assignChemistry, rateRoll } from '../services/rolls';
 
 // Simple toast notification function
 const showToast = (message, type = 'success') => {
@@ -42,6 +43,7 @@ export default function RollsPage() {
   const [datePickerModal, setDatePickerModal] = useState({ isOpen: false, roll: null, action: null });
   const [chemistryModal, setChemistryModal] = useState({ isOpen: false, roll: null });
   const [ratingModal, setRatingModal] = useState({ isOpen: false, roll: null });
+  const [editRollModal, setEditRollModal] = useState({ isOpen: false, roll: null });
 
   // Status configuration
   const statusConfig = [
@@ -286,6 +288,29 @@ export default function RollsPage() {
     }
   };
 
+  // Handle card click to edit roll
+  const handleCardClick = (roll) => {
+    setEditRollModal({ isOpen: true, roll });
+  };
+
+  // Handle edit roll form submission
+  const handleEditRoll = async (rollId, formData) => {
+    try {
+      const updatedRoll = await updateRoll(rollId, formData);
+      
+      // Update local state
+      setRolls((prevRolls) =>
+        prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
+      );
+      
+      showToast('✏️ Roll updated successfully');
+    } catch (err) {
+      console.error('Failed to update roll:', err);
+      showToast(`Failed to update roll: ${err.message}`, 'error');
+      throw err; // Re-throw to let form handle it
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -332,6 +357,7 @@ export default function RollsPage() {
               displayName={displayName}
               icon={icon}
               rolls={rollsByStatus[status]}
+              onCardClick={handleCardClick}
             />
           ))}
         </div>
@@ -370,6 +396,13 @@ export default function RollsPage() {
         onClose={() => setRatingModal({ isOpen: false, roll: null })}
         onConfirm={handleRatingConfirm}
         roll={ratingModal.roll}
+      />
+
+      <EditRollForm
+        isOpen={editRollModal.isOpen}
+        onClose={() => setEditRollModal({ isOpen: false, roll: null })}
+        onSubmit={handleEditRoll}
+        roll={editRollModal.roll}
       />
     </div>
   );
