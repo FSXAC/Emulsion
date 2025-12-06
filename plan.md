@@ -562,11 +562,11 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 7.1 Create DatePickerModal component
 - [X] 7.2 Create ChemistryPickerModal component
 - [X] 7.3 Create RatingModal component (star selector)
-- [ ] 7.4 Wire up drag-to-load action (calls PATCH /load) **← NEXT**
-- [ ] 7.5 Wire up drag-to-expose action (calls PATCH /unload)
-- [ ] 7.6 Wire up drag-to-chemistry action (calls PATCH /chemistry)
-- [ ] 7.7 Wire up rating action (calls PATCH /rating)
-- [ ] 7.8 Add toast notifications for success/errors
+- [X] 7.4 Wire up drag-to-load action (calls PATCH /load)
+- [X] 7.5 Wire up drag-to-expose action (calls PATCH /unload)
+- [X] 7.6 Wire up drag-to-chemistry action (calls PATCH /chemistry)
+- [X] 7.7 Wire up rating action (calls PATCH /rating)
+- [X] 7.8 Add toast notifications for success/errors
 
 ### Phase 8: Frontend - Forms
 - [ ] 8.1 Create AddRollForm component

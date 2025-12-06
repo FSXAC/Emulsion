@@ -12,13 +12,36 @@ import {
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import StatusColumn from '../components/StatusColumn';
 import FilmRollCard from '../components/FilmRollCard';
+import DatePickerModal from '../components/DatePickerModal';
+import ChemistryPickerModal from '../components/ChemistryPickerModal';
+import RatingModal from '../components/RatingModal';
 import { getRolls, loadRoll, unloadRoll, assignChemistry, rateRoll } from '../services/rolls';
+
+// Simple toast notification function
+const showToast = (message, type = 'success') => {
+  const toast = document.createElement('div');
+  toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium animate-slideIn ${
+    type === 'success' ? 'bg-green-500' : 'bg-red-500'
+  }`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('animate-slideOut');
+    setTimeout(() => document.body.removeChild(toast), 300);
+  }, 3000);
+};
 
 export default function RollsPage() {
   const [rolls, setRolls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeRoll, setActiveRoll] = useState(null);
+  
+  // Modal states
+  const [datePickerModal, setDatePickerModal] = useState({ isOpen: false, roll: null, action: null });
+  const [chemistryModal, setChemistryModal] = useState({ isOpen: false, roll: null });
+  const [ratingModal, setRatingModal] = useState({ isOpen: false, roll: null });
 
   // Status configuration
   const statusConfig = [
@@ -132,34 +155,27 @@ export default function RollsPage() {
         const { updateRoll } = await import('../services/rolls');
         updatedRoll = await updateRoll(roll.id, fieldsToUpdate);
       } else {
-        // Handle forward transitions
+        // Handle forward transitions - show modals for user input
         switch (targetStatus) {
           case 'LOADED':
-            // Set date_loaded to today
-            updatedRoll = await loadRoll(roll.id, new Date().toISOString().split('T')[0]);
-            break;
+            // Show date picker modal for load date
+            setDatePickerModal({ isOpen: true, roll, action: 'load' });
+            return;
 
           case 'EXPOSED':
-            // Set date_unloaded to today
-            updatedRoll = await unloadRoll(roll.id, new Date().toISOString().split('T')[0]);
-            break;
+            // Show date picker modal for unload date
+            setDatePickerModal({ isOpen: true, roll, action: 'unload' });
+            return;
 
           case 'DEVELOPED':
-            // TODO: Show chemistry picker modal
-            // For now, we'll skip this transition (requires chemistry_id)
-            alert('⚠️ Chemistry assignment requires chemistry picker modal (not yet implemented).\n\nThis will be added in Phase 7.');
+            // Show chemistry picker modal
+            setChemistryModal({ isOpen: true, roll });
             return;
 
           case 'SCANNED':
-            // TODO: Show rating modal for stars selection
-            // For now, prompt for star rating
-            const stars = prompt('Rate this roll (1-5 stars):', '3');
-            if (!stars || isNaN(stars) || stars < 1 || stars > 5) {
-              alert('Invalid rating. Please enter 1-5 stars.');
-              return;
-            }
-            updatedRoll = await rateRoll(roll.id, parseInt(stars));
-            break;
+            // Show rating modal
+            setRatingModal({ isOpen: true, roll });
+            return;
 
           default:
             return;
@@ -170,11 +186,86 @@ export default function RollsPage() {
       setRolls((prevRolls) =>
         prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
       );
+      
+      // Show success message
+      const statusMessages = {
+        'NEW': '🎞️ Roll reset to NEW',
+        'LOADED': '📷 Roll marked as LOADED',
+        'EXPOSED': '✅ Roll marked as EXPOSED',
+        'DEVELOPED': '🧪 Roll marked as DEVELOPED',
+        'SCANNED': '⭐ Roll marked as SCANNED'
+      };
+      showToast(statusMessages[updatedRoll.status] || 'Roll updated successfully');
     } catch (err) {
       console.error('Failed to update roll status:', err);
-      alert(`Failed to update roll: ${err.message}`);
+      showToast(`Failed to update roll: ${err.message}`, 'error');
       // Optionally refresh to ensure UI is in sync
       fetchRolls();
+    }
+  };
+
+  // Handle date picker confirmation
+  const handleDateConfirm = async (selectedDate) => {
+    const { roll, action } = datePickerModal;
+    if (!roll || !action) return;
+
+    try {
+      let updatedRoll;
+      if (action === 'load') {
+        updatedRoll = await loadRoll(roll.id, selectedDate);
+        showToast(`📷 Roll loaded on ${selectedDate}`);
+      } else if (action === 'unload') {
+        updatedRoll = await unloadRoll(roll.id, selectedDate);
+        showToast(`✅ Roll unloaded on ${selectedDate}`);
+      }
+
+      // Update local state
+      setRolls((prevRolls) =>
+        prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
+      );
+    } catch (err) {
+      console.error('Failed to update date:', err);
+      showToast(`Failed to update roll: ${err.message}`, 'error');
+    }
+  };
+
+  // Handle chemistry picker confirmation
+  const handleChemistryConfirm = async (chemistryId) => {
+    const { roll } = chemistryModal;
+    if (!roll) return;
+
+    try {
+      const updatedRoll = await assignChemistry(roll.id, chemistryId);
+      
+      // Update local state
+      setRolls((prevRolls) =>
+        prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
+      );
+      
+      showToast('🧪 Chemistry batch assigned successfully');
+    } catch (err) {
+      console.error('Failed to assign chemistry:', err);
+      showToast(`Failed to assign chemistry: ${err.message}`, 'error');
+    }
+  };
+
+  // Handle rating confirmation
+  const handleRatingConfirm = async (stars, actualExposures) => {
+    const { roll } = ratingModal;
+    if (!roll) return;
+
+    try {
+      const updatedRoll = await rateRoll(roll.id, stars, actualExposures);
+      
+      // Update local state
+      setRolls((prevRolls) =>
+        prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
+      );
+      
+      showToast(`⭐ Roll rated ${stars} star${stars !== 1 ? 's' : ''}`);
+    } catch (err) {
+      console.error('Failed to rate roll:', err);
+      showToast(`Failed to rate roll: ${err.message}`, 'error');
     }
   };
 
@@ -236,6 +327,33 @@ export default function RollsPage() {
           ) : null}
         </DragOverlay>
       </DndContext>
+
+      {/* Modals */}
+      <DatePickerModal
+        isOpen={datePickerModal.isOpen}
+        onClose={() => setDatePickerModal({ isOpen: false, roll: null, action: null })}
+        onConfirm={handleDateConfirm}
+        title={datePickerModal.action === 'load' ? 'Load Roll' : 'Unload Roll'}
+        defaultDate={
+          datePickerModal.action === 'load' 
+            ? datePickerModal.roll?.date_loaded 
+            : datePickerModal.roll?.date_unloaded
+        }
+      />
+
+      <ChemistryPickerModal
+        isOpen={chemistryModal.isOpen}
+        onClose={() => setChemistryModal({ isOpen: false, roll: null })}
+        onConfirm={handleChemistryConfirm}
+        roll={chemistryModal.roll}
+      />
+
+      <RatingModal
+        isOpen={ratingModal.isOpen}
+        onClose={() => setRatingModal({ isOpen: false, roll: null })}
+        onConfirm={handleRatingConfirm}
+        roll={ratingModal.roll}
+      />
     </div>
   );
 }
