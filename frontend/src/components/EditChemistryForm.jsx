@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 
-const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
+const EditChemistryForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, batch }) => {
   const [formData, setFormData] = useState({
     name: '',
     chemistry_type: 'C41',
-    date_mixed: new Date().toISOString().split('T')[0], // Today's date
+    date_mixed: new Date().toISOString().split('T')[0],
     developer_cost: '',
     fixer_cost: '',
     other_cost: '',
@@ -13,34 +13,28 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Populate form when initialData changes (for duplication)
+  // Populate form when batch changes
   useEffect(() => {
-    if (initialData && isOpen) {
-      setFormData(prev => ({
-        ...prev,
-        ...initialData,
-        date_mixed: new Date().toISOString().split('T')[0], // Always use today for new batch
-      }));
-    } else if (isOpen) {
-      // Reset to defaults when opening without initialData
+    if (batch && isOpen) {
       setFormData({
-        name: '',
-        chemistry_type: 'C41',
-        date_mixed: new Date().toISOString().split('T')[0],
-        developer_cost: '',
-        fixer_cost: '',
-        other_cost: '',
-        rolls_offset: 0,
-        notes: '',
+        name: batch.name || '',
+        chemistry_type: batch.chemistry_type || 'C41',
+        date_mixed: batch.date_mixed || new Date().toISOString().split('T')[0],
+        developer_cost: batch.developer_cost || '',
+        fixer_cost: batch.fixer_cost || '',
+        other_cost: batch.other_cost || '',
+        rolls_offset: batch.rolls_offset || 0,
+        notes: batch.notes || '',
       });
     }
-  }, [initialData, isOpen]);
+  }, [batch, isOpen]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !batch) return null;
 
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -106,7 +100,7 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
         notes: formData.notes.trim() || null,
       };
 
-      await onSubmit(submitData);
+      await onSubmit(batch.id, submitData);
       handleClose();
     } catch (err) {
       console.error('Form submission error:', err);
@@ -114,18 +108,37 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
   };
 
   const handleClose = () => {
-    setFormData({
-      name: '',
-      chemistry_type: 'C41',
-      date_mixed: new Date().toISOString().split('T')[0],
-      developer_cost: '',
-      fixer_cost: '',
-      other_cost: '',
-      rolls_offset: 0,
-      notes: '',
-    });
     setErrors({});
+    setShowDeleteConfirm(false);
     onClose();
+  };
+
+  const handleDelete = async () => {
+    if (!batch) return;
+    
+    try {
+      await onDelete(batch.id);
+      handleClose();
+    } catch (err) {
+      console.error('Delete error:', err);
+    }
+  };
+
+  const handleDuplicate = () => {
+    if (!batch || !onDuplicate) return;
+    
+    // Copy relevant fields for duplication
+    const duplicateData = {
+      name: batch.name + ' (Copy)',
+      chemistry_type: batch.chemistry_type,
+      developer_cost: batch.developer_cost,
+      fixer_cost: batch.fixer_cost,
+      other_cost: batch.other_cost,
+      rolls_offset: 0, // Reset offset for new batch
+    };
+    
+    onDuplicate(duplicateData);
+    handleClose();
   };
 
   const handleBackdropClick = (e) => {
@@ -150,8 +163,15 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full my-8">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">Add Chemistry Batch</h2>
-          <p className="text-sm text-gray-600 mt-1">Create a new chemistry batch for film development</p>
+          <h2 className="text-2xl font-bold text-gray-900">Edit Chemistry Batch</h2>
+          <p className="text-sm text-gray-600 mt-1">Update details for this batch</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Status: <span className="font-medium text-gray-700">
+              {batch.is_active ? 'Active' : 'Retired'}
+            </span>
+            {' • '}
+            Rolls developed: <span className="font-medium text-gray-700">{batch.rolls_developed || 0}</span>
+          </p>
         </div>
 
         {/* Form */}
@@ -327,20 +347,70 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={handleClose}
-              className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-4 py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors"
-            >
-              Create Batch
-            </button>
+          <div className="mt-6 pt-4 border-t border-gray-200">
+            {/* Delete Confirmation */}
+            {showDeleteConfirm && (
+              <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                <p className="text-xs text-gray-700 mb-2">
+                  Are you sure you want to delete this chemistry batch? This action cannot be undone.
+                </p>
+                <div className="flex gap-2 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="px-3 py-1 text-xs text-gray-600 hover:text-gray-800 hover:underline transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="px-3 py-1 text-xs text-red-600 hover:text-red-700 font-medium hover:underline transition-colors"
+                  >
+                    Yes, delete
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Save/Cancel Actions */}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              {onDuplicate && (
+                <button
+                  type="button"
+                  onClick={handleDuplicate}
+                  className="flex-1 px-4 py-2 bg-film-amber hover:bg-film-amber/90 text-white rounded-lg font-medium transition-colors"
+                >
+                  📋 Duplicate
+                </button>
+              )}
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors"
+              >
+                Save Changes
+              </button>
+            </div>
+
+            {/* Delete Link - De-emphasized */}
+            {!showDeleteConfirm && (
+              <div className="mt-3 text-center">
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="text-xs text-red-600 hover:text-red-700 hover:underline transition-colors"
+                >
+                  Delete this batch
+                </button>
+              </div>
+            )}
           </div>
         </form>
       </div>
@@ -348,4 +418,4 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
   );
 };
 
-export default AddChemistryForm;
+export default EditChemistryForm;

@@ -589,9 +589,9 @@ Since you're not familiar with Node/TS, you have options:
 - [X] 9.2 Display list of chemistry batches
 - [X] 9.3 Show roll count and C41 dev time for each batch
 - [ ] 9.4 Add C41 development timer widget (DO NOT impl. in phase 9: defer to later phases)
-- [ ] 9.5 Edit Chemistry form and Implement retire chemistry action
-- [ ] ~~9.6 Link to view rolls that used each batch~~ (Cancelled; not needed)
-- [ ] 9.7 Add duplicate and delete actions similar to the ones for rolls
+- [X] 9.5 Edit Chemistry form and Implement retire chemistry action
+- [X] 9.6 Link to view rolls that used each batch
+- [X] 9.7 Add duplicate and delete actions similar to the ones for rolls
 
 ### Phase 10: Mobile Responsiveness
 - [ ] 10.1 Make kanban board responsive (stack columns on mobile)

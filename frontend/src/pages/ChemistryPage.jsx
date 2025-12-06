@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import AddChemistryForm from '../components/AddChemistryForm';
-import { getChemistry, createChemistry } from '../services/chemistry';
+import EditChemistryForm from '../components/EditChemistryForm';
+import { getChemistry, createChemistry, updateChemistry, deleteChemistry } from '../services/chemistry';
 
 // Simple toast notification function
 const showToast = (message, type = 'success') => {
@@ -22,6 +24,9 @@ export default function ChemistryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [addBatchModal, setAddBatchModal] = useState({ isOpen: false });
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedBatch, setSelectedBatch] = useState(null);
+  const [duplicateData, setDuplicateData] = useState(null);
 
   // Fetch chemistry batches on mount
   useEffect(() => {
@@ -58,14 +63,65 @@ export default function ChemistryPage() {
       const newBatch = await createChemistry(formData);
       
       // Add to local state
-      setBatches((prevBatches) => [...prevBatches, newBatch]);
+      setBatches((prevBatches) => [newBatch, ...prevBatches]);
       
       showToast('🧪 Chemistry batch created successfully');
+      setDuplicateData(null); // Clear duplicate data after success
     } catch (err) {
       console.error('Failed to create chemistry batch:', err);
       showToast(`Failed to create batch: ${err.message}`, 'error');
       throw err; // Re-throw to let form handle it
     }
+  };
+
+  // Handle edit batch
+  const handleEditBatch = (batch) => {
+    setSelectedBatch(batch);
+    setIsEditModalOpen(true);
+  };
+
+  // Handle update batch
+  const handleUpdateBatch = async (batchId, updatedData) => {
+    try {
+      const updatedBatch = await updateChemistry(batchId, updatedData);
+      setBatches((prevBatches) =>
+        prevBatches.map((b) => (b.id === updatedBatch.id ? updatedBatch : b))
+      );
+      showToast('✅ Chemistry batch updated');
+    } catch (err) {
+      console.error('Failed to update batch:', err);
+      showToast(`Failed to update batch: ${err.message}`, 'error');
+      throw err;
+    }
+  };
+
+  // Handle delete batch
+  const handleDeleteBatch = async (batchId) => {
+    try {
+      await deleteChemistry(batchId);
+      setBatches((prevBatches) => prevBatches.filter((b) => b.id !== batchId));
+      showToast('🗑️ Chemistry batch deleted');
+    } catch (err) {
+      console.error('Failed to delete batch:', err);
+      // Check if error is due to rolls using this batch
+      if (err.response?.status === 400) {
+        showToast('❌ Cannot delete: rolls are using this batch', 'error');
+      } else {
+        showToast(`Failed to delete batch: ${err.message}`, 'error');
+      }
+      throw err;
+    }
+  };
+
+  // Handle duplicate batch
+  const handleDuplicateBatch = (duplicateData) => {
+    // Close edit modal
+    setIsEditModalOpen(false);
+    setSelectedBatch(null);
+    
+    // Open add modal with duplicate data
+    setDuplicateData(duplicateData);
+    setAddBatchModal({ isOpen: true });
   };
 
   // Handle retire chemistry batch
@@ -247,21 +303,34 @@ export default function ChemistryPage() {
               </div>
 
               {/* Actions */}
-              <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
-                <a
-                  href={`/rolls?chemistry=${batch.id}`}
-                  className="text-xs text-blue-600 hover:text-blue-700 hover:underline"
-                >
-                  View {batch.rolls_developed || 0} roll{batch.rolls_developed !== 1 ? 's' : ''} →
-                </a>
-                {batch.is_active && (
+              <div className="mt-3 pt-3 border-t border-gray-200">
+                <div className="flex flex-col gap-2">
+                  {/* Edit button */}
                   <button
-                    onClick={() => handleRetireBatch(batch.id, batch.name)}
-                    className="text-xs text-gray-600 hover:text-gray-800 hover:underline"
+                    onClick={() => handleEditBatch(batch)}
+                    className="text-sm text-film-cyan hover:text-film-cyan/80 hover:underline text-left transition-colors font-medium"
                   >
-                    Retire batch
+                    ✏️ Edit batch
                   </button>
-                )}
+                  
+                  {/* Link to view rolls using this batch */}
+                  <Link
+                    to={`/rolls?chemistry=${batch.id}`}
+                    className="text-sm text-film-cyan hover:text-film-cyan/80 hover:underline transition-colors"
+                  >
+                    View {batch.rolls_developed || 0} {batch.rolls_developed === 1 ? 'roll' : 'rolls'} →
+                  </Link>
+                  
+                  {/* Retire button (only show for active batches) */}
+                  {batch.is_active && (
+                    <button
+                      onClick={() => handleRetireBatch(batch.id, batch.name)}
+                      className="text-sm text-gray-600 hover:text-gray-800 hover:underline text-left transition-colors"
+                    >
+                      Retire batch
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -271,8 +340,25 @@ export default function ChemistryPage() {
       {/* Add Chemistry Modal */}
       <AddChemistryForm
         isOpen={addBatchModal.isOpen}
-        onClose={() => setAddBatchModal({ isOpen: false })}
+        onClose={() => {
+          setAddBatchModal({ isOpen: false });
+          setDuplicateData(null);
+        }}
         onSubmit={handleAddChemistry}
+        initialData={duplicateData}
+      />
+
+      {/* Edit Chemistry Modal */}
+      <EditChemistryForm
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedBatch(null);
+        }}
+        onSubmit={handleUpdateBatch}
+        onDelete={handleDeleteBatch}
+        onDuplicate={handleDuplicateBatch}
+        batch={selectedBatch}
       />
     </div>
   );

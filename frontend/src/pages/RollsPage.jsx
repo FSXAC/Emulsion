@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   DndContext,
   DragOverlay,
@@ -18,6 +19,7 @@ import RatingModal from '../components/RatingModal';
 import EditRollForm from '../components/EditRollForm';
 import AddRollForm from '../components/AddRollForm';
 import { getRolls, createRoll, updateRoll, deleteRoll, loadRoll, unloadRoll, assignChemistry, rateRoll } from '../services/rolls';
+import { getChemistryBatch } from '../services/chemistry';
 
 // Simple toast notification function
 const showToast = (message, type = 'success') => {
@@ -35,10 +37,14 @@ const showToast = (message, type = 'success') => {
 };
 
 export default function RollsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const chemistryFilter = searchParams.get('chemistry');
+  
   const [rolls, setRolls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeRoll, setActiveRoll] = useState(null);
+  const [chemistryBatch, setChemistryBatch] = useState(null);
   
   // Modal states
   const [datePickerModal, setDatePickerModal] = useState({ isOpen: false, roll: null, action: null });
@@ -74,10 +80,24 @@ export default function RollsPage() {
     })
   );
 
-  // Fetch rolls on mount
+  // Fetch rolls on mount and when chemistry filter changes
   useEffect(() => {
     fetchRolls();
-  }, []);
+    if (chemistryFilter) {
+      fetchChemistryBatch();
+    } else {
+      setChemistryBatch(null);
+    }
+  }, [chemistryFilter]);
+
+  const fetchChemistryBatch = async () => {
+    try {
+      const batch = await getChemistryBatch(chemistryFilter);
+      setChemistryBatch(batch);
+    } catch (err) {
+      console.error('Failed to fetch chemistry batch:', err);
+    }
+  };
 
   const fetchRolls = async () => {
     try {
@@ -85,22 +105,34 @@ export default function RollsPage() {
       setError(null);
       const data = await getRolls();
       // Handle different response formats
+      let allRolls = [];
       if (Array.isArray(data)) {
-        setRolls(data);
+        allRolls = data;
       } else if (data.rolls && Array.isArray(data.rolls)) {
-        setRolls(data.rolls);
+        allRolls = data.rolls;
       } else if (data.items && Array.isArray(data.items)) {
-        setRolls(data.items);
+        allRolls = data.items;
       } else {
         console.error('Unexpected API response format:', data);
-        setRolls([]);
+        allRolls = [];
       }
+      
+      // Filter by chemistry if specified
+      if (chemistryFilter) {
+        allRolls = allRolls.filter(roll => roll.chemistry_id === chemistryFilter);
+      }
+      
+      setRolls(allRolls);
     } catch (err) {
       console.error('Failed to fetch rolls:', err);
       setError(err.message || 'Failed to load film rolls');
     } finally {
       setLoading(false);
     }
+  };
+
+  const clearChemistryFilter = () => {
+    setSearchParams({});
   };
 
   // Group rolls by status
@@ -391,6 +423,29 @@ export default function RollsPage() {
           + Add Roll
         </button>
       </div>
+
+      {/* Chemistry Filter Banner */}
+      {chemistryFilter && chemistryBatch && (
+        <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-purple-900">
+              🧪 Filtered by chemistry:
+            </span>
+            <span className="text-sm text-purple-700 font-semibold">
+              {chemistryBatch.name}
+            </span>
+            <span className="text-xs text-purple-600">
+              ({rolls.length} roll{rolls.length !== 1 ? 's' : ''})
+            </span>
+          </div>
+          <button
+            onClick={clearChemistryFilter}
+            className="text-xs text-purple-600 hover:text-purple-800 hover:underline"
+          >
+            Clear filter
+          </button>
+        </div>
+      )}
 
       <DndContext
         sensors={sensors}
