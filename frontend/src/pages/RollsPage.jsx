@@ -308,10 +308,10 @@ export default function RollsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-3">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Film Rolls</h2>
-          <p className="text-gray-600 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900">Film Rolls</h2>
+          <p className="text-sm text-gray-500">
             Drag rolls between columns to update their status
           </p>
         </div>
@@ -324,7 +324,7 @@ export default function RollsPage() {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex gap-6 overflow-x-auto pb-6 px-2">
+        <div className="flex gap-3 overflow-x-auto pb-2">
           {statusConfig.map(({ status, displayName, icon }) => (
             <StatusColumn
               key={status}

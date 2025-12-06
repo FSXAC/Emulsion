@@ -12,8 +12,8 @@ export default function Layout({ children }) {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <div className="px-4">
+          <div className="flex items-center justify-between h-12">
             {/* Logo */}
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-gray-900">
@@ -51,7 +51,7 @@ export default function Layout({ children }) {
       </header>
       
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="px-4 py-4">
         {children}
       </main>
     </div>

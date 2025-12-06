@@ -45,7 +45,7 @@ const FilmRollCard = ({ roll }) => {
       {...listeners}
       className={`
         bg-white rounded-lg shadow-md hover:shadow-lg
-        p-4 mb-3 cursor-grab active:cursor-grabbing
+        p-3 mb-2 cursor-grab active:cursor-grabbing
         border border-gray-200 hover:border-film-cyan
         transition-all duration-200 ease-in-out
         touch-friendly

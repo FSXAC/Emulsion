@@ -15,13 +15,13 @@ const StatusColumn = ({ status, rolls, displayName, icon }) => {
   });
 
   return (
-    <div className="flex-1 min-w-[300px] flex flex-col">
+    <div className="flex-1 min-w-[280px] flex flex-col">
       {/* Column Header - DROP ZONE */}
       <div 
         ref={setNodeRef}
         className={`
-          mb-4 px-6 py-4 rounded-lg shadow-md border-2 transition-all duration-200 cursor-pointer
-          min-h-[80px] flex flex-col justify-center
+          mb-2 px-4 py-3 rounded-lg shadow-md border-2 transition-all duration-200 cursor-pointer
+          min-h-[68px] flex flex-col justify-center
           ${isOver 
             ? 'bg-film-cyan border-film-cyan shadow-2xl ring-4 ring-film-cyan/30' 
             : 'bg-gradient-to-r from-gray-100 to-gray-50 border-gray-300 hover:border-gray-400 hover:shadow-lg'
@@ -50,7 +50,7 @@ const StatusColumn = ({ status, rolls, displayName, icon }) => {
 
       {/* Cards Area (NOT a drop zone) */}
       <div
-        className="flex-1 min-h-[500px] p-4 rounded-xl bg-white border border-gray-200"
+        className="flex-1 min-h-[400px] p-2 rounded-lg bg-white border border-gray-200"
       >
         <SortableContext
           items={rolls.map((roll) => roll.id)}
