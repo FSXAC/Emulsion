@@ -497,11 +497,11 @@ date_taken      : Timestamp
 - [ ] 10.5 Add swipe gestures for quick actions (optional - deferred)
 
 ### Phase 11: Data Migration
-- [ ] 11.1 Export existing Numbers spreadsheet to CSV
-- [ ] 11.2 Write Python import script for film rolls
-- [ ] 11.3 Write Python import script for chemistry batches
-- [ ] 11.4 Run import and validate data integrity
-- [ ] 11.5 Verify all calculations match spreadsheet
+- [X] 11.1 Export existing Numbers spreadsheet to CSV
+- [X] 11.2 Write Python import script for film rolls
+- [X] 11.3 Write Python import script for chemistry batches
+- [X] 11.4 Run import and validate data integrity
+- [X] 11.5 Verify all calculations match spreadsheet
 
 ### Phase 12: Polish & Launch
 - [ ] 12.1 Add loading states and skeleton screens

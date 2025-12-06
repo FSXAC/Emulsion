@@ -5,7 +5,7 @@ import {
 } from '@dnd-kit/sortable';
 import FilmRollCard from './FilmRollCard';
 
-const StatusColumn = ({ status, rolls, displayName, icon, onCardClick }) => {
+const StatusColumn = ({ status, rolls, totalCount, hasMore, onLoadMore, displayName, icon, onCardClick }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: status,
     data: {
@@ -43,7 +43,7 @@ const StatusColumn = ({ status, rolls, displayName, icon, onCardClick }) => {
           <span className={`text-sm font-semibold px-3 py-1 rounded-full min-w-[2rem] text-center ${
             isOver ? 'bg-white text-film-cyan' : 'text-white bg-gray-700'
           }`}>
-            {rolls.length}
+            {totalCount}
           </span>
         </div>
       </div>
@@ -63,7 +63,18 @@ const StatusColumn = ({ status, rolls, displayName, icon, onCardClick }) => {
               <div className="text-xs mt-1">Drag rolls to this column</div>
             </div>
           ) : (
-            rolls.map((roll) => <FilmRollCard key={roll.id} roll={roll} onClick={onCardClick} />)
+            <>
+              {rolls.map((roll) => <FilmRollCard key={roll.id} roll={roll} onClick={onCardClick} />)}
+              
+              {hasMore && (
+                <button
+                  onClick={onLoadMore}
+                  className="mt-3 w-full py-2 px-4 bg-film-cyan hover:bg-film-cyan/90 text-white font-medium rounded-lg transition-colors duration-200 text-sm"
+                >
+                  Load More ({totalCount - rolls.length} more)
+                </button>
+              )}
+            </>
           )}
         </SortableContext>
       </div>

@@ -53,6 +53,12 @@ export default function RollsPage() {
   const [editRollModal, setEditRollModal] = useState({ isOpen: false, roll: null });
   const [addRollModal, setAddRollModal] = useState({ isOpen: false, initialData: null });
 
+  // Pagination state for NEW and SCANNED columns
+  const [visibleCounts, setVisibleCounts] = useState({
+    NEW: 4,
+    SCANNED: 4,
+  });
+
   // Status configuration
   const statusConfig = [
     { status: 'NEW', displayName: 'New', icon: '🎞️' },
@@ -140,6 +146,27 @@ export default function RollsPage() {
     acc[status] = rolls.filter((roll) => roll.status === status);
     return acc;
   }, {});
+
+  // Apply pagination to NEW and SCANNED columns
+  const getVisibleRolls = (status) => {
+    const allRolls = rollsByStatus[status] || [];
+    if (status === 'NEW' || status === 'SCANNED') {
+      return allRolls.slice(0, visibleCounts[status]);
+    }
+    return allRolls;
+  };
+
+  const hasMoreRolls = (status) => {
+    const allRolls = rollsByStatus[status] || [];
+    return (status === 'NEW' || status === 'SCANNED') && allRolls.length > visibleCounts[status];
+  };
+
+  const loadMoreRolls = (status) => {
+    setVisibleCounts(prev => ({
+      ...prev,
+      [status]: prev[status] + 8,
+    }));
+  };
 
   // Handle drag start
   const handleDragStart = (event) => {
@@ -461,7 +488,10 @@ export default function RollsPage() {
               status={status}
               displayName={displayName}
               icon={icon}
-              rolls={rollsByStatus[status]}
+              rolls={getVisibleRolls(status)}
+              totalCount={rollsByStatus[status]?.length || 0}
+              hasMore={hasMoreRolls(status)}
+              onLoadMore={() => loadMoreRolls(status)}
               onCardClick={handleCardClick}
             />
           ))}

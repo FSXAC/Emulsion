@@ -138,14 +138,14 @@ const FilmRollCard = ({ roll, onClick }) => {
       )}
 
       {/* Push/Pull */}
-      {roll.push_pull_stops !== null && roll.push_pull_stops !== 0 && (
+      {roll.push_pull_stops && Math.abs(roll.push_pull_stops) > 0 && (
         <div className="inline-flex items-center gap-1 px-2 py-1 mb-2 text-xs bg-film-red/10 text-film-red border border-film-red/30 rounded font-bold">
-          ⚡ {roll.push_pull_stops > 0 ? '+' : ''}{roll.push_pull_stops} stop
+          ⚡ {roll.push_pull_stops > 0 ? '+' : ''}{roll.push_pull_stops} stop{Math.abs(roll.push_pull_stops) !== 1 ? 's' : ''}
         </div>
       )}
 
       {/* Rating */}
-      {roll.stars && roll.stars > 0 && (
+      {roll.stars > 0 && (
         <div className="text-xl mt-2 pt-2 border-t border-gray-200">
           {renderStars(roll.stars)}
         </div>
