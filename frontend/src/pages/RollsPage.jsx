@@ -142,14 +142,16 @@ export default function RollsPage() {
       const currentIndex = statusOrder.indexOf(roll.status);
       const targetIndex = statusOrder.indexOf(targetStatus);
       const isBackward = targetIndex < currentIndex;
+      const isForward = targetIndex > currentIndex;
 
-      // Handle backward transitions (reset fields)
+      // Handle backward transitions (reset fields) - can jump to any previous status
       if (isBackward) {
         const fieldsToUpdate = {};
         
         // Reset fields based on target status
         if (targetIndex < statusOrder.indexOf('SCANNED')) {
           fieldsToUpdate.stars = null;
+          fieldsToUpdate.actual_exposures = null;
         }
         if (targetIndex < statusOrder.indexOf('DEVELOPED')) {
           fieldsToUpdate.chemistry_id = null;
@@ -164,7 +166,13 @@ export default function RollsPage() {
         // Use updateRoll to clear fields
         const { updateRoll } = await import('../services/rolls');
         updatedRoll = await updateRoll(roll.id, fieldsToUpdate);
-      } else {
+      } else if (isForward) {
+        // Forward transitions - only allow sequential moves (one step at a time)
+        if (targetIndex - currentIndex > 1) {
+          showToast('⚠️ Please move rolls one status at a time in the forward direction', 'error');
+          return;
+        }
+
         // Handle forward transitions - show modals for user input
         switch (targetStatus) {
           case 'LOADED':
