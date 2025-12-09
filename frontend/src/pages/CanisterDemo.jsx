@@ -10,9 +10,6 @@ export default function CanisterDemo() {
   const [textureFile, setTextureFile] = useState(null);
   const [texturePreview, setTexturePreview] = useState('/sample-label.svg');
   const [thumbnail, setThumbnail] = useState(null);
-  const [enableShadows, setEnableShadows] = useState(true);
-  const [backgroundColor, setBackgroundColor] = useState('#ffffff');
-  const [autoRotate, setAutoRotate] = useState(true);
 
   const handleTextureUpload = (e) => {
     const file = e.target.files[0];
@@ -58,7 +55,7 @@ export default function CanisterDemo() {
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left column - Upload and controls */}
+          {/* Left column - Upload */}
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-lg shadow">
               <h2 className="text-lg font-semibold mb-4">1. Upload Label Texture</h2>
@@ -90,56 +87,9 @@ export default function CanisterDemo() {
               )}
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-lg font-semibold mb-4">2. Adjust Settings</h2>
-              
-              <div className="space-y-4">
-                <label className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">Auto-Rotate</span>
-                  <input
-                    type="checkbox"
-                    checked={autoRotate}
-                    onChange={(e) => setAutoRotate(e.target.checked)}
-                    className="rounded"
-                  />
-                </label>
-
-                <label className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">Enable Shadows</span>
-                  <input
-                    type="checkbox"
-                    checked={enableShadows}
-                    onChange={(e) => setEnableShadows(e.target.checked)}
-                    className="rounded"
-                  />
-                </label>
-
-                <div>
-                  <label className="block text-sm text-gray-700 mb-2">
-                    Background Color
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="color"
-                      value={backgroundColor}
-                      onChange={(e) => setBackgroundColor(e.target.value)}
-                      className="h-10 w-20 rounded cursor-pointer"
-                    />
-                    <input
-                      type="text"
-                      value={backgroundColor}
-                      onChange={(e) => setBackgroundColor(e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm"
-                      placeholder="#ffffff"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {thumbnail && (
               <div className="bg-white p-6 rounded-lg shadow">
-                <h2 className="text-lg font-semibold mb-4">3. Generated Thumbnail</h2>
+                <h2 className="text-lg font-semibold mb-4">2. Generated Thumbnail</h2>
                 <img 
                   src={thumbnail} 
                   alt="Generated canister thumbnail" 
@@ -166,9 +116,10 @@ export default function CanisterDemo() {
                 config={{
                   width: 400,
                   height: 400,
-                  enableShadows: enableShadows,
-                  backgroundColor: backgroundColor,
-                  autoRotate: autoRotate,
+                  enableShadows: true,
+                  backgroundColor: null, // Transparent background
+                  autoRotate: false,
+                  enableOrbit: false,
                 }}
               />
             ) : (

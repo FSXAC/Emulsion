@@ -17,7 +17,7 @@ const DEFAULT_CONFIG = {
     canisterRadius: 0.5,
     canisterHeight: 0.5,
     cameraDistance: 1000,
-    backgroundColor: '#ffffff',
+    backgroundColor: null, // null = transparent
     enableShadows: true,
     antialias: true,
 };
@@ -35,6 +35,8 @@ function mm2screen(value_mm) {
  * Create a film canister mesh with texture
  * @param {string} textureUrl - URL or data URL of the label texture
  * @param {Object} options - Canister options
+ * @param {number} options.textureRotation - Rotation angle in radians (0, Math.PI/2, Math.PI, etc.)
+ * @param {boolean} options.autoRotateTexture - Auto-rotate vertical images to horizontal (default: true)
  * @returns {THREE.Group} Canister group with mesh
  */
 export function createCanister(textureUrl, options = {}) {
@@ -48,42 +50,82 @@ export function createCanister(textureUrl, options = {}) {
 
     // Load texture
     const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load(textureUrl);
+    const texture = textureLoader.load(textureUrl, (loadedTexture) => {
+        // Auto-rotate vertical images to horizontal if enabled
+        const autoRotate = true;
+        let finalRotation = 0;
+        
+        if (autoRotate && loadedTexture.image) {
+            const img = loadedTexture.image;
+            const isVertical = img.height > img.width;
+            
+            if (isVertical) {
+                // Start with 90 degrees for vertical images
+                finalRotation = Math.PI / 2;
+            }
+        }
+        
+        // Add manual rotation on top of auto-rotation
+        if (options.textureRotation !== undefined && options.textureRotation !== 0) {
+            finalRotation += options.textureRotation;
+        }
+        
+        // Apply final rotation
+        if (finalRotation !== 0) {
+            loadedTexture.rotation = finalRotation;
+            loadedTexture.center.set(0.5, 0.5);
+            loadedTexture.needsUpdate = true;
+        }
+    });
+    
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.ClampToEdgeWrapping;
     texture.colorSpace = THREE.SRGBColorSpace;
+    
+    // Improve texture quality
+    texture.minFilter = THREE.LinearMipMapLinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.anisotropy = 16; // Maximum anisotropic filtering
 
     // Canister body (cylinder) with custom shader for saturation boost
     const bodyGeometry = new THREE.CylinderGeometry(radius, radius, height, 32);
     const bodyMaterial = new THREE.MeshStandardMaterial({
         map: texture,
-        metalness: 0.15,
-        roughness: 0.25,
+        metalness: 0.1,
+        roughness: 0.15,
     });
     
-    // Custom shader to boost saturation
+    // Custom shader to boost saturation and crush colors
     bodyMaterial.onBeforeCompile = (shader) => {
-        // Add saturation uniform
-        shader.uniforms.saturationBoost = { value: 1.0 };
+        // Add uniforms
+        shader.uniforms.saturationBoost = { value: 1.12 };
+        shader.uniforms.colorDepth = { value: 32.0 };
         
-        // Inject saturation adjustment into fragment shader
+        // Inject saturation adjustment and color crushing into fragment shader
         shader.fragmentShader = shader.fragmentShader.replace(
             '#include <map_fragment>',
             `
             #include <map_fragment>
             
-            // Apply saturation boost
+            // Apply effects to textured areas
             if (vMapUv.x >= 0.0) {
                 vec3 color = diffuseColor.rgb;
+                
+                // Saturation boost
                 float gray = dot(color, vec3(0.299, 0.587, 0.114));
                 vec3 grayVec = vec3(gray);
-                diffuseColor.rgb = mix(grayVec, color, saturationBoost);
+                color = mix(grayVec, color, saturationBoost);
+                
+                // Color depth reduction (posterization)
+                color = floor(color * colorDepth) / colorDepth;
+                
+                diffuseColor.rgb = color;
             }
             `
         );
         
-        // Add uniform declaration
-        shader.fragmentShader = 'uniform float saturationBoost;\n' + shader.fragmentShader;
+        // Add uniform declarations
+        shader.fragmentShader = 'uniform float saturationBoost;\nuniform float colorDepth;\n' + shader.fragmentShader;
     };
     const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
     body.castShadow = true;
@@ -145,7 +187,7 @@ export function createCanister(textureUrl, options = {}) {
     const spoolInnerWall = new THREE.Mesh(spoolInnerWallGeometry, spoolMaterial);
     spoolInnerWall.position.y = height / 2 + capHeight / 2 + spoolCapHeight / 2;
     spoolInnerWall.castShadow = true;
-    group.add(spoolInnerWall);
+    // group.add(spoolInnerWall);
 
     // Top ring cap
     const topRingGeometry = new THREE.RingGeometry(spoolCapRadiusInner, spoolCapRadiusOuter, 32);
@@ -153,13 +195,13 @@ export function createCanister(textureUrl, options = {}) {
     topRing.rotation.x = -Math.PI / 2;
     topRing.position.y = height / 2 + capHeight / 2 + spoolCapHeight;
     topRing.castShadow = true;
-    group.add(topRing);
+    // group.add(topRing);
 
     // Bottom ring cap (inside surface)
     const bottomRing = new THREE.Mesh(topRingGeometry, spoolMaterial);
     bottomRing.rotation.x = Math.PI / 2;
     bottomRing.position.y = height / 2 + capHeight / 2;
-    group.add(bottomRing);
+    // group.add(bottomRing);
 
     // Rotate to show the label front (opposite side from seam)
     group.rotation.y = -Math.PI;
@@ -177,7 +219,7 @@ export function setupScene(config = {}) {
 
     // Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(cfg.backgroundColor);
+    scene.background = cfg.backgroundColor ? new THREE.Color(cfg.backgroundColor) : null;
 
     // Camera
     const camera = new THREE.PerspectiveCamera(
@@ -203,7 +245,7 @@ export function setupScene(config = {}) {
     
     // Use Linear tone mapping for more vibrant colors
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 2.1;
+    renderer.toneMappingExposure = 1.8;
     
     // Boost color output for more vibrant rendering
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -211,20 +253,20 @@ export function setupScene(config = {}) {
     // Lighting
 
     // Ambient light for general illumination (reduced since we have hemisphere)
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
     scene.add(ambientLight);
 
     // Main directional lights (key lights)
-    const mainLight = new THREE.DirectionalLight(0xffffff, 1.0);
-    mainLight.position.set(12, 2, 10);
+    const mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    mainLight.position.set(15, 2, 8);
     scene.add(mainLight);
 
-    const mainLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
-    mainLight2.position.set(-8, 3, 6);
+    const mainLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+    mainLight2.position.set(-15, 1.2, -8);
     scene.add(mainLight2);
 
     // Fill light from the top with shadows enabled
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.4);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.2);
     fillLight.position.set(-0.5, 10, 1.5);
     fillLight.castShadow = true;
     fillLight.shadow.mapSize.width = 2048;
@@ -240,9 +282,15 @@ export function setupScene(config = {}) {
     scene.add(fillLight);
 
     // Add another point light from the front-bottom
-    const pointLight = new THREE.DirectionalLight(0xffffff, 0.2);
-    pointLight.position.set(0, -1, 10);
+    const pointLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    pointLight.position.set(15, -2, 8);
     scene.add(pointLight);
+
+    // Add a box light to the left side for better illumination
+    const rectLight = new THREE.RectAreaLight(0xffffff, 1.0, 2, 10);
+        rectLight.position.set(-1, 0, 2);
+        rectLight.lookAt(0, 0, 0);
+        scene.add(rectLight);
     
 
     // Ground plane for shadows
@@ -326,6 +374,11 @@ export function renderCanisterToCanvas(container, textureUrl, config = {}) {
     controls.maxDistance = 13;
     controls.autoRotate = cfg.autoRotate ?? false;
     controls.autoRotateSpeed = 1.0;
+    
+    // Disable orbit controls if specified
+    if (cfg.enableOrbit === false) {
+        controls.enabled = false;
+    }
 
     // Create canister
     const canister = createCanister(textureUrl, cfg);

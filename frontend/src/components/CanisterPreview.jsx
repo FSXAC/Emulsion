@@ -10,8 +10,8 @@ import { renderCanisterToCanvas } from '../utils/canisterRenderer';
 export default function CanisterPreview({ textureUrl, onGenerate, config = {} }) {
   const containerRef = useRef(null);
   const [renderer, setRenderer] = useState(null);
-  const [autoRotate, setAutoRotate] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [textureRotation, setTextureRotation] = useState(0);
 
   useEffect(() => {
     if (!containerRef.current || !textureUrl) return;
@@ -23,7 +23,7 @@ export default function CanisterPreview({ textureUrl, onGenerate, config = {} })
       canvasRenderer = renderCanisterToCanvas(
         containerRef.current,
         textureUrl,
-        config
+        { ...config, textureRotation }
       );
 
       setRenderer(canvasRenderer);
@@ -38,19 +38,17 @@ export default function CanisterPreview({ textureUrl, onGenerate, config = {} })
         canvasRenderer.dispose();
       }
     };
-  }, [textureUrl, config]);
-
-  useEffect(() => {
-    if (renderer && renderer.setAutoRotate) {
-      renderer.setAutoRotate(autoRotate);
-    }
-  }, [renderer, autoRotate]);
+  }, [textureUrl, config, textureRotation]);
 
   const handleScreenshot = () => {
     if (renderer && onGenerate) {
       const dataURL = renderer.screenshot();
       onGenerate(dataURL);
     }
+  };
+
+  const handleFlipRotation = () => {
+    setTextureRotation((prev) => prev + Math.PI);
   };
 
   return (
@@ -69,16 +67,14 @@ export default function CanisterPreview({ textureUrl, onGenerate, config = {} })
         )}
       </div>
       
-      <div className="flex gap-4 items-center">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={autoRotate}
-            onChange={(e) => setAutoRotate(e.target.checked)}
-            className="rounded"
-          />
-          <span className="text-sm text-gray-700">Auto-rotate</span>
-        </label>
+      <div className="flex gap-2">
+        <button
+          onClick={handleFlipRotation}
+          disabled={!renderer}
+          className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          🔄 Flip 180°
+        </button>
         
         <button
           onClick={handleScreenshot}
@@ -87,10 +83,6 @@ export default function CanisterPreview({ textureUrl, onGenerate, config = {} })
         >
           📸 Generate Thumbnail
         </button>
-      </div>
-
-      <div className="text-xs text-gray-500 text-center">
-        Drag to rotate • Scroll to zoom • Auto-rotate for full view
       </div>
     </div>
   );
