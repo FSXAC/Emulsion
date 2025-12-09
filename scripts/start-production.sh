@@ -33,11 +33,11 @@ else
 fi
 echo ""
 echo "Access the app at:"
-echo "  - Local:   http://localhost:8000"
-echo "  - Network: http://$(ipconfig getifaddr en0 2>/dev/null || echo "192.168.1.244"):8000"
+echo "  - Local:   http://localhost:8200"
+echo "  - Network: http://$(ipconfig getifaddr en0 2>/dev/null || echo "192.168.1.244"):8200"
 echo ""
 echo "Press Ctrl+C to stop the server"
 echo ""
 
 # Start the server (from backend directory)
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+uvicorn app.main:app --host 0.0.0.0 --port 8200

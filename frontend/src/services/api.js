@@ -6,7 +6,7 @@ import axios from 'axios';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (
   import.meta.env.MODE === 'production' 
     ? ''  // Empty string - routes already have /api prefix from backend router
-    : 'http://localhost:8000'  // Backend dev server
+    : 'http://localhost:8200'  // Backend dev server
 );
 
 // Log configuration for debugging

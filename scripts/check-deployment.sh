@@ -99,20 +99,20 @@ LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null)
 if [ -n "$LOCAL_IP" ]; then
     check_pass "Network interface found"
     echo "   Local IP: $LOCAL_IP"
-    echo "   Access URL: http://$LOCAL_IP:8000"
+    echo "   Access URL: http://$LOCAL_IP:8200"
 else
     check_warn "Could not determine local IP"
     echo "   Try: ipconfig getifaddr en1 (ethernet)"
 fi
 
-# 8. Check if port 8000 is available
+# 8. Check if port 8200 is available
 echo ""
 echo "Checking port availability..."
-PORT_CHECK=$(lsof -ti:8000 2>/dev/null)
+PORT_CHECK=$(lsof -ti:8200 2>/dev/null)
 if [ -z "$PORT_CHECK" ]; then
-    check_pass "Port 8000 is available"
+    check_pass "Port 8200 is available"
 else
-    check_warn "Port 8000 is in use"
+    check_warn "Port 8200 is in use"
     echo "   Process ID: $PORT_CHECK"
     echo "   Kill with: kill $PORT_CHECK"
 fi
@@ -133,9 +133,9 @@ echo ""
 echo "1. If any checks failed, fix them first"
 echo "2. Run: ./scripts/build-production.sh"
 echo "3. Run: ./scripts/start-production.sh"
-echo "4. Access at: http://localhost:8000"
+echo "4. Access at: http://localhost:8200"
 if [ -n "$LOCAL_IP" ]; then
-    echo "5. From phone: http://$LOCAL_IP:8000"
+    echo "5. From phone: http://$LOCAL_IP:8200"
 fi
 echo ""
 echo "📚 See QUICKSTART.md for detailed instructions"

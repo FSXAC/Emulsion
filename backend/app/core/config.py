@@ -25,10 +25,10 @@ class Settings(BaseSettings):
     # The wildcard allows network access from other devices on local network
     cors_origins: list[str] = [
         "http://localhost:5173",  # Vite dev server
-        "http://localhost:8000",  # Production server
+        "http://localhost:8200",  # Production server
         "http://127.0.0.1:5173",
-        "http://127.0.0.1:8000",
-        "*",  # Allow network access (e.g., http://192.168.x.x:8000)
+        "http://127.0.0.1:8200",
+        "*",  # Allow network access (e.g., http://192.168.x.x:8200)
     ]
     
     model_config = SettingsConfigDict(

@@ -17,41 +17,67 @@ A web-based application for tracking analog film rolls through their lifecycle: 
 - Framer Motion 11
 - axios 1.7
 
-## Getting Started
+## 🚀 Quick Start
 
-### Development Mode
+### First Time Setup
 
-**Backend:**
-```sh
+1. **Make scripts executable:**
+```bash
+chmod +x scripts/*.sh
+```
+
+2. **Set up Python virtual environment (backend):**
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cd ..
+```
+
+3. **Install frontend dependencies:**
+```bash
+cd frontend
+npm install
+cd ..
+```
+
+### Development Mode (Two Servers)
+
+Use this for active development with hot-reload:
+
+**Terminal 1 - Backend:**
+```bash
 cd backend
 source venv/bin/activate
 uvicorn app.main:app --reload
 ```
 
-**Frontend:**
-```sh
+**Terminal 2 - Frontend:**
+```bash
 cd frontend
 npm run dev
 ```
 
-Access at: http://localhost:5173
+Access at: **http://localhost:5173** (Vite proxies API requests to backend on port 8200)
 
-### Production Mode (Recommended)
+### Production Mode (Single Server)
 
-Build and run for local network access:
+Use this for local network access from mobile devices:
 
-```sh
-# First time setup
-chmod +x scripts/*.sh
+```bash
+# Build frontend (first time or after changes)
 ./scripts/build-production.sh
 
 # Start server
 ./scripts/start-production.sh
 ```
 
-Access at: http://localhost:8000 or http://YOUR_IP:8000
+Access at:
+- **Local:** http://localhost:8200
+- **Network:** http://YOUR_IP:8200 (shown in terminal when server starts)
 
-📚 **See [QUICKSTART.md](QUICKSTART.md) for complete setup instructions**
+The production server serves both frontend and backend from port **8200**
 
 ## Features
 
@@ -140,29 +166,80 @@ Access at: http://localhost:8000 or http://YOUR_IP:8000
 - `PUT /api/chemistry/{id}` - Update batch
 - `DELETE /api/chemistry/{id}` - Delete batch
 
-## Database
+## 🗄️ Database
 
-**Location:** `backend/data/emulsion.db`
+**Location:** `backend/data/emulsion.db` (SQLite)
 
 **Tables:**
-- `film_rolls` - Film roll tracking
-- `chemistry_batches` - Chemistry batch tracking
+- `film_rolls` - Film roll tracking with computed status
+- `chemistry_batches` - Chemistry batch tracking with C41 dev time calculation
 
-**Backups:**
-```sh
-./scripts/backup-database.sh
+**Changing Database Location:**
+
+Edit `backend/app/core/config.py`:
+```python
+database_url: str = "sqlite:///path/to/your/emulsion.db"
 ```
 
-Backups stored in: `backend/data/backups/`
+## 📊 Data Migration
 
-## Status Logic
+Import existing data from CSV files (e.g., from Numbers spreadsheet):
 
-Status computed from field presence:
+```bash
+cd migration/scripts
+
+# Import chemistry batches first (required before rolls)
+python import_chemistry.py --db-path ../../backend/data/emulsion.db
+
+# Import film rolls
+python import_rolls.py --db-path ../../backend/data/emulsion.db
+
+# Validate imported data
+python validate.py --db-path ../../backend/data/emulsion.db
+```
+
+See `migration/README.md` for CSV format requirements.
+
+## 🏗️ Architecture
+
+### How It Works
+
+**Development Mode:**
+```
+Browser → Port 5173 (Vite) → Proxy → Port 8200 (FastAPI)
+```
+- Frontend dev server with hot-reload
+- API requests automatically proxied to backend
+- Best for active development
+
+**Production Mode:**
+```
+Browser → Port 8200 (FastAPI)
+            ├── /api/* → Backend API
+            └── /* → Frontend (React SPA)
+```
+- Single server serves both frontend and backend
+- FastAPI serves built frontend static files
+- SPA routing support with fallback to index.html
+- Best for local network access (mobile devices)
+
+### Status Derivation Pattern
+
+**Status is computed, not stored.** The `FilmRoll.status` property derives status from field presence:
 - **NEW**: No dates, no chemistry, no stars
 - **LOADED**: Has `date_loaded`
 - **EXPOSED**: Has `date_unloaded`
 - **DEVELOPED**: Has `chemistry_id`
 - **SCANNED**: Has `stars > 0`
+
+This flexible approach avoids rigid state machines and allows data corrections.
+
+### Computed Properties
+
+Both models use `@property` decorators for on-the-fly calculations (never stored):
+- **FilmRoll**: `status`, `dev_cost`, `total_cost`, `cost_per_shot`, `duration_days`
+- **ChemistryBatch**: `batch_cost`, `rolls_developed`, `cost_per_roll`, `development_time_formatted`
+- **C41 development time:** Base 3:30 + 2% per roll used
 
 ## Project Structure
 
@@ -206,14 +283,84 @@ emulsion/
 - `ChemistryBatch` model - Roll count, C41 dev time calculation
 - CRUD + PATCH endpoints for all operations
 
-## Documentation
+## 📱 Mobile Access (Add to Home Screen)
 
-- **[QUICKSTART.md](QUICKSTART.md)** - 🚀 Quick production setup (start here!)
-- **[PRODUCTION.md](PRODUCTION.md)** - Production deployment reference
-- **[DEPLOY.md](DEPLOY.md)** - Comprehensive deployment guide with all options
-- **[plan.md](plan.md)** - Full architecture and development plan
+### iOS (Safari)
+1. Open `http://YOUR_IP:8200` in Safari
+2. Tap the Share button (square with arrow)
+3. Tap "Add to Home Screen"
+4. Name it "Emulsion" and tap "Add"
 
-## Testing
+### Android (Chrome)
+1. Open `http://YOUR_IP:8200` in Chrome
+2. Tap the three-dot menu
+3. Tap "Add to Home screen"
+4. Name it "Emulsion" and tap "Add"
 
-- Backend API: http://localhost:8000/docs (Swagger UI)
-- Database: `backend/data/emulsion.db` (SQLite file)
+## 💾 Database Backups
+
+### Manual Backup
+```bash
+./scripts/backup-database.sh
+```
+
+Backups are stored in: `backend/data/backups/`
+
+### Automatic Daily Backups (Optional)
+
+Set up a cron job to run daily at 2 AM:
+
+```bash
+crontab -e
+```
+
+Add this line (replace `YOUR_PATH` with actual path):
+```bash
+0 2 * * * /YOUR_PATH/Emulsion/scripts/backup-database.sh
+```
+
+## 🔧 Troubleshooting
+
+### Port Already in Use
+```bash
+# Find what's using port 8200
+lsof -ti:8200
+
+# Kill the process
+kill $(lsof -ti:8200)
+```
+
+### Can't Access from Phone
+1. Check firewall settings (allow incoming connections for Python/uvicorn)
+2. Verify both devices are on same WiFi network
+3. Use IP address (not localhost) when accessing from phone
+4. Try: `http://YOUR_IP:8200` (find IP with `ipconfig getifaddr en0` on macOS)
+
+### Frontend Not Loading in Production
+```bash
+# Rebuild frontend
+cd frontend
+npm run build
+
+# Restart server
+cd ..
+./scripts/start-production.sh
+```
+
+### CORS Errors
+Backend is configured to allow all local network origins. If you see CORS errors:
+- Check `backend/app/core/config.py` for `cors_origins` settings
+- Verify API requests use `/api` prefix
+
+## 🔐 Security Notes
+
+⚠️ **Important**: This setup is for **local network use only**. Do not expose port 8200 directly to the internet without:
+- Adding authentication
+- Using HTTPS
+- Implementing rate limiting
+- Adding security headers
+
+## 📚 Documentation
+
+- **[plan.md](plan.md)** - Complete architecture and development plan
+- **Backend API:** http://localhost:8200/docs (Swagger UI when running)
