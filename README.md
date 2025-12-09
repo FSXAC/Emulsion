@@ -50,7 +50,7 @@ Use this for active development with hot-reload:
 ```bash
 cd backend
 source venv/bin/activate
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8200
 ```
 
 **Terminal 2 - Frontend:**
