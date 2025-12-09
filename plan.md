@@ -121,7 +121,7 @@ A web-based application for tracking analog film rolls through their lifecycle: 
 │  └────────────────────────────────────────┘ │
 └─────────────────┬──────────────────────────┘
                   │ REST API / HTTP
-                  │ http://localhost:8000
+                  │ http://localhost:8200
 ┌─────────────────▼──────────────────────────┐
 │     Backend Server (FastAPI + Python)      │
 │                                             │
@@ -318,16 +318,16 @@ date_taken      : Timestamp
 ### Current Setup
 
 **Development Servers**:
-- Backend: `uvicorn app.main:app --reload` (FastAPI dev server on port 8000)
+- Backend: `uvicorn app.main:app --reload` (FastAPI dev server on port 8200)
 - Frontend: `npm run dev` (Vite dev server on port 5173)
-- Access: `http://localhost:5173` (frontend) → `http://localhost:8000` (backend API)
+- Access: `http://localhost:5173` (frontend) → `http://localhost:8200` (backend API)
 - Database: SQLite file at `backend/data/emulsion.db`
 
 **Production-style Local Setup** (optional):
 - Use `systemd` service (Linux) or `launchd` (macOS) to auto-start on boot
 - Backend: Serve via Gunicorn/Uvicorn
 - Frontend: Build production bundle, serve via backend static files
-- Single port access: `http://localhost:8000`
+- Single port access: `http://localhost:8200`
 
 **Backup Strategy**:
 - SQLite database is a single file - easy to backup
@@ -577,8 +577,8 @@ The application includes:
 ✅ Database file created at `backend/data/emulsion.db`
 ✅ Database tables created automatically on startup (`film_rolls`, `chemistry_batches`)
 ✅ Health check endpoint returns `{"status":"healthy","database":"connected","version":"0.1.0"}`
-✅ Root endpoint accessible at http://localhost:8000
-✅ Interactive API documentation available at http://localhost:8000/docs
+✅ Root endpoint accessible at http://localhost:8200
+✅ Interactive API documentation available at http://localhost:8200/docs
 
 **What Was Verified:**
 - SQLAlchemy engine connects to SQLite database successfully
@@ -629,7 +629,7 @@ Implements complete CRUD API for film rolls with:
 - `PUT /api/rolls/{id}` - Update roll
 - `DELETE /api/rolls/{id}` - Delete roll
 
-All endpoints documented at http://localhost:8000/docs with interactive testing.
+All endpoints documented at http://localhost:8200/docs with interactive testing.
 
 ### Task 3.1-3.6: Chemistry Batches API Implementation
 **Files Modified:**
@@ -669,7 +669,7 @@ Implements complete CRUD API for chemistry batches with:
   - Chemistry: `batch_cost`, `rolls_developed`, `cost_per_roll`, `development_time_formatted`, `is_active`
   - Film rolls: `status`, `dev_cost`, `total_cost`, `cost_per_shot`, `duration_days`
 ✅ Timestamp serialization fixed (datetime → ISO 8601 strings)
-✅ Interactive API documentation at http://localhost:8000/docs functional
+✅ Interactive API documentation at http://localhost:8200/docs functional
 
 **Issues Fixed:**
 - Changed `created_at` and `updated_at` from `str` to `datetime` in response schemas to match SQLAlchemy model types
