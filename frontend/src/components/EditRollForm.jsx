@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import AutocompleteInput from './AutocompleteInput';
 import { getRolls } from '../services/rolls';
+import { getFilmStockImage } from '../utils/filmStockImages';
 
 const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }) => {
   const [formData, setFormData] = useState({
@@ -175,22 +176,55 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 overflow-y-auto"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full my-8">
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">Edit Film Roll</h2>
-          <p className="text-sm text-gray-600 mt-1">Update details for this roll</p>
-          <p className="text-sm text-gray-500 mt-1">
-            Status: <span className="font-medium text-gray-700">{roll.status}</span>
-          </p>
+      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh]">
+        {/* Header - Fixed */}
+        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200">
+          <div className="flex items-start gap-4">
+            {/* Thumbnail */}
+            <div className="flex-shrink-0 w-16 h-24 sm:w-20 sm:h-28 overflow-hidden rounded">
+              <img 
+                src={getFilmStockImage(roll.film_stock_name, roll.film_format)}
+                alt={roll.film_stock_name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            
+            {/* Title and Status */}
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Edit Film Roll</h2>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">Update details for this roll</p>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                Status: <span className="font-medium text-gray-700">{roll.status}</span>
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="px-6 py-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Form - Scrollable */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
+          {/* Film Stock Name - Full Width */}
+          <div className="mb-4">
+            <label htmlFor="film_stock_name" className="block text-sm font-medium text-gray-700 mb-1">
+              Film Stock *
+            </label>
+            <AutocompleteInput
+              id="film_stock_name"
+              name="film_stock_name"
+              value={formData.film_stock_name}
+              onChange={handleChange}
+              suggestions={filmStockSuggestions}
+              placeholder="e.g., Kodak Portra 400"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
+                errors.film_stock_name ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.film_stock_name && <p className="mt-1 text-xs text-red-600">{errors.film_stock_name}</p>}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {/* Order ID */}
             <div>
               <label htmlFor="order_id" className="block text-sm font-medium text-gray-700 mb-1">
@@ -202,7 +236,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
                 value={formData.order_id}
                 onChange={handleChange}
                 suggestions={orderIdSuggestions}
-                placeholder="e.g., 42"
+                placeholder="42"
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
                   errors.order_id ? 'border-red-500' : 'border-gray-300'
                 }`}
@@ -210,51 +244,10 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
               {errors.order_id && <p className="mt-1 text-xs text-red-600">{errors.order_id}</p>}
             </div>
 
-            {/* Film Stock Name */}
-            <div>
-              <label htmlFor="film_stock_name" className="block text-sm font-medium text-gray-700 mb-1">
-                Film Stock *
-              </label>
-              <AutocompleteInput
-                id="film_stock_name"
-                name="film_stock_name"
-                value={formData.film_stock_name}
-                onChange={handleChange}
-                suggestions={filmStockSuggestions}
-                placeholder="e.g., Kodak Portra 400"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.film_stock_name ? 'border-red-500' : 'border-gray-300'
-                }`}
-              />
-              {errors.film_stock_name && <p className="mt-1 text-xs text-red-600">{errors.film_stock_name}</p>}
-            </div>
-
-            {/* Film Format */}
-            <div>
-              <label htmlFor="film_format" className="block text-sm font-medium text-gray-700 mb-1">
-                Format *
-              </label>
-              <select
-                id="film_format"
-                name="film_format"
-                value={formData.film_format}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan"
-              >
-                <option value="35mm">35mm</option>
-                <option value="HF">HF (Half Frame)</option>
-                <option value="120">120 (Medium Format)</option>
-                <option value="110">110</option>
-                <option value="126">126</option>
-                <option value="4x5">4x5 (Large Format)</option>
-                <option value="8x10">8x10 (Large Format)</option>
-              </select>
-            </div>
-
             {/* Expected Exposures */}
             <div>
               <label htmlFor="expected_exposures" className="block text-sm font-medium text-gray-700 mb-1">
-                Expected Exposures *
+                Exposures *
               </label>
               <input
                 type="number"
@@ -269,32 +262,35 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
               />
               {errors.expected_exposures && <p className="mt-1 text-xs text-red-600">{errors.expected_exposures}</p>}
             </div>
+          </div>
 
-            {/* Film Cost */}
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-4">
+            {/* Film Format */}
             <div>
-              <label htmlFor="film_cost" className="block text-sm font-medium text-gray-700 mb-1">
-                Film Cost ($) *
+              <label htmlFor="film_format" className="block text-sm font-medium text-gray-700 mb-1">
+                Format *
               </label>
-              <input
-                type="number"
-                id="film_cost"
-                name="film_cost"
-                value={formData.film_cost}
+              <select
+                id="film_format"
+                name="film_format"
+                value={formData.film_format}
                 onChange={handleChange}
-                min="0"
-                step="0.01"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.film_cost ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="0.00"
-              />
-              {errors.film_cost && <p className="mt-1 text-xs text-red-600">{errors.film_cost}</p>}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan text-sm"
+              >
+                <option value="35mm">35mm</option>
+                <option value="HF">HF</option>
+                <option value="120">120</option>
+                <option value="110">110</option>
+                <option value="126">126</option>
+                <option value="4x5">4x5</option>
+                <option value="8x10">8x10</option>
+              </select>
             </div>
 
             {/* Push/Pull Stops */}
             <div>
               <label htmlFor="push_pull_stops" className="block text-sm font-medium text-gray-700 mb-1">
-                Push/Pull Stops
+                Push/Pull
               </label>
               <input
                 type="number"
@@ -305,10 +301,31 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
                 step="0.5"
                 min="-3"
                 max="3"
+                placeholder="0"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan"
               />
-              <p className="mt-1 text-xs text-gray-500">e.g., +1, -0.5 (range: -3 to +3)</p>
             </div>
+          </div>
+
+          {/* Film Cost - Full Width */}
+          <div className="mt-4">
+            <label htmlFor="film_cost" className="block text-sm font-medium text-gray-700 mb-1">
+              Film Cost ($) *
+            </label>
+            <input
+              type="number"
+              id="film_cost"
+              name="film_cost"
+              value={formData.film_cost}
+              onChange={handleChange}
+              min="0"
+              step="0.01"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
+                errors.film_cost ? 'border-red-500' : 'border-gray-300'
+              }`}
+              placeholder="0.00"
+            />
+            {errors.film_cost && <p className="mt-1 text-xs text-red-600">{errors.film_cost}</p>}
           </div>
 
           {/* Not Mine Checkbox */}
@@ -346,16 +363,16 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
           {/* Cost Preview */}
           {formData.film_cost && formData.expected_exposures && (
             <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">Film Cost:</span>
-                <span className="text-lg font-bold text-green-700">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Film Cost:</span>
+                <span className="text-base sm:text-lg font-bold text-green-700">
                   ${parseFloat(formData.film_cost).toFixed(2)}
                 </span>
               </div>
               {calculateCostPerShot() && (
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-600">
-                    Estimated cost per shot ({formData.expected_exposures} exposures):
+                    Cost per shot ({formData.expected_exposures} exp):
                   </span>
                   <span className="text-sm font-semibold text-green-600">
                     ${calculateCostPerShot()}/shot
@@ -364,92 +381,93 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
               )}
               {formData.not_mine && (
                 <p className="text-xs text-gray-500 mt-2 italic">
-                  👥 This cost will not be included in your totals (friend's roll)
+                  👥 Friend's roll - cost excluded from totals
                 </p>
               )}
             </div>
           )}
+        </form>
 
-          {/* Actions */}
-          <div className="mt-6 pt-4 border-t border-gray-200">
-            {/* Delete Confirmation */}
-            {showDeleteConfirm && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-xs text-gray-700 mb-2">
-                  Are you sure you want to delete this roll? This action cannot be undone.
-                </p>
-                <div className="flex gap-2 justify-end">
-                  <button
-                    type="button"
-                    onClick={() => setShowDeleteConfirm(false)}
-                    className="px-3 py-1 text-xs text-gray-600 hover:text-gray-800 hover:underline transition-colors"
-                    disabled={isDeleting}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleDelete}
-                    className="px-3 py-1 text-xs text-red-600 hover:text-red-700 font-medium hover:underline transition-colors disabled:opacity-50"
-                    disabled={isDeleting}
-                  >
-                    {isDeleting ? 'Deleting...' : 'Yes, delete'}
-                  </button>
-                </div>
+        {/* Actions - Fixed Footer */}
+        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-t border-gray-200 bg-gray-50">
+          {/* Delete Confirmation */}
+          {showDeleteConfirm && (
+            <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-xs text-gray-700 mb-2">
+                Delete this roll? This cannot be undone.
+              </p>
+              <div className="flex gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-3 py-1 text-xs text-gray-600 hover:text-gray-800 hover:underline transition-colors"
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="px-3 py-1 text-xs text-red-600 hover:text-red-700 font-medium hover:underline transition-colors disabled:opacity-50"
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? 'Deleting...' : 'Yes, delete'}
+                </button>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Submit Error */}
-            {errors.submit && (
-              <div className="text-red-600 text-sm text-center p-2 bg-red-50 rounded">
-                {errors.submit}
-              </div>
-            )}
+          {/* Submit Error */}
+          {errors.submit && (
+            <div className="text-red-600 text-xs sm:text-sm text-center p-2 bg-red-50 rounded mb-3">
+              {errors.submit}
+            </div>
+          )}
 
-            {/* Save/Cancel Actions */}
-            <div className="flex gap-3">
+          {/* Save/Cancel Actions */}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="flex-1 px-4 py-2.5 sm:py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors text-sm sm:text-base"
+              disabled={isSubmitting || isDeleting}
+            >
+              Cancel
+            </button>
+            {roll && roll.status === 'NEW' && onDuplicate && (
               <button
                 type="button"
-                onClick={handleClose}
-                className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
+                onClick={handleDuplicate}
+                className="flex-1 px-4 py-2.5 sm:py-2 bg-film-amber hover:bg-film-amber/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                 disabled={isSubmitting || isDeleting}
               >
-                Cancel
+                📋 Duplicate
               </button>
-              {roll && roll.status === 'NEW' && onDuplicate && (
-                <button
-                  type="button"
-                  onClick={handleDuplicate}
-                  className="flex-1 px-4 py-2 bg-film-amber hover:bg-film-amber/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={isSubmitting || isDeleting}
-                >
-                  📋 Duplicate
-                </button>
-              )}
+            )}
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="flex-1 px-4 py-2.5 sm:py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+              disabled={isSubmitting || isDeleting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+
+          {/* Delete Link - De-emphasized */}
+          {!showDeleteConfirm && (
+            <div className="mt-3 text-center">
               <button
-                type="submit"
-                className="flex-1 px-4 py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                type="button"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="text-xs text-red-600 hover:text-red-700 hover:underline transition-colors disabled:opacity-50"
                 disabled={isSubmitting || isDeleting}
               >
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                Delete this roll
               </button>
             </div>
-
-            {/* Delete Link - De-emphasized */}
-            {!showDeleteConfirm && (
-              <div className="mt-3 text-center">
-                <button
-                  type="button"
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="text-xs text-red-600 hover:text-red-700 hover:underline transition-colors disabled:opacity-50"
-                  disabled={isSubmitting || isDeleting}
-                >
-                  Delete this roll
-                </button>
-              </div>
-            )}
-          </div>
-        </form>
+          )}
+        </div>
       </div>
     </div>
   );
