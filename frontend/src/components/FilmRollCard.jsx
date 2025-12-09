@@ -91,7 +91,7 @@ const FilmRollCard = ({ roll, onClick }) => {
       {/* Top Section: Thumbnail + Film Info */}
       <div className="flex gap-2 mb-2">
         {/* Left: Film Thumbnail */}
-        <div className="flex-shrink-0 w-24 h-28 p-2 pl-0 overflow-hidden">
+        <div className="flex-shrink-0 w-20 h-28 p-0 pl-0 overflow-hidden">
           <img 
             src={getFilmStockImage(roll.film_stock_name, roll.film_format)}
             alt={roll.film_stock_name}

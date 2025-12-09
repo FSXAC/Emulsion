@@ -2,14 +2,18 @@
  * Mapping utility for film stock names to their corresponding icon images
  */
 
-import fuji400Icon from '../assets/film-stocks/fuji400_icon.png';
-import ilfordDelta400Icon from '../assets/film-stocks/ilforddelta400_icon.png';
-import ilfordHp5Plus400Icon from '../assets/film-stocks/ilfordhp5plus400_icon.png';
-import ilfordSfx200Icon from '../assets/film-stocks/ilfordsfx200_icon.png';
-import kentmerePan100Icon from '../assets/film-stocks/kentmerepan100_icon.png';
-import kentmerePan400Icon from '../assets/film-stocks/kentmerepan400_icon.png';
-import kodakUltra400Icon from '../assets/film-stocks/kodakultra400_icon.png';
-import unknownRollIcon from '../assets/film-stocks/unknown_roll_icon.png';
+import fuji400Icon from '../assets/film-stocks/fuji-400.png';
+import ilfordDelta400Icon from '../assets/film-stocks/ilford-delta-400.png';
+import ilfordHp5Plus400Icon from '../assets/film-stocks/ilford-hp5.png';
+import ilfordSfx200Icon from '../assets/film-stocks/ilford-sfx-200.png';
+import kentmerePan100Icon from '../assets/film-stocks/kentmere-200.png';
+import kentmerePan400Icon from '../assets/film-stocks/kentmere-400.png';
+import kodakUltra400Icon from '../assets/film-stocks/kodak-400.png';
+import kodak200Icon from '../assets/film-stocks/kodak-200.png';
+import kodakPro100Icon from '../assets/film-stocks/kodak-pro-100.png';
+import kodakEktar100Icon from '../assets/film-stocks/kodak-ektar-100.png';
+import flicAurora800 from '../assets/film-stocks/flic-aurora-800.png';
+import unknownRollIcon from '../assets/film-stocks/unknown.png';
 
 // Direct mapping from exact film stock names to images
 const filmStockImageMap = {
@@ -29,9 +33,14 @@ const filmStockImageMap = {
   
   // Kodak stocks
   'Kodak GC400': kodakUltra400Icon,
-  'Kodak GB200': kodakUltra400Icon,
+  'Kodak GB200': kodak200Icon,
   'Kodak UltraMax 400': kodakUltra400Icon,
-  'Kodak Gold 200': kodakUltra400Icon,
+  'Kodak Gold 200': kodak200Icon,
+  'Kodak Pro Image 100': kodakPro100Icon,
+  'Kodak Ektar 100': kodakEktar100Icon,
+
+  // Flic film stocks
+  'Flic Film Aurora 800': flicAurora800,
 };
 
 /**
