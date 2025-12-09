@@ -13,7 +13,10 @@ export default defineConfig({
         target: 'http://localhost:8200',
         changeOrigin: true,
       }
-    }
+    },
+    allowedHosts: [
+      'hydra.local',
+    ]
   },
   build: {
     outDir: 'dist',
