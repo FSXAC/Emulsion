@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import AddChemistryForm from '../components/AddChemistryForm';
 import Icon from '../components/Icon';
 import EditChemistryForm from '../components/EditChemistryForm';
-import SkeletonCard from '../components/SkeletonCard';
+import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { getChemistry, createChemistry, updateChemistry, deleteChemistry } from '../services/chemistry';
 
@@ -195,26 +195,8 @@ export default function ChemistryPage() {
 
   if (loading) {
     return (
-      <div className="pb-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Chemistry Batches</h2>
-            <p className="text-xs sm:text-sm text-gray-500">
-              Loading your chemistry batches...
-            </p>
-          </div>
-        </div>
-        <div className="space-y-6">
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <h3 className="text-lg font-semibold text-gray-900">Active</h3>
-            </div>
-            <div className="grid gap-3">
-              <SkeletonCard variant="chemistry" />
-              <SkeletonCard variant="chemistry" />
-            </div>
-          </div>
-        </div>
+      <div className="pb-4 flex items-center justify-center min-h-[400px]">
+        <LoadingSpinner size="lg" text="Loading your chemistry batches..." />
       </div>
     );
   }
