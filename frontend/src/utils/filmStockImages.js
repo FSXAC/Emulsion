@@ -10,12 +10,17 @@ import kentmerePan100Icon from '../assets/film-stocks/kentmere-200.png';
 import kentmerePan400Icon from '../assets/film-stocks/kentmere-400.png';
 import kodakUltra400Icon from '../assets/film-stocks/kodak-400.png';
 import kodak200Icon from '../assets/film-stocks/kodak-200.png';
+import kodakColorPlus200Icon from '../assets/film-stocks/kodak-colorplus-200.png';
 import kodakPro100Icon from '../assets/film-stocks/kodak-pro-100.png';
 import kodakEktar100Icon from '../assets/film-stocks/kodak-ektar-100.png';
+import harmanPhoenix200Icon from '../assets/film-stocks/harman-phoenix-200.png';
+import harmanPhoenix200IIIcon from '../assets/film-stocks/harman-phoenix-200-ii.png';
 import flicAurora800 from '../assets/film-stocks/flic-aurora-800.png';
 import cinestill800T from '../assets/film-stocks/cinestill-800t.png';
 import cinestill50D from '../assets/film-stocks/cinestill-50d.png';
 import cinestill400D from '../assets/film-stocks/cinestill-400d.png';
+import reflx800 from '../assets/film-stocks/reflx-800.png';
+import reflx400 from '../assets/film-stocks/reflx-400.png';
 import unknownRollIcon from '../assets/film-stocks/unknown.png';
 
 
@@ -42,6 +47,15 @@ const filmStockImageMap = {
   'Kodak Gold 200': kodak200Icon,
   'Kodak Pro Image 100': kodakPro100Icon,
   'Kodak Ektar 100': kodakEktar100Icon,
+  'Kodak ColorPlus 200': kodakColorPlus200Icon,
+  
+  // Harman stocks
+  'Harman Phoenix 200': harmanPhoenix200Icon,
+  'Harman Phoenix 200 II': harmanPhoenix200IIIcon,
+  
+  // Reflx stocks
+  'Reflx Lab 800': reflx800,
+  'Reflx Lab 400': reflx400,
 
   // Flic film stocks
   'Flic Film Aurora 800': flicAurora800,
