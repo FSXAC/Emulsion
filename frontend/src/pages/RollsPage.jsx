@@ -70,17 +70,23 @@ export default function RollsPage() {
     { status: 'SCANNED', displayName: 'Scanned', icon: '⭐' },
   ];
 
-  // Configure drag sensors
+  // Check if on mobile
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640); // sm breakpoint
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Configure drag sensors - disabled on mobile
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8, // 8px of movement before drag starts
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 200, // 200ms press before drag on touch
-        tolerance: 8,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -367,6 +373,19 @@ export default function RollsPage() {
     setEditRollModal({ isOpen: true, roll });
   };
 
+  // Handle status change from edit form (mobile)
+  const handleStatusChangeFromForm = async (roll, newStatus) => {
+    // Create a fake drag event to reuse existing logic
+    const fakeEvent = {
+      active: { id: roll.id },
+      over: { 
+        id: newStatus,
+        data: { current: { type: 'status-column', status: newStatus } }
+      }
+    };
+    await handleDragEnd(fakeEvent);
+  };
+
   // Handle edit roll form submission
   const handleEditRoll = async (rollId, formData) => {
     try {
@@ -480,7 +499,7 @@ export default function RollsPage() {
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Film Rolls</h2>
           <p className="text-xs sm:text-sm text-gray-500">
-            Drag rolls between columns to update their status
+            {isMobile ? 'Tap a roll to view details and change status' : 'Drag rolls between columns to update their status'}
           </p>
         </div>
         <button 
@@ -533,6 +552,7 @@ export default function RollsPage() {
               hasMore={hasMoreRolls(status)}
               onLoadMore={() => loadMoreRolls(status)}
               onCardClick={handleCardClick}
+              isMobile={isMobile}
             />
           ))}
         </div>
@@ -579,6 +599,7 @@ export default function RollsPage() {
         onSubmit={handleEditRoll}
         onDelete={handleDeleteRoll}
         onDuplicate={handleDuplicateRoll}
+        onStatusChange={isMobile ? handleStatusChangeFromForm : null}
         roll={editRollModal.roll}
       />
 

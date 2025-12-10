@@ -3,7 +3,7 @@ import AutocompleteInput from './AutocompleteInput';
 import { getRolls } from '../services/rolls';
 import { getFilmStockImage } from '../utils/filmStockImages';
 
-const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }) => {
+const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, onStatusChange }) => {
   const [formData, setFormData] = useState({
     order_id: '',
     film_stock_name: '',
@@ -25,7 +25,9 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
   // Fetch suggestions when modal opens
   useEffect(() => {
     if (isOpen) {
-      fetchSuggestions();
+
+      // NOTE: nope, too annoying
+      // fetchSuggestions();
     }
   }, [isOpen]);
 
@@ -174,12 +176,19 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
     }
   };
 
+  const handleStatusChange = (newStatus) => {
+    if (onStatusChange) {
+      onStatusChange(roll, newStatus);
+      handleClose();
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 overflow-y-auto"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh]">
+      <div className="bg-white/85 backdrop-blur-sm rounded-lg shadow-xl max-w-3xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh]">
         {/* Header - Fixed */}
         <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200">
           <div className="flex items-start gap-4">
@@ -196,10 +205,65 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
             <div className="flex-1 min-w-0">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Edit Film Roll</h2>
               <p className="text-xs sm:text-sm text-gray-600 mt-1">Update details for this roll</p>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                Status: <span className="font-medium text-gray-700">{roll.status}</span>
-              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-xs sm:text-sm text-gray-500">Status:</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                  {roll.status}
+                </span>
+              </div>
             </div>
+          </div>
+        </div>
+        
+        {/* Status Change Buttons - Mobile Only */}
+        <div className="flex-shrink-0 px-4 sm:px-6 py-3 border-b border-gray-200 bg-gray-50 sm:hidden">
+          <p className="text-xs text-gray-600 mb-2">Change Status:</p>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {roll.status !== 'NEW' && (
+              <button
+                type="button"
+                onClick={() => handleStatusChange('NEW')}
+                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors"
+              >
+                🎞️ New
+              </button>
+            )}
+            {roll.status !== 'LOADED' && (
+              <button
+                type="button"
+                onClick={() => handleStatusChange('LOADED')}
+                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors"
+              >
+                📷 Loaded
+              </button>
+            )}
+            {roll.status !== 'EXPOSED' && (
+              <button
+                type="button"
+                onClick={() => handleStatusChange('EXPOSED')}
+                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors"
+              >
+                ✅ Exposed
+              </button>
+            )}
+            {roll.status !== 'DEVELOPED' && (
+              <button
+                type="button"
+                onClick={() => handleStatusChange('DEVELOPED')}
+                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors"
+              >
+                🧪 Developed
+              </button>
+            )}
+            {roll.status !== 'SCANNED' && (
+              <button
+                type="button"
+                onClick={() => handleStatusChange('SCANNED')}
+                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors"
+              >
+                ⭐ Scanned
+              </button>
+            )}
           </div>
         </div>
 
@@ -386,13 +450,11 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
               )}
             </div>
           )}
-        </form>
 
-        {/* Actions - Fixed Footer */}
-        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-t border-gray-200 bg-gray-50">
+
           {/* Delete Confirmation */}
           {showDeleteConfirm && (
-            <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="my-3 p-3 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-xs text-gray-700 mb-2">
                 Delete this roll? This cannot be undone.
               </p>
@@ -417,6 +479,23 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
             </div>
           )}
 
+          {/* Delete Link - De-emphasized */}
+          {!showDeleteConfirm && (
+            <div className="mt-3 text-center">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="text-xs text-red-600 hover:text-red-700 hover:underline transition-colors disabled:opacity-50"
+                disabled={isSubmitting || isDeleting}
+              >
+                Delete this roll
+              </button>
+            </div>
+          )}
+        </form>
+
+        {/* Actions - Fixed Footer */}
+        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-t border-gray-200 bg-white/50 rounded-b-lg">
           {/* Submit Error */}
           {errors.submit && (
             <div className="text-red-600 text-xs sm:text-sm text-center p-2 bg-red-50 rounded mb-3">
@@ -453,20 +532,6 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll }
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
-
-          {/* Delete Link - De-emphasized */}
-          {!showDeleteConfirm && (
-            <div className="mt-3 text-center">
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(true)}
-                className="text-xs text-red-600 hover:text-red-700 hover:underline transition-colors disabled:opacity-50"
-                disabled={isSubmitting || isDeleting}
-              >
-                Delete this roll
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>

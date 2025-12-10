@@ -2,7 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getFilmStockImage } from '../utils/filmStockImages';
 
-const FilmRollCard = ({ roll, onClick }) => {
+const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
   const {
     attributes,
     listeners,
@@ -10,7 +10,7 @@ const FilmRollCard = ({ roll, onClick }) => {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: roll.id });
+  } = useSortable({ id: roll.id, disabled: isMobile });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -77,12 +77,12 @@ const FilmRollCard = ({ roll, onClick }) => {
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
+      {...(isMobile ? {} : attributes)}
+      {...(isMobile ? {} : listeners)}
       onClick={handleClick}
       className={`
         bg-white rounded-2xl shadow-sm hover:shadow-md
-        p-2 mb-2 cursor-grab active:cursor-grabbing
+        p-2 mb-2 ${isMobile ? 'cursor-pointer' : 'cursor-grab active:cursor-grabbing'}
         border border-[#D9D9D9] hover:border-film-cyan
         transition-all duration-200 ease-in-out
         ${isDragging ? 'opacity-50 shadow-2xl' : ''}
@@ -144,7 +144,7 @@ const FilmRollCard = ({ roll, onClick }) => {
                 <>
                   {Array.from({ length: 5 }, (_, i) => (
                     <span key={i} className='text-gray-800'>
-                      {i < roll.stars ? '★' : '•'}
+                      {i < roll.stars ? '★' : '☆'}
                     </span>
                   ))}
                 </>

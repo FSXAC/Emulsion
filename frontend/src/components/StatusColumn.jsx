@@ -5,7 +5,7 @@ import {
 } from '@dnd-kit/sortable';
 import FilmRollCard from './FilmRollCard';
 
-const StatusColumn = ({ status, rolls, totalCount, hasMore, onLoadMore, displayName, icon, onCardClick }) => {
+const StatusColumn = ({ status, rolls, totalCount, hasMore, onLoadMore, displayName, icon, onCardClick, isMobile = false }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: status,
     data: {
@@ -64,7 +64,7 @@ const StatusColumn = ({ status, rolls, totalCount, hasMore, onLoadMore, displayN
             </div>
           ) : (
             <>
-              {rolls.map((roll) => <FilmRollCard key={roll.id} roll={roll} onClick={onCardClick} />)}
+              {rolls.map((roll) => <FilmRollCard key={roll.id} roll={roll} onClick={onCardClick} isMobile={isMobile} />)}
               
               {hasMore && (
                 <button
