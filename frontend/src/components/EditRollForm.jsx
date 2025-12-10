@@ -514,7 +514,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
               <button
                 type="button"
                 onClick={handleDuplicate}
-                className="flex-1 px-4 py-2.5 sm:py-2 bg-film-amber hover:bg-film-amber/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                className="flex-1 px-4 py-2.5 sm:py-2 bg-film-amber hover:bg-film-amber/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base flex items-center justify-center gap-2"
                 disabled={isSubmitting || isDeleting}
               >
                 <Icon name="copy" size={18} /> Duplicate

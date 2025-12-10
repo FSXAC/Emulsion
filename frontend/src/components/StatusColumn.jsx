@@ -4,6 +4,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import FilmRollCard from './FilmRollCard';
+import Icon from './Icon';
 
 const StatusColumn = ({ status, rolls, totalCount, hasMore, onLoadMore, displayName, icon, onCardClick, isMobile = false }) => {
   const { setNodeRef, isOver } = useDroppable({
@@ -30,7 +31,7 @@ const StatusColumn = ({ status, rolls, totalCount, hasMore, onLoadMore, displayN
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">{icon}</span>
+            <Icon name={icon} size={32} className={isOver ? 'text-white' : 'text-gray-700 dark:text-gray-300'} />
             <div>
               <h3 className={`font-bold text-lg ${isOver ? 'text-white' : 'text-gray-900 dark:text-gray-100'}`}>
                 {displayName}
@@ -58,7 +59,9 @@ const StatusColumn = ({ status, rolls, totalCount, hasMore, onLoadMore, displayN
         >
           {rolls.length === 0 ? (
             <div className="text-center text-gray-400 dark:text-gray-500 py-16">
-              <div className="text-6xl mb-3 opacity-30">{icon}</div>
+              <div className="mb-3 opacity-30 flex justify-center">
+                <Icon name={icon} size={64} />
+              </div>
               <div className="text-sm font-medium">No rolls here</div>
               <div className="text-xs mt-1">Drag rolls to this column</div>
             </div>
