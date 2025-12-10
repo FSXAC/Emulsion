@@ -13,7 +13,11 @@ import kodak200Icon from '../assets/film-stocks/kodak-200.png';
 import kodakPro100Icon from '../assets/film-stocks/kodak-pro-100.png';
 import kodakEktar100Icon from '../assets/film-stocks/kodak-ektar-100.png';
 import flicAurora800 from '../assets/film-stocks/flic-aurora-800.png';
+import cinestill800T from '../assets/film-stocks/cinestill-800t.png';
+import cinestill50D from '../assets/film-stocks/cinestill-50d.png';
+import cinestill400D from '../assets/film-stocks/cinestill-400d.png';
 import unknownRollIcon from '../assets/film-stocks/unknown.png';
+
 
 // Direct mapping from exact film stock names to images
 const filmStockImageMap = {
@@ -41,6 +45,11 @@ const filmStockImageMap = {
 
   // Flic film stocks
   'Flic Film Aurora 800': flicAurora800,
+
+  // Cinestill stocks
+  'Cinestill 800T': cinestill800T,
+  'Cinestill 50D': cinestill50D,
+  'Cinestill 400D': cinestill400D,
 };
 
 /**
