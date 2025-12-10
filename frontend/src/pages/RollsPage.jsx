@@ -497,8 +497,8 @@ export default function RollsPage() {
     <div className="pb-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Film Rolls</h2>
-          <p className="text-xs sm:text-sm text-gray-500">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Film Rolls</h2>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
             {isMobile ? 'Tap a roll to view details and change status' : 'Drag rolls between columns to update their status'}
           </p>
         </div>
@@ -512,21 +512,21 @@ export default function RollsPage() {
 
       {/* Chemistry Filter Banner */}
       {chemistryFilter && chemistryBatch && (
-        <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg flex items-center justify-between">
+        <div className="mb-4 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-purple-900">
+            <span className="text-sm font-medium text-purple-900 dark:text-purple-300">
               🧪 Filtered by chemistry:
             </span>
-            <span className="text-sm text-purple-700 font-semibold">
+            <span className="text-sm text-purple-700 dark:text-purple-400 font-semibold">
               {chemistryBatch.name}
             </span>
-            <span className="text-xs text-purple-600">
+            <span className="text-xs text-purple-600 dark:text-purple-500">
               ({rolls.length} roll{rolls.length !== 1 ? 's' : ''})
             </span>
           </div>
           <button
             onClick={clearChemistryFilter}
-            className="text-xs text-purple-600 hover:text-purple-800 hover:underline"
+            className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 hover:underline"
           >
             Clear filter
           </button>

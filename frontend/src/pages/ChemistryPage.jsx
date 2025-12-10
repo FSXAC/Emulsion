@@ -240,8 +240,8 @@ export default function ChemistryPage() {
     <div className="pb-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Chemistry Batches</h2>
-          <p className="text-xs sm:text-sm text-gray-500">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Chemistry Batches</h2>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
             Track your film development chemistry and costs
           </p>
         </div>
@@ -254,10 +254,10 @@ export default function ChemistryPage() {
       </div>
 
       {batches.length === 0 ? (
-        <div className="text-center py-12 sm:py-16 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+        <div className="text-center py-12 sm:py-16 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700">
           <div className="text-5xl sm:text-6xl mb-4">🧪</div>
-          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No chemistry batches yet</h3>
-          <p className="text-xs sm:text-sm text-gray-500 mb-4 px-4">
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No chemistry batches yet</h3>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-4 px-4">
             Add your first chemistry batch to start tracking development costs
           </p>
           <button 
@@ -281,21 +281,21 @@ export default function ChemistryPage() {
                   <div
                     key={batch.id}
                     onClick={() => handleEditBatch(batch)}
-                    className="bg-white rounded-2xl shadow-sm hover:shadow-md p-4 transition-all duration-200 border border-[#D9D9D9] hover:border-film-cyan cursor-pointer"
+                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-md p-4 transition-all duration-200 border border-[#D9D9D9] dark:border-gray-700 hover:border-film-cyan dark:hover:border-film-cyan cursor-pointer"
                   >
                     {/* Top Section: Name, Type & Cost */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-base font-bold text-gray-900">{batch.name}</h3>
-                          <span className="text-[11px] text-gray-700 bg-gray-100 rounded px-2 py-1">
+                          <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">{batch.name}</h3>
+                          <span className="text-[11px] text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded px-2 py-1">
                             {batch.chemistry_type}
                           </span>
                         </div>
                         
                         {/* Date Mixed */}
                         {batch.date_mixed && (
-                          <div className="text-xs text-gray-600">
+                          <div className="text-xs text-gray-600 dark:text-gray-400">
                             Mixed {formatDate(batch.date_mixed)}
                           </div>
                         )}
@@ -303,8 +303,8 @@ export default function ChemistryPage() {
 
                       {/* Batch Cost */}
                       <div className="text-right">
-                        <div className="text-xs text-gray-500 mb-0.5">Total</div>
-                        <div className="text-xl font-bold text-purple-700">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Total</div>
+                        <div className="text-xl font-bold text-purple-700 dark:text-purple-400">
                           {formatCost(batch.batch_cost)}
                         </div>
                       </div>
@@ -341,11 +341,11 @@ export default function ChemistryPage() {
                     )}
 
                     {/* Quick Actions */}
-                    <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                       <Link
                         to={`/rolls?chemistry=${batch.id}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="text-xs text-film-cyan hover:text-film-cyan/80 hover:underline transition-colors"
+                        className="text-xs text-film-cyan dark:text-film-cyan/90 hover:text-film-cyan/80 dark:hover:text-film-cyan/70 hover:underline transition-colors"
                       >
                         View rolls →
                       </Link>
@@ -355,7 +355,7 @@ export default function ChemistryPage() {
                             e.stopPropagation();
                             handleRetireBatch(batch.id, batch.name);
                           }}
-                          className="text-xs text-gray-600 hover:text-gray-800 hover:underline transition-colors"
+                          className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 hover:underline transition-colors"
                         >
                           Retire
                         </button>
@@ -369,7 +369,7 @@ export default function ChemistryPage() {
               {hasMoreActive && (
                 <button
                   onClick={loadMoreActive}
-                  className="w-full mt-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors"
+                  className="w-full mt-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 transition-colors"
                 >
                   Load more active batches ({activeBatches.length - visibleCounts.active} remaining)
                 </button>

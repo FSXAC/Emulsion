@@ -81,9 +81,9 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
       {...(isMobile ? {} : listeners)}
       onClick={handleClick}
       className={`
-        bg-white rounded-2xl shadow-sm hover:shadow-md
+        bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-md
         p-2 mb-2 ${isMobile ? 'cursor-pointer' : 'cursor-grab active:cursor-grabbing'}
-        border border-[#D9D9D9] hover:border-film-cyan
+        border border-[#D9D9D9] dark:border-gray-700 hover:border-film-cyan dark:hover:border-film-cyan
         transition-all duration-200 ease-in-out
         ${isDragging ? 'opacity-50 shadow-2xl' : ''}
       `}
@@ -103,12 +103,12 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
         <div className="flex-1 flex flex-col justify-between">
           <div className="flex flex-col gap-0">
             {/* Film Stock Name */}
-            <div className="font-bold text-gray-900 text-base leading-tight">
+            <div className="font-bold text-gray-900 dark:text-gray-100 text-base leading-tight">
               {roll.film_stock_name}
             </div>
 
             {/* Format + Exposures */}
-            <div className="text-xs text-gray-600 flex items-center gap-1.5">
+            <div className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
             <span>{roll.film_format}</span>
             <span className="text-gray-400">•</span>
             <span>{roll.expected_exposures} exp</span>
@@ -123,12 +123,12 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
             {(roll.order_id || roll.not_mine) && (
               <div className="flex items-center gap-2 flex-wrap mt-1">
                 {roll.order_id && (
-                  <div className="text-[11px] text-gray-700 bg-gray-100 rounded px-2 py-1">
+                  <div className="text-[11px] text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded px-2 py-1">
                     Order #{roll.order_id}
                   </div>
                 )}
                 {roll.not_mine && (
-                  <div className="text-[11px] text-gray-700 bg-gray-100 rounded px-2 py-1">
+                  <div className="text-[11px] text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded px-2 py-1">
                     👥 Friend's
                   </div>
                 )}
@@ -155,7 +155,7 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
 
             {/* Right: Push/Pull Tag */}
             {roll.push_pull_stops && Math.abs(roll.push_pull_stops) > 0 && (
-              <div className="text-[11px] text-gray-700 bg-gray-100 rounded px-2 py-1">
+              <div className="text-[11px] text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded px-2 py-1">
                 {roll.push_pull_stops > 0 ? '+' : ''}{roll.push_pull_stops} ⚡
               </div>
             )}
@@ -164,26 +164,26 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
       </div>
 
       {/* Cost + Date Stats Block */}
-      <div className="bg-gray-50 rounded-xl px-2 py-2 mb-2 space-y-2">
+      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl px-2 py-2 mb-2 space-y-2">
         {/* Top Row: Dates + Per Shot Cost */}
         {(roll.date_loaded || roll.date_unloaded || calculateCostPerShot() !== null) && (
           <div className="flex items-center justify-between text-sm">
-            <div className="text-gray-800">
+            <div className="text-gray-800 dark:text-gray-200">
               {roll.date_loaded && roll.date_unloaded ? (
                 <>
                   <span className="font-bold">{formatDate(roll.date_loaded)}</span>
-                  <span className="text-xs text-gray-500 font-normal mx-1">→</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 font-normal mx-1">→</span>
                   <span className="font-bold">{formatDate(roll.date_unloaded)}</span>
                 </>
               ) : roll.date_loaded ? (
                 <span className="font-bold">{formatDate(roll.date_loaded)}</span>
               ) : (
-                <span className="text-gray-400">No dates</span>
+                <span className="text-gray-400 dark:text-gray-500">No dates</span>
               )}
             </div>
             {calculateCostPerShot() !== null && (
-              <div className="font-semibold text-gray-800">
-                {formatCost(calculateCostPerShot())} <span className="text-xs text-gray-500 font-normal">per shot</span>
+              <div className="font-semibold text-gray-800 dark:text-gray-200">
+                {formatCost(calculateCostPerShot())} <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">per shot</span>
               </div>
             )}
           </div>
@@ -191,7 +191,7 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
 
         {/* Second Row: Days Loaded + Cost Breakdown */}
         {(roll.duration_days !== null || roll.film_cost !== null || roll.dev_cost !== null) && (
-          <div className="flex items-center justify-between text-xs text-gray-500">
+          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
             <div>
               {roll.duration_days !== null && roll.duration_days !== undefined ? (
                 <>
@@ -214,7 +214,7 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
 
       {/* Comments Block */}
       {roll.notes && (
-        <div className="bg-gray-50 rounded-xl px-2 py-2 text-xs text-gray-600 italic leading-relaxed">
+        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl px-2 py-2 text-xs text-gray-600 dark:text-gray-400 italic leading-relaxed">
           {roll.notes}
         </div>
       )}

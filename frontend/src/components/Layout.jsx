@@ -9,17 +9,17 @@ export default function Layout({ children }) {
   ];
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
         <div className="px-2 sm:px-4">
           <div className="flex items-center justify-between h-12 sm:h-14">
             {/* Logo */}
             <div className="flex items-center">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                 📷 Emulsion
               </h1>
-              <span className="hidden sm:inline ml-3 text-sm text-gray-500">
+              <span className="hidden sm:inline ml-3 text-sm text-gray-500 dark:text-gray-400">
                 Film Roll Tracker
               </span>
             </div>
@@ -35,8 +35,8 @@ export default function Layout({ children }) {
                     className={`
                       flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg transition-colors touch-friendly
                       ${isActive
-                        ? 'bg-blue-100 text-blue-700 font-medium'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                       }
                     `}
                   >

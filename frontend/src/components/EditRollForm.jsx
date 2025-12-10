@@ -188,9 +188,9 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
       className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 overflow-y-auto"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white/85 backdrop-blur-sm rounded-lg shadow-xl max-w-3xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh]">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh]">
         {/* Header - Fixed */}
-        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200">
+        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-start gap-4">
             {/* Thumbnail */}
             <div className="flex-shrink-0 w-16 h-24 sm:w-20 sm:h-28 overflow-hidden rounded">
@@ -203,11 +203,11 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
             
             {/* Title and Status */}
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Edit Film Roll</h2>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">Update details for this roll</p>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Edit Film Roll</h2>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Update details for this roll</p>
               <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs sm:text-sm text-gray-500">Status:</span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Status:</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                   {roll.status}
                 </span>
               </div>
@@ -216,14 +216,14 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
         </div>
         
         {/* Status Change Buttons - Mobile Only */}
-        <div className="flex-shrink-0 px-4 sm:px-6 py-3 border-b border-gray-200 bg-gray-50 sm:hidden">
-          <p className="text-xs text-gray-600 mb-2">Change Status:</p>
+        <div className="flex-shrink-0 px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 sm:hidden">
+          <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Change Status:</p>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {roll.status !== 'NEW' && (
               <button
                 type="button"
                 onClick={() => handleStatusChange('NEW')}
-                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors"
+                className="flex-shrink-0 px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
               >
                 🎞️ New
               </button>
@@ -232,7 +232,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
               <button
                 type="button"
                 onClick={() => handleStatusChange('LOADED')}
-                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors"
+                className="flex-shrink-0 px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
               >
                 📷 Loaded
               </button>

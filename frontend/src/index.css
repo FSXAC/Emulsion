@@ -5,11 +5,11 @@
 /* Custom base styles */
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
   }
   
   * {
-    @apply border-gray-200;
+    @apply border-gray-200 dark:border-gray-700;
   }
 }
 
@@ -36,13 +36,22 @@
   
   /* Button styles */
   .btn-primary {
-    @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium;
+    @apply bg-blue-600 dark:bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors font-medium;
     @apply min-h-[44px] flex items-center justify-center;
   }
   
   .btn-secondary {
-    @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors;
+    @apply bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors;
     @apply min-h-[44px] flex items-center justify-center;
+  }
+  
+  /* Form input styles */
+  input, textarea, select {
+    @apply dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600;
+  }
+  
+  input::placeholder, textarea::placeholder {
+    @apply dark:text-gray-400;
   }
 }
 
