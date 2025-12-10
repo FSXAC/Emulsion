@@ -1,6 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getFilmStockImage } from '../utils/filmStockImages';
+import Icon from './Icon';
 
 const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
   const {
@@ -128,8 +129,8 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
                   </div>
                 )}
                 {roll.not_mine && (
-                  <div className="text-[11px] text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded px-2 py-1">
-                    👥 Friend's
+                  <div className="text-[11px] text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded px-2 py-1 flex items-center gap-1">
+                    <Icon name="users" size={12} /> Friend's
                   </div>
                 )}
               </div>
@@ -143,9 +144,12 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
               {roll.stars > 0 ? (
                 <>
                   {Array.from({ length: 5 }, (_, i) => (
-                    <span key={i} className='text-gray-800 dark:text-gray-200'>
-                      {i < roll.stars ? '★' : '☆'}
-                    </span>
+                    <Icon 
+                      key={i} 
+                      name="star" 
+                      size={16}
+                      className={`${i < roll.stars ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}
+                    />
                   ))}
                 </>
               ) : (
@@ -155,8 +159,8 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
 
             {/* Right: Push/Pull Tag */}
             {roll.push_pull_stops && Math.abs(roll.push_pull_stops) > 0 && (
-              <div className="text-[11px] text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded px-2 py-1">
-                {roll.push_pull_stops > 0 ? '+' : ''}{roll.push_pull_stops} ⚡
+              <div className="text-[11px] text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded px-2 py-1 flex items-center gap-1">
+                {roll.push_pull_stops > 0 ? '+' : ''}{roll.push_pull_stops} <Icon name="zap" size={12} />
               </div>
             )}
           </div>

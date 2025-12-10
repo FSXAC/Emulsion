@@ -1,11 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
+import Icon from './Icon';
 
 export default function Layout({ children }) {
   const location = useLocation();
   
   const navItems = [
-    { path: '/rolls', label: 'Film Rolls', icon: '🎞️' },
-    { path: '/chemistry', label: 'Chemistry', icon: '🧪' },
+    { path: '/rolls', label: 'Film Rolls', icon: 'film' },
+    { path: '/chemistry', label: 'Chemistry', icon: 'chemistry' },
   ];
   
   return (
@@ -16,8 +17,8 @@ export default function Layout({ children }) {
           <div className="flex items-center justify-between h-12 sm:h-14">
             {/* Logo */}
             <div className="flex items-center">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
-                📷 Emulsion
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <Icon name="camera" size={24} className="text-gray-900 dark:text-gray-100" /> Emulsion
               </h1>
               <span className="hidden sm:inline ml-3 text-sm text-gray-500 dark:text-gray-400">
                 Film Roll Tracker
@@ -40,7 +41,7 @@ export default function Layout({ children }) {
                       }
                     `}
                   >
-                    <span className="text-lg sm:text-base">{item.icon}</span>
+                    <Icon name={item.icon} size={18} />
                     <span className="text-sm sm:text-base">{item.label}</span>
                   </Link>
                 );

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import AutocompleteInput from './AutocompleteInput';
 import { getRolls } from '../services/rolls';
+import Icon from './Icon';
 
 const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
   const [formData, setFormData] = useState({
@@ -303,8 +304,8 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
                 onChange={handleChange}
                 className="w-4 h-4 text-film-cyan border-gray-300 rounded focus:ring-film-cyan"
               />
-              <span className="ml-2 text-sm text-gray-700">
-                👥 This is a friend's roll (exclude film cost from calculations)
+              <span className="ml-2 text-sm text-gray-700 flex items-center gap-1">
+                <Icon name="users" size={16} /> This is a friend's roll (exclude film cost from calculations)
               </span>
             </label>
           </div>
@@ -345,8 +346,8 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
                 </div>
               )}
               {formData.not_mine && (
-                <p className="text-xs text-gray-500 mt-2 italic">
-                  👥 This cost will not be included in your totals (friend's roll)
+                <p className="text-xs text-gray-500 mt-2 italic flex items-center gap-1">
+                  <Icon name="users" size={12} /> This cost will not be included in your totals (friend's roll)
                 </p>
               )}
             </div>

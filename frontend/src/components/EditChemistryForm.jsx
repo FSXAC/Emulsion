@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Icon from './Icon';
 
 const EditChemistryForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, batch }) => {
   const [formData, setFormData] = useState({
@@ -402,7 +403,7 @@ const EditChemistryForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, b
                   className="flex-1 px-4 py-2 bg-film-amber hover:bg-film-amber/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isSubmitting || isDeleting}
                 >
-                  📋 Duplicate
+                  <Icon name="copy" size={18} /> Duplicate
                 </button>
               )}
               <button

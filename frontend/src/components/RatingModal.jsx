@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Icon from './Icon';
 
 const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
   const [stars, setStars] = useState(3);
@@ -47,7 +48,11 @@ const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
         className="text-5xl transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-film-cyan rounded"
         aria-label={`${starNumber} star${starNumber !== 1 ? 's' : ''}`}
       >
-        {isFilled ? '⭐' : '☆'}
+        <Icon 
+          name="star" 
+          size={48}
+          className={`${isFilled ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+        />
       </button>
     );
   };
@@ -90,11 +95,11 @@ const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
           <div className="mb-6 bg-gray-50 rounded-lg p-4">
             <p className="text-xs font-medium text-gray-700 mb-2">Rating Guide:</p>
             <div className="text-xs text-gray-600 space-y-1">
-              <div><span className="font-semibold">⭐ 1:</span> Major issues, mostly unusable</div>
-              <div><span className="font-semibold">⭐⭐ 2:</span> Below average, some good shots</div>
-              <div><span className="font-semibold">⭐⭐⭐ 3:</span> Good, solid results</div>
-              <div><span className="font-semibold">⭐⭐⭐⭐ 4:</span> Great roll, very happy</div>
-              <div><span className="font-semibold">⭐⭐⭐⭐⭐ 5:</span> Exceptional, favorite shots</div>
+              <div><span className="font-semibold">1 star:</span> Major issues, mostly unusable</div>
+              <div><span className="font-semibold">2 stars:</span> Below average, some good shots</div>
+              <div><span className="font-semibold">3 stars:</span> Good, solid results</div>
+              <div><span className="font-semibold">4 stars:</span> Great roll, very happy</div>
+              <div><span className="font-semibold">5 stars:</span> Exceptional, favorite shots</div>
             </div>
           </div>
 
@@ -121,8 +126,8 @@ const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
                 {parseInt(actualExposures) === roll.expected_exposures ? (
                   <span className="text-green-600">✓ Matches expected exposures</span>
                 ) : parseInt(actualExposures) < roll.expected_exposures ? (
-                  <span className="text-amber-600">
-                    ⚠️ {roll.expected_exposures - parseInt(actualExposures)} fewer than expected
+                  <span className="text-amber-600 flex items-center gap-1">
+                    <Icon name="warning" size={12} /> {roll.expected_exposures - parseInt(actualExposures)} fewer than expected
                   </span>
                 ) : (
                   <span className="text-blue-600">

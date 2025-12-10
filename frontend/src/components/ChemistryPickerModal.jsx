@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getChemistry } from '../services/chemistry';
+import Icon from './Icon';
 
 const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
   const [chemistryBatches, setChemistryBatches] = useState([]);
@@ -107,7 +108,9 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
 
           {!loading && !error && chemistryBatches.length === 0 && (
             <div className="text-center py-8">
-              <div className="text-4xl mb-3">🧪</div>
+              <div className="mb-3 flex justify-center">
+                <Icon name="chemistry" size={48} className="text-gray-400" />
+              </div>
               <p className="text-gray-600 font-medium">No active chemistry batches</p>
               <p className="text-sm text-gray-500 mt-2">
                 Create a chemistry batch first before developing rolls
@@ -141,7 +144,7 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-lg">🧪</span>
+                          <Icon name="chemistry" size={20} />
                           <h4 className="font-bold text-gray-900">{batch.name}</h4>
                           {selectedBatchId === batch.id && (
                             <span className="text-film-cyan">✓</span>
@@ -175,8 +178,8 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
                           )}
                           
                           {batch.development_time_formatted && batch.chemistry_type === 'C41' && (
-                            <div className="text-film-red font-medium">
-                              ⏱️ Dev time: {batch.development_time_formatted}
+                            <div className="text-film-red font-medium flex items-center gap-1">
+                              <Icon name="clock" size={14} /> Dev time: {batch.development_time_formatted}
                             </div>
                           )}
                         </div>

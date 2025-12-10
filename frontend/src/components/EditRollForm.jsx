@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import AutocompleteInput from './AutocompleteInput';
 import { getRolls } from '../services/rolls';
+import Icon from './Icon';
 import { getFilmStockImage } from '../utils/filmStockImages';
 
 const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, onStatusChange }) => {
@@ -223,45 +224,45 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
               <button
                 type="button"
                 onClick={() => handleStatusChange('NEW')}
-                className="flex-shrink-0 px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                className="flex-shrink-0 px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center gap-1"
               >
-                🎞️ New
+                <Icon name="film" size={14} /> New
               </button>
             )}
             {roll.status !== 'LOADED' && (
               <button
                 type="button"
                 onClick={() => handleStatusChange('LOADED')}
-                className="flex-shrink-0 px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                className="flex-shrink-0 px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center gap-1"
               >
-                📷 Loaded
+                <Icon name="camera" size={14} /> Loaded
               </button>
             )}
             {roll.status !== 'EXPOSED' && (
               <button
                 type="button"
                 onClick={() => handleStatusChange('EXPOSED')}
-                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors"
+                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors flex items-center gap-1"
               >
-                ✅ Exposed
+                <Icon name="checkCircle" size={14} /> Exposed
               </button>
             )}
             {roll.status !== 'DEVELOPED' && (
               <button
                 type="button"
                 onClick={() => handleStatusChange('DEVELOPED')}
-                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors"
+                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors flex items-center gap-1"
               >
-                🧪 Developed
+                <Icon name="chemistry" size={14} /> Developed
               </button>
             )}
             {roll.status !== 'SCANNED' && (
               <button
                 type="button"
                 onClick={() => handleStatusChange('SCANNED')}
-                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors"
+                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors flex items-center gap-1"
               >
-                ⭐ Scanned
+                <Icon name="star" size={14} /> Scanned
               </button>
             )}
           </div>
@@ -398,8 +399,8 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
                 onChange={handleChange}
                 className="w-4 h-4 text-film-cyan border-gray-300 rounded focus:ring-film-cyan"
               />
-              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                👥 This is a friend's roll (exclude film cost from calculations)
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                <Icon name="users" size={16} /> This is a friend's roll (exclude film cost from calculations)
               </span>
             </label>
           </div>
@@ -440,8 +441,8 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
                 </div>
               )}
               {formData.not_mine && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 italic">
-                  👥 Friend's roll - cost excluded from totals
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
+                  <Icon name="users" size={12} /> Friend's roll - cost excluded from totals
                 </p>
               )}
             </div>
@@ -516,7 +517,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
                 className="flex-1 px-4 py-2.5 sm:py-2 bg-film-amber hover:bg-film-amber/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                 disabled={isSubmitting || isDeleting}
               >
-                📋 Duplicate
+                <Icon name="copy" size={18} /> Duplicate
               </button>
             )}
             <button

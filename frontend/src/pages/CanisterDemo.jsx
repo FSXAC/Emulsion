@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import CanisterPreview from '../components/CanisterPreview';
+import Icon from '../components/Icon';
 
 export default function CanisterDemo() {
   const [textureFile, setTextureFile] = useState(null);
@@ -49,7 +50,9 @@ export default function CanisterDemo() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2">🎞️ Canister Thumbnail Generator</h1>
+        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
+          <Icon name="film" size={32} /> Canister Thumbnail Generator
+        </h1>
         <p className="text-gray-600 mb-8">
           Upload a label texture to generate a 3D canister thumbnail with shadows and lighting
         </p>
@@ -97,9 +100,9 @@ export default function CanisterDemo() {
                 />
                 <button
                   onClick={handleDownload}
-                  className="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                  className="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                 >
-                  ⬇️ Download Thumbnail
+                  <Icon name="download" size={18} /> Download Thumbnail
                 </button>
               </div>
             )}
@@ -125,7 +128,9 @@ export default function CanisterDemo() {
             ) : (
               <div className="flex items-center justify-center h-96 border-2 border-dashed border-gray-300 rounded-lg">
                 <div className="text-center text-gray-500">
-                  <div className="text-4xl mb-2">🎞️</div>
+                  <div className="mb-2 flex justify-center">
+                    <Icon name="film" size={48} />
+                  </div>
                   <div className="text-sm">Upload a texture to see preview</div>
                 </div>
               </div>

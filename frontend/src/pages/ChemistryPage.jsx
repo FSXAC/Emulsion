@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AddChemistryForm from '../components/AddChemistryForm';
+import Icon from '../components/Icon';
 import EditChemistryForm from '../components/EditChemistryForm';
 import SkeletonCard from '../components/SkeletonCard';
 import ErrorMessage from '../components/ErrorMessage';
@@ -72,7 +73,7 @@ export default function ChemistryPage() {
       // Add to local state
       setBatches((prevBatches) => [newBatch, ...prevBatches]);
 
-      showToast('🧪 Chemistry batch created successfully');
+      showToast('Chemistry batch created successfully');
       setDuplicateData(null); // Clear duplicate data after success
     } catch (err) {
       console.error('Failed to create chemistry batch:', err);
@@ -94,7 +95,7 @@ export default function ChemistryPage() {
       setBatches((prevBatches) =>
         prevBatches.map((b) => (b.id === updatedBatch.id ? updatedBatch : b))
       );
-      showToast('✅ Chemistry batch updated');
+      showToast('Chemistry batch updated');
     } catch (err) {
       console.error('Failed to update batch:', err);
       showToast(`Failed to update batch: ${err.message}`, 'error');
@@ -107,12 +108,12 @@ export default function ChemistryPage() {
     try {
       await deleteChemistry(batchId);
       setBatches((prevBatches) => prevBatches.filter((b) => b.id !== batchId));
-      showToast('🗑️ Chemistry batch deleted');
+      showToast('Chemistry batch deleted');
     } catch (err) {
       console.error('Failed to delete batch:', err);
       // Check if error is due to rolls using this batch
       if (err.response?.status === 400) {
-        showToast('❌ Cannot delete: rolls are using this batch', 'error');
+        showToast('Cannot delete: rolls are using this batch', 'error');
       } else {
         showToast(`Failed to delete batch: ${err.message}`, 'error');
       }
@@ -146,7 +147,7 @@ export default function ChemistryPage() {
         prevBatches.map((b) => (b.id === updatedBatch.id ? updatedBatch : b))
       );
 
-      showToast('🔒 Chemistry batch retired');
+      showToast('Chemistry batch retired');
     } catch (err) {
       console.error('Failed to retire batch:', err);
       showToast(`Failed to retire batch: ${err.message}`, 'error');
@@ -254,7 +255,9 @@ export default function ChemistryPage() {
 
       {batches.length === 0 ? (
         <div className="text-center py-12 sm:py-16 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700">
-          <div className="text-5xl sm:text-6xl mb-4">🧪</div>
+          <div className="mb-4 flex justify-center">
+            <Icon name="chemistry" size={64} className="text-gray-400" />
+          </div>
           <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No chemistry batches yet</h3>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-4 px-4">
             Add your first chemistry batch to start tracking development costs
@@ -324,7 +327,7 @@ export default function ChemistryPage() {
                       {/* C41 Development Time */}
                       {batch.chemistry_type === 'C41' && batch.development_time_formatted && (
                         <div className="flex items-center justify-between text-xs text-gray-500">
-                          <span>⏱️ Dev Time</span>
+                          <span className="flex items-center gap-1"><Icon name="clock" size={12} /> Dev Time</span>
                           <span className="font-bold text-purple-700">
                             {batch.development_time_formatted}
                           </span>
@@ -432,7 +435,7 @@ export default function ChemistryPage() {
                       {/* C41 Development Time */}
                       {batch.chemistry_type === 'C41' && batch.development_time_formatted && (
                         <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                          <span>⏱️ Dev Time</span>
+                          <span className="flex items-center gap-1"><Icon name="clock" size={12} /> Dev Time</span>
                           <span className="font-bold text-purple-700 dark:text-purple-400">
                             {batch.development_time_formatted}
                           </span>

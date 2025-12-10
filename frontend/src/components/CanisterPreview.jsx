@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { renderCanisterToCanvas } from '../utils/canisterRenderer';
+import Icon from './Icon';
 
 /**
  * CanisterPreview Component
@@ -71,17 +72,17 @@ export default function CanisterPreview({ textureUrl, onGenerate, config = {} })
         <button
           onClick={handleFlipRotation}
           disabled={!renderer}
-          className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
         >
-          🔄 Flip 180°
+          <Icon name="rotate" size={18} /> Flip 180°
         </button>
         
         <button
           onClick={handleScreenshot}
           disabled={!renderer}
-          className="px-4 py-2 bg-film-cyan text-white rounded hover:bg-film-cyan/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="px-4 py-2 bg-film-cyan text-white rounded hover:bg-film-cyan/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
         >
-          📸 Generate Thumbnail
+          <Icon name="image" size={18} /> Generate Thumbnail
         </button>
       </div>
     </div>

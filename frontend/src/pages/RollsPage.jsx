@@ -14,6 +14,7 @@ import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import StatusColumn from '../components/StatusColumn';
 import FilmRollCard from '../components/FilmRollCard';
 import DatePickerModal from '../components/DatePickerModal';
+import Icon from '../components/Icon';
 import ChemistryPickerModal from '../components/ChemistryPickerModal';
 import RatingModal from '../components/RatingModal';
 import EditRollForm from '../components/EditRollForm';
@@ -62,11 +63,11 @@ export default function RollsPage() {
 
   // Status configuration
   const statusConfig = [
-    { status: 'NEW', displayName: 'New', icon: '🎞️' },
-    { status: 'LOADED', displayName: 'Loaded', icon: '📷' },
-    { status: 'EXPOSED', displayName: 'Exposed', icon: '✅' },
-    { status: 'DEVELOPED', displayName: 'Developed', icon: '🧪' },
-    { status: 'SCANNED', displayName: 'Scanned', icon: '⭐' },
+    { status: 'NEW', displayName: 'New', icon: 'film' },
+    { status: 'LOADED', displayName: 'Loaded', icon: 'camera' },
+    { status: 'EXPOSED', displayName: 'Exposed', icon: 'checkCircle' },
+    { status: 'DEVELOPED', displayName: 'Developed', icon: 'chemistry' },
+    { status: 'SCANNED', displayName: 'Scanned', icon: 'star' },
   ];
 
   // Check if on mobile
@@ -250,7 +251,7 @@ export default function RollsPage() {
       } else if (isForward) {
         // Forward transitions - only allow sequential moves (one step at a time)
         if (targetIndex - currentIndex > 1) {
-          showToast('⚠️ Please move rolls one status at a time in the forward direction', 'error');
+          showToast('Please move rolls one status at a time in the forward direction', 'error');
           return;
         }
 
@@ -288,11 +289,11 @@ export default function RollsPage() {
 
       // Show success message
       const statusMessages = {
-        'NEW': '🎞️ Roll reset to NEW',
-        'LOADED': '📷 Roll marked as LOADED',
-        'EXPOSED': '✅ Roll marked as EXPOSED',
-        'DEVELOPED': '🧪 Roll marked as DEVELOPED',
-        'SCANNED': '⭐ Roll marked as SCANNED'
+        'NEW': 'Roll reset to NEW',
+        'LOADED': 'Roll marked as LOADED',
+        'EXPOSED': 'Roll marked as EXPOSED',
+        'DEVELOPED': 'Roll marked as DEVELOPED',
+        'SCANNED': 'Roll marked as SCANNED'
       };
       showToast(statusMessages[updatedRoll.status] || 'Roll updated successfully');
     } catch (err) {
@@ -312,10 +313,10 @@ export default function RollsPage() {
       let updatedRoll;
       if (action === 'load') {
         updatedRoll = await loadRoll(roll.id, selectedDate);
-        showToast(`📷 Roll loaded on ${selectedDate}`);
+        showToast(`Roll loaded on ${selectedDate}`);
       } else if (action === 'unload') {
         updatedRoll = await unloadRoll(roll.id, selectedDate);
-        showToast(`✅ Roll unloaded on ${selectedDate}`);
+        showToast(`Roll unloaded on ${selectedDate}`);
       }
 
       // Update local state
@@ -340,7 +341,7 @@ export default function RollsPage() {
       // (chemistry cost is amortized across all rolls using that batch)
       await fetchRolls();
 
-      showToast('🧪 Chemistry batch assigned successfully');
+      showToast('Chemistry batch assigned successfully');
     } catch (err) {
       console.error('Failed to assign chemistry:', err);
       showToast(`Failed to assign chemistry: ${err.message}`, 'error');
@@ -360,7 +361,7 @@ export default function RollsPage() {
         prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
       );
 
-      showToast(`⭐ Roll rated ${stars} star${stars !== 1 ? 's' : ''}`);
+      showToast(`Roll rated ${stars} star${stars !== 1 ? 's' : ''}`);
     } catch (err) {
       console.error('Failed to rate roll:', err);
       showToast(`Failed to rate roll: ${err.message}`, 'error');
@@ -395,7 +396,7 @@ export default function RollsPage() {
         prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
       );
 
-      showToast('✏️ Roll updated successfully');
+      showToast('Roll updated successfully');
     } catch (err) {
       console.error('Failed to update roll:', err);
       showToast(`Failed to update roll: ${err.message}`, 'error');
@@ -411,7 +412,7 @@ export default function RollsPage() {
       // Remove from local state
       setRolls((prevRolls) => prevRolls.filter((r) => r.id !== rollId));
 
-      showToast('🗑️ Roll deleted successfully');
+      showToast('Roll deleted successfully');
     } catch (err) {
       console.error('Failed to delete roll:', err);
       showToast(`Failed to delete roll: ${err.message}`, 'error');
@@ -427,7 +428,7 @@ export default function RollsPage() {
       // Add to local state
       setRolls((prevRolls) => [...prevRolls, newRoll]);
 
-      showToast('🎞️ Roll added successfully');
+      showToast('Roll added successfully');
     } catch (err) {
       console.error('Failed to create roll:', err);
       showToast(`Failed to create roll: ${err.message}`, 'error');
@@ -442,7 +443,7 @@ export default function RollsPage() {
     // We need to pass the duplicate data to AddRollForm
     // For now, just open AddRollForm and show success message
     setAddRollModal({ isOpen: true, initialData: duplicateData });
-    showToast('📋 Opening form to duplicate roll');
+    showToast('Opening form to duplicate roll');
   };
 
   if (loading) {
@@ -513,8 +514,8 @@ export default function RollsPage() {
       {chemistryFilter && chemistryBatch && (
         <div className="mb-4 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-purple-900 dark:text-purple-300">
-              🧪 Filtered by chemistry:
+            <span className="text-sm font-medium text-purple-900 dark:text-purple-300 flex items-center gap-1">
+              <Icon name="chemistry" size={16} /> Filtered by chemistry:
             </span>
             <span className="text-sm text-purple-700 dark:text-purple-400 font-semibold">
               {chemistryBatch.name}
