@@ -45,22 +45,22 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
     if (roll.cost_per_shot !== null && roll.cost_per_shot !== undefined) {
       return roll.cost_per_shot;
     }
-    
+
     // Calculate on frontend otherwise
     const exposures = roll.actual_exposures || roll.expected_exposures;
     if (!exposures || exposures === 0) return null;
-    
+
     // Parse costs as numbers, handling string values
     const filmCost = typeof roll.film_cost === 'string' ? parseFloat(roll.film_cost) || 0 : roll.film_cost || 0;
     const devCost = typeof roll.dev_cost === 'string' ? parseFloat(roll.dev_cost) || 0 : roll.dev_cost || 0;
-    
+
     // For "not mine" rolls, only count dev cost
     const totalCost = roll.not_mine ? devCost : (filmCost + devCost);
-    
+
     if (totalCost === 0) return null;
 
     const costPerShot = totalCost / exposures;
-    
+
     // Safety check for NaN
     if (isNaN(costPerShot)) return null;
 
@@ -92,7 +92,7 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
       <div className="flex gap-2 mb-2">
         {/* Left: Film Thumbnail */}
         <div className="flex-shrink-0 w-20 h-28 p-0 pl-0 overflow-hidden">
-          <img 
+          <img
             src={getFilmStockImage(roll.film_stock_name, roll.film_format)}
             alt={roll.film_stock_name}
             className="w-full h-full object-cover"
@@ -109,14 +109,14 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
 
             {/* Format + Exposures */}
             <div className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
-            <span>{roll.film_format}</span>
-            <span className="text-gray-400">•</span>
-            <span>{roll.expected_exposures} exp</span>
-            {roll.actual_exposures && roll.actual_exposures !== roll.expected_exposures && (
-              <span className={`font-bold ${roll.actual_exposures >= roll.expected_exposures ? 'text-green-600' : 'text-orange-600'}`}>
-              ({roll.actual_exposures})
-              </span>
-            )}
+              <span>{roll.film_format}</span>
+              <span className="text-gray-400">•</span>
+              <span>{roll.expected_exposures} exp</span>
+              {roll.actual_exposures && roll.actual_exposures !== roll.expected_exposures && (
+                <span className={`font-bold ${roll.actual_exposures >= roll.expected_exposures ? 'text-green-600' : 'text-orange-600'}`}>
+                  ({roll.actual_exposures})
+                </span>
+              )}
             </div>
 
             {/* Order Tag & Not Mine Flag Row */}
@@ -143,7 +143,7 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
               {roll.stars > 0 ? (
                 <>
                   {Array.from({ length: 5 }, (_, i) => (
-                    <span key={i} className='text-gray-800'>
+                    <span key={i} className='text-gray-800 dark:text-gray-200'>
                       {i < roll.stars ? '★' : '☆'}
                     </span>
                   ))}

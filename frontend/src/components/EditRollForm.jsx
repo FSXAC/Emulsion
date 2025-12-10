@@ -35,11 +35,11 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
     try {
       const data = await getRolls({ limit: 1000 });
       const rolls = Array.isArray(data) ? data : data.rolls || [];
-      
+
       // Extract unique film stock names
       const stockNames = [...new Set(rolls.map(r => r.film_stock_name).filter(Boolean))];
       setFilmStockSuggestions(stockNames.sort());
-      
+
       // Extract unique order IDs
       const orderIds = [...new Set(rolls.map(r => r.order_id).filter(Boolean))];
       setOrderIdSuggestions(orderIds.sort());
@@ -80,7 +80,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
 
   const validate = () => {
     const newErrors = {};
-    
+
     if (!formData.order_id.trim()) newErrors.order_id = 'Order ID is required';
     if (!formData.film_stock_name.trim()) newErrors.film_stock_name = 'Film stock name is required';
     if (!formData.film_format.trim()) newErrors.film_format = 'Film format is required';
@@ -97,7 +97,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validate()) return;
 
     setIsSubmitting(true);
@@ -128,7 +128,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
 
   const handleDelete = async () => {
     if (!roll) return;
-    
+
     setIsDeleting(true);
     try {
       await onDelete(roll.id);
@@ -144,7 +144,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
 
   const handleDuplicate = () => {
     if (!roll || !onDuplicate) return;
-    
+
     // Copy relevant fields for duplication
     const duplicateData = {
       order_id: roll.order_id,
@@ -155,7 +155,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
       push_pull_stops: roll.push_pull_stops,
       not_mine: roll.not_mine,
     };
-    
+
     onDuplicate(duplicateData);
     handleClose();
   };
@@ -194,13 +194,13 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
           <div className="flex items-start gap-4">
             {/* Thumbnail */}
             <div className="flex-shrink-0 w-16 h-24 sm:w-20 sm:h-28 overflow-hidden rounded">
-              <img 
+              <img
                 src={getFilmStockImage(roll.film_stock_name, roll.film_format)}
                 alt={roll.film_stock_name}
                 className="w-full h-full object-cover"
               />
             </div>
-            
+
             {/* Title and Status */}
             <div className="flex-1 min-w-0">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Edit Film Roll</h2>
@@ -214,7 +214,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
             </div>
           </div>
         </div>
-        
+
         {/* Status Change Buttons - Mobile Only */}
         <div className="flex-shrink-0 px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 sm:hidden">
           <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Change Status:</p>
@@ -271,7 +271,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
           {/* Film Stock Name - Full Width */}
           <div className="mb-4">
-            <label htmlFor="film_stock_name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="film_stock_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Film Stock *
             </label>
             <AutocompleteInput
@@ -281,9 +281,8 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
               onChange={handleChange}
               suggestions={filmStockSuggestions}
               placeholder="e.g., Kodak Portra 400"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                errors.film_stock_name ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${errors.film_stock_name ? 'border-red-500' : 'border-gray-300'
+                }`}
             />
             {errors.film_stock_name && <p className="mt-1 text-xs text-red-600">{errors.film_stock_name}</p>}
           </div>
@@ -291,7 +290,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {/* Order ID */}
             <div>
-              <label htmlFor="order_id" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="order_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Order ID *
               </label>
               <AutocompleteInput
@@ -301,16 +300,15 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
                 onChange={handleChange}
                 suggestions={orderIdSuggestions}
                 placeholder="42"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.order_id ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${errors.order_id ? 'border-red-500' : 'border-gray-300'
+                  }`}
               />
               {errors.order_id && <p className="mt-1 text-xs text-red-600">{errors.order_id}</p>}
             </div>
 
             {/* Expected Exposures */}
             <div>
-              <label htmlFor="expected_exposures" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="expected_exposures" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Exposures *
               </label>
               <input
@@ -320,9 +318,8 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
                 value={formData.expected_exposures}
                 onChange={handleChange}
                 min="1"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.expected_exposures ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${errors.expected_exposures ? 'border-red-500' : 'border-gray-300'
+                  }`}
               />
               {errors.expected_exposures && <p className="mt-1 text-xs text-red-600">{errors.expected_exposures}</p>}
             </div>
@@ -331,7 +328,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
           <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-4">
             {/* Film Format */}
             <div>
-              <label htmlFor="film_format" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="film_format" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Format *
               </label>
               <select
@@ -353,7 +350,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
 
             {/* Push/Pull Stops */}
             <div>
-              <label htmlFor="push_pull_stops" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="push_pull_stops" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Push/Pull
               </label>
               <input
@@ -373,7 +370,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
 
           {/* Film Cost - Full Width */}
           <div className="mt-4">
-            <label htmlFor="film_cost" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="film_cost" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Film Cost ($) *
             </label>
             <input
@@ -384,9 +381,8 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
               onChange={handleChange}
               min="0"
               step="0.01"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                errors.film_cost ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${errors.film_cost ? 'border-red-500' : 'border-gray-300'
+                }`}
               placeholder="0.00"
             />
             {errors.film_cost && <p className="mt-1 text-xs text-red-600">{errors.film_cost}</p>}
@@ -402,7 +398,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
                 onChange={handleChange}
                 className="w-4 h-4 text-film-cyan border-gray-300 rounded focus:ring-film-cyan"
               />
-              <span className="ml-2 text-sm text-gray-700">
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
                 👥 This is a friend's roll (exclude film cost from calculations)
               </span>
             </label>
@@ -410,7 +406,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
 
           {/* Notes */}
           <div className="mt-4">
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Notes
             </label>
             <textarea
@@ -426,25 +422,25 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
 
           {/* Cost Preview */}
           {formData.film_cost && formData.expected_exposures && (
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs sm:text-sm font-medium text-gray-700">Film Cost:</span>
-                <span className="text-base sm:text-lg font-bold text-green-700">
+                <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Film Cost:</span>
+                <span className="text-base sm:text-lg font-bold text-green-700 dark:text-green-400">
                   ${parseFloat(formData.film_cost).toFixed(2)}
                 </span>
               </div>
               {calculateCostPerShot() && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-600">
+                  <span className="text-xs text-gray-600 dark:text-gray-400">
                     Cost per shot ({formData.expected_exposures} exp):
                   </span>
-                  <span className="text-sm font-semibold text-green-600">
+                  <span className="text-sm font-semibold text-green-600 dark:text-green-500">
                     ${calculateCostPerShot()}/shot
                   </span>
                 </div>
               )}
               {formData.not_mine && (
-                <p className="text-xs text-gray-500 mt-2 italic">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 italic">
                   👥 Friend's roll - cost excluded from totals
                 </p>
               )}
@@ -454,15 +450,15 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
 
           {/* Delete Confirmation */}
           {showDeleteConfirm && (
-            <div className="my-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-xs text-gray-700 mb-2">
+            <div className="my-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-xs text-gray-700 dark:text-gray-300 mb-2">
                 Delete this roll? This cannot be undone.
               </p>
               <div className="flex gap-2 justify-end">
                 <button
                   type="button"
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="px-3 py-1 text-xs text-gray-600 hover:text-gray-800 hover:underline transition-colors"
+                  className="px-3 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:underline transition-colors"
                   disabled={isDeleting}
                 >
                   Cancel
@@ -470,7 +466,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
                 <button
                   type="button"
                   onClick={handleDelete}
-                  className="px-3 py-1 text-xs text-red-600 hover:text-red-700 font-medium hover:underline transition-colors disabled:opacity-50"
+                  className="px-3 py-1 text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium hover:underline transition-colors disabled:opacity-50"
                   disabled={isDeleting}
                 >
                   {isDeleting ? 'Deleting...' : 'Yes, delete'}
@@ -485,7 +481,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(true)}
-                className="text-xs text-red-600 hover:text-red-700 hover:underline transition-colors disabled:opacity-50"
+                className="text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:underline transition-colors disabled:opacity-50"
                 disabled={isSubmitting || isDeleting}
               >
                 Delete this roll
@@ -508,7 +504,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2.5 sm:py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors text-sm sm:text-base"
+              className="flex-1 px-4 py-2.5 sm:py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-colors text-sm sm:text-base"
               disabled={isSubmitting || isDeleting}
             >
               Cancel

@@ -26,12 +26,11 @@ import { getChemistryBatch } from '../services/chemistry';
 // Simple toast notification function
 const showToast = (message, type = 'success') => {
   const toast = document.createElement('div');
-  toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium animate-slideIn ${
-    type === 'success' ? 'bg-green-500' : 'bg-red-500'
-  }`;
+  toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium animate-slideIn ${type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
   toast.textContent = message;
   document.body.appendChild(toast);
-  
+
   setTimeout(() => {
     toast.classList.add('animate-slideOut');
     setTimeout(() => document.body.removeChild(toast), 300);
@@ -41,13 +40,13 @@ const showToast = (message, type = 'success') => {
 export default function RollsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const chemistryFilter = searchParams.get('chemistry');
-  
+
   const [rolls, setRolls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeRoll, setActiveRoll] = useState(null);
   const [chemistryBatch, setChemistryBatch] = useState(null);
-  
+
   // Modal states
   const [datePickerModal, setDatePickerModal] = useState({ isOpen: false, roll: null, action: null });
   const [chemistryModal, setChemistryModal] = useState({ isOpen: false, roll: null });
@@ -72,7 +71,7 @@ export default function RollsPage() {
 
   // Check if on mobile
   const [isMobile, setIsMobile] = useState(false);
-  
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 640); // sm breakpoint
@@ -130,12 +129,12 @@ export default function RollsPage() {
         console.error('Unexpected API response format:', data);
         allRolls = [];
       }
-      
+
       // Filter by chemistry if specified
       if (chemistryFilter) {
         allRolls = allRolls.filter(roll => roll.chemistry_id === chemistryFilter);
       }
-      
+
       setRolls(allRolls);
     } catch (err) {
       console.error('Failed to fetch rolls:', err);
@@ -152,7 +151,7 @@ export default function RollsPage() {
   // Group rolls by status
   const rollsByStatus = statusConfig.reduce((acc, { status }) => {
     const filteredRolls = rolls.filter((roll) => roll.status === status);
-    
+
     // Sort SCANNED rolls by most recent unload date
     if (status === 'SCANNED') {
       filteredRolls.sort((a, b) => {
@@ -161,7 +160,7 @@ export default function RollsPage() {
         return dateB - dateA; // Most recent first
       });
     }
-    
+
     acc[status] = filteredRolls;
     return acc;
   }, {});
@@ -201,7 +200,7 @@ export default function RollsPage() {
 
     // Validate drop target
     if (!over) return;
-    
+
     // Get the target status - check if it's a column or a card
     let targetStatus;
     if (over.data?.current?.type === 'status-column') {
@@ -229,7 +228,7 @@ export default function RollsPage() {
       // Handle backward transitions (reset fields) - can jump to any previous status
       if (isBackward) {
         const fieldsToUpdate = {};
-        
+
         // Reset fields based on target status
         if (targetIndex < statusOrder.indexOf('SCANNED')) {
           fieldsToUpdate.stars = null;
@@ -286,7 +285,7 @@ export default function RollsPage() {
       setRolls((prevRolls) =>
         prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
       );
-      
+
       // Show success message
       const statusMessages = {
         'NEW': '🎞️ Roll reset to NEW',
@@ -336,11 +335,11 @@ export default function RollsPage() {
 
     try {
       await assignChemistry(roll.id, chemistryId);
-      
+
       // Refresh all rolls to update cost calculations
       // (chemistry cost is amortized across all rolls using that batch)
       await fetchRolls();
-      
+
       showToast('🧪 Chemistry batch assigned successfully');
     } catch (err) {
       console.error('Failed to assign chemistry:', err);
@@ -355,12 +354,12 @@ export default function RollsPage() {
 
     try {
       const updatedRoll = await rateRoll(roll.id, stars, actualExposures);
-      
+
       // Update local state
       setRolls((prevRolls) =>
         prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
       );
-      
+
       showToast(`⭐ Roll rated ${stars} star${stars !== 1 ? 's' : ''}`);
     } catch (err) {
       console.error('Failed to rate roll:', err);
@@ -378,7 +377,7 @@ export default function RollsPage() {
     // Create a fake drag event to reuse existing logic
     const fakeEvent = {
       active: { id: roll.id },
-      over: { 
+      over: {
         id: newStatus,
         data: { current: { type: 'status-column', status: newStatus } }
       }
@@ -390,12 +389,12 @@ export default function RollsPage() {
   const handleEditRoll = async (rollId, formData) => {
     try {
       const updatedRoll = await updateRoll(rollId, formData);
-      
+
       // Update local state
       setRolls((prevRolls) =>
         prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
       );
-      
+
       showToast('✏️ Roll updated successfully');
     } catch (err) {
       console.error('Failed to update roll:', err);
@@ -408,10 +407,10 @@ export default function RollsPage() {
   const handleDeleteRoll = async (rollId) => {
     try {
       await deleteRoll(rollId);
-      
+
       // Remove from local state
       setRolls((prevRolls) => prevRolls.filter((r) => r.id !== rollId));
-      
+
       showToast('🗑️ Roll deleted successfully');
     } catch (err) {
       console.error('Failed to delete roll:', err);
@@ -424,10 +423,10 @@ export default function RollsPage() {
   const handleAddRoll = async (formData) => {
     try {
       const newRoll = await createRoll(formData);
-      
+
       // Add to local state
       setRolls((prevRolls) => [...prevRolls, newRoll]);
-      
+
       showToast('🎞️ Roll added successfully');
     } catch (err) {
       console.error('Failed to create roll:', err);
@@ -502,7 +501,7 @@ export default function RollsPage() {
             {isMobile ? 'Tap a roll to view details and change status' : 'Drag rolls between columns to update their status'}
           </p>
         </div>
-        <button 
+        <button
           onClick={() => setAddRollModal({ isOpen: true, initialData: null })}
           className="btn-primary whitespace-nowrap touch-friendly"
         >
@@ -573,8 +572,8 @@ export default function RollsPage() {
         onConfirm={handleDateConfirm}
         title={datePickerModal.action === 'load' ? 'Load Roll' : 'Unload Roll'}
         defaultDate={
-          datePickerModal.action === 'load' 
-            ? datePickerModal.roll?.date_loaded 
+          datePickerModal.action === 'load'
+            ? datePickerModal.roll?.date_loaded
             : datePickerModal.roll?.date_unloaded
         }
       />

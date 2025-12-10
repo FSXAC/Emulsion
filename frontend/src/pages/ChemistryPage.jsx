@@ -9,12 +9,11 @@ import { getChemistry, createChemistry, updateChemistry, deleteChemistry } from 
 // Simple toast notification function
 const showToast = (message, type = 'success') => {
   const toast = document.createElement('div');
-  toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium animate-slideIn ${
-    type === 'success' ? 'bg-green-500' : 'bg-red-500'
-  }`;
+  toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium animate-slideIn ${type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
   toast.textContent = message;
   document.body.appendChild(toast);
-  
+
   setTimeout(() => {
     toast.classList.add('animate-slideOut');
     setTimeout(() => document.body.removeChild(toast), 300);
@@ -29,7 +28,7 @@ export default function ChemistryPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [duplicateData, setDuplicateData] = useState(null);
-  
+
   // Pagination state
   const [visibleCounts, setVisibleCounts] = useState({
     active: 4,
@@ -69,10 +68,10 @@ export default function ChemistryPage() {
   const handleAddChemistry = async (formData) => {
     try {
       const newBatch = await createChemistry(formData);
-      
+
       // Add to local state
       setBatches((prevBatches) => [newBatch, ...prevBatches]);
-      
+
       showToast('🧪 Chemistry batch created successfully');
       setDuplicateData(null); // Clear duplicate data after success
     } catch (err) {
@@ -126,7 +125,7 @@ export default function ChemistryPage() {
     // Close edit modal
     setIsEditModalOpen(false);
     setSelectedBatch(null);
-    
+
     // Open add modal with duplicate data
     setDuplicateData(duplicateData);
     setAddBatchModal({ isOpen: true });
@@ -141,12 +140,12 @@ export default function ChemistryPage() {
     try {
       const today = new Date().toISOString().split('T')[0];
       const updatedBatch = await updateChemistry(batchId, { date_retired: today });
-      
+
       // Update local state
       setBatches((prevBatches) =>
         prevBatches.map((b) => (b.id === updatedBatch.id ? updatedBatch : b))
       );
-      
+
       showToast('🔒 Chemistry batch retired');
     } catch (err) {
       console.error('Failed to retire batch:', err);
@@ -245,7 +244,7 @@ export default function ChemistryPage() {
             Track your film development chemistry and costs
           </p>
         </div>
-        <button 
+        <button
           onClick={() => setAddBatchModal({ isOpen: true })}
           className="btn-primary whitespace-nowrap touch-friendly"
         >
@@ -260,7 +259,7 @@ export default function ChemistryPage() {
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-4 px-4">
             Add your first chemistry batch to start tracking development costs
           </p>
-          <button 
+          <button
             onClick={() => setAddBatchModal({ isOpen: true })}
             className="btn-primary touch-friendly"
           >
@@ -292,7 +291,7 @@ export default function ChemistryPage() {
                             {batch.chemistry_type}
                           </span>
                         </div>
-                        
+
                         {/* Date Mixed */}
                         {batch.date_mixed && (
                           <div className="text-xs text-gray-600 dark:text-gray-400">
@@ -314,11 +313,11 @@ export default function ChemistryPage() {
                     <div className="bg-gray-50 rounded-xl px-3 py-2 space-y-2">
                       {/* Rolls + Cost per Roll */}
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">
+                        <span className="text-gray-600 dark:text-gray-400">
                           {batch.rolls_developed || 0} {batch.rolls_developed === 1 ? 'roll' : 'rolls'}
                         </span>
-                        <span className="font-semibold text-gray-800">
-                          {formatCost(batch.cost_per_roll)} <span className="text-xs text-gray-500 font-normal">per roll</span>
+                        <span className="font-semibold text-gray-800 dark:text-gray-200">
+                          {formatCost(batch.cost_per_roll)} <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">per roll</span>
                         </span>
                       </div>
 
@@ -389,20 +388,20 @@ export default function ChemistryPage() {
                   <div
                     key={batch.id}
                     onClick={() => handleEditBatch(batch)}
-                    className="bg-white rounded-2xl shadow-sm hover:shadow-md p-4 transition-all duration-200 border border-gray-200 cursor-pointer opacity-70 hover:opacity-100"
+                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-md p-4 transition-all duration-200 border border-gray-200 dark:border-gray-700 cursor-pointer opacity-70 hover:opacity-100"
                   >
                     {/* Top Section: Name, Type & Cost */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-base font-bold text-gray-900">{batch.name}</h3>
-                          <span className="text-[11px] text-gray-700 bg-gray-100 rounded px-2 py-1">
+                          <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">{batch.name}</h3>
+                          <span className="text-[11px] text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded px-2 py-1">
                             {batch.chemistry_type}
                           </span>
                         </div>
-                        
+
                         {/* Dates */}
-                        <div className="text-xs text-gray-600">
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
                           {batch.date_mixed && `Mixed ${formatDate(batch.date_mixed)}`}
                           {batch.date_mixed && batch.date_retired && ' • '}
                           {batch.date_retired && `Retired ${formatDate(batch.date_retired)}`}
@@ -411,30 +410,30 @@ export default function ChemistryPage() {
 
                       {/* Batch Cost */}
                       <div className="text-right">
-                        <div className="text-xs text-gray-500 mb-0.5">Total</div>
-                        <div className="text-xl font-bold text-gray-600">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Total</div>
+                        <div className="text-xl font-bold text-gray-600 dark:text-gray-400">
                           {formatCost(batch.batch_cost)}
                         </div>
                       </div>
                     </div>
 
                     {/* Stats Block */}
-                    <div className="bg-gray-50 rounded-xl px-3 py-2 space-y-2">
+                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl px-3 py-2 space-y-2">
                       {/* Rolls + Cost per Roll */}
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">
+                        <span className="text-gray-600 dark:text-gray-400">
                           {batch.rolls_developed || 0} {batch.rolls_developed === 1 ? 'roll' : 'rolls'}
                         </span>
-                        <span className="font-semibold text-gray-800">
-                          {formatCost(batch.cost_per_roll)} <span className="text-xs text-gray-500 font-normal">per roll</span>
+                        <span className="font-semibold text-gray-800 dark:text-gray-200">
+                          {formatCost(batch.cost_per_roll)} <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">per roll</span>
                         </span>
                       </div>
 
                       {/* C41 Development Time */}
                       {batch.chemistry_type === 'C41' && batch.development_time_formatted && (
-                        <div className="flex items-center justify-between text-xs text-gray-500">
+                        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                           <span>⏱️ Dev Time</span>
-                          <span className="font-bold text-purple-700">
+                          <span className="font-bold text-purple-700 dark:text-purple-400">
                             {batch.development_time_formatted}
                           </span>
                         </div>
@@ -443,13 +442,13 @@ export default function ChemistryPage() {
 
                     {/* Notes */}
                     {batch.notes && (
-                      <div className="mt-3 bg-gray-50 rounded-xl px-3 py-2 text-xs text-gray-600 italic leading-relaxed">
+                      <div className="mt-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl px-3 py-2 text-xs text-gray-600 dark:text-gray-400 italic leading-relaxed">
                         {batch.notes}
                       </div>
                     )}
 
                     {/* Quick Actions */}
-                    <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                       <Link
                         to={`/rolls?chemistry=${batch.id}`}
                         onClick={(e) => e.stopPropagation()}
@@ -466,7 +465,7 @@ export default function ChemistryPage() {
               {hasMoreRetired && (
                 <button
                   onClick={loadMoreRetired}
-                  className="w-full mt-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors"
+                  className="w-full mt-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 transition-colors"
                 >
                   Load more retired batches ({retiredBatches.length - visibleCounts.retired} remaining)
                 </button>
