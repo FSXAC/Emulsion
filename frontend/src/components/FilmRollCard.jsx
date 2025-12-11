@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getFilmStockImage } from '../utils/filmStockImages';
 import Icon from './Icon';
 
 const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
+  const [hoveringDates, setHoveringDates] = useState(false);
+  const [hoveringCost, setHoveringCost] = useState(false);
   const {
     attributes,
     listeners,
@@ -67,6 +70,7 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
 
     return costPerShot;
   };
+
 
   // Render star rating
   // const renderStars = (stars) => {
@@ -140,22 +144,21 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
           {/* Rating + Push/Pull Row */}
           <div className="flex items-center justify-between">
             {/* Left: Star Rating */}
-            <div className="flex items-center gap-0.5 text-base">
-              {roll.stars > 0 ? (
-                <>
-                  {Array.from({ length: 5 }, (_, i) => (
-                    <Icon 
-                      key={i} 
-                      name="star" 
-                      size={16}
-                      className={`${i < roll.stars ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}
-                    />
-                  ))}
-                </>
-              ) : (
-                <span className="text-gray-400 text-xs">Unrated</span>
-              )}
-            </div>
+            {roll.stars > 0 && (
+              <div className="flex items-center gap-0.5 text-base">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <Icon 
+                    key={i} 
+                    name="star" 
+                    size={16}
+                    className={`${i < roll.stars ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Spacer when no stars to keep push/pull aligned right */}
+            {!roll.stars && <div />}
 
             {/* Right: Push/Pull Tag */}
             {roll.push_pull_stops && Math.abs(roll.push_pull_stops) > 0 && (
@@ -168,48 +171,99 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
       </div>
 
       {/* Cost + Date Stats Block */}
-      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl px-2 py-2 mb-2 space-y-2">
+      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl px-2 py-2 mb-2">
         {/* Top Row: Dates + Per Shot Cost */}
         {(roll.date_loaded || roll.date_unloaded || calculateCostPerShot() !== null) && (
           <div className="flex items-center justify-between text-sm">
-            <div className="text-gray-800 dark:text-gray-200">
-              {roll.date_loaded && roll.date_unloaded ? (
-                <>
-                  <span className="font-bold">{formatDate(roll.date_loaded)}</span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 font-normal mx-1">→</span>
-                  <span className="font-bold">{formatDate(roll.date_unloaded)}</span>
-                </>
-              ) : roll.date_loaded ? (
-                <span className="font-bold">{formatDate(roll.date_loaded)}</span>
-              ) : (
-                <span className="text-gray-400 dark:text-gray-500">No dates</span>
-              )}
-            </div>
-            {calculateCostPerShot() !== null && (
-              <div className="font-semibold text-gray-800 dark:text-gray-200">
-                {formatCost(calculateCostPerShot())} <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">per shot</span>
+            {/* Dates Section with Hover Effect */}
+            {(roll.date_loaded || roll.date_unloaded) ? (
+              <div 
+                className="relative text-gray-800 dark:text-gray-200 flex-1 min-w-0"
+                onMouseEnter={() => setHoveringDates(true)}
+                onMouseLeave={() => setHoveringDates(false)}
+              >
+                {/* Invisible placeholder to maintain height */}
+                <div className="invisible whitespace-nowrap">
+                  {roll.date_loaded && roll.date_unloaded ? (
+                    <>
+                      <span className="font-bold">{formatDate(roll.date_loaded)}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 font-normal mx-1">→</span>
+                      <span className="font-bold">{formatDate(roll.date_unloaded)}</span>
+                    </>
+                  ) : roll.date_loaded ? (
+                    <span className="font-bold">{formatDate(roll.date_loaded)}</span>
+                  ) : null}
+                </div>
+                
+                {/* Dates View */}
+                <div 
+                  className={`absolute inset-0 transition-opacity duration-300 whitespace-nowrap ${
+                    hoveringDates && roll.duration_days !== null && roll.duration_days !== undefined 
+                      ? 'opacity-0' 
+                      : 'opacity-100'
+                  }`}
+                >
+                  {roll.date_loaded && roll.date_unloaded ? (
+                    <>
+                      <span className="font-bold">{formatDate(roll.date_loaded)}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 font-normal mx-1">→</span>
+                      <span className="font-bold">{formatDate(roll.date_unloaded)}</span>
+                    </>
+                  ) : roll.date_loaded ? (
+                    <span className="font-bold">{formatDate(roll.date_loaded)}</span>
+                  ) : null}
+                </div>
+                
+                {/* Days Loaded View (shown on hover) */}
+                {roll.duration_days !== null && roll.duration_days !== undefined && (
+                  <div 
+                    className={`absolute inset-0 transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis ${
+                      hoveringDates ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">
+                      {roll.duration_days} {roll.duration_days === 1 ? 'day' : 'days'} loaded
+                    </span>
+                  </div>
+                )}
               </div>
+            ) : (
+              <div className="flex-1" />
             )}
-          </div>
-        )}
 
-        {/* Second Row: Days Loaded + Cost Breakdown */}
-        {(roll.duration_days !== null || roll.film_cost !== null || roll.dev_cost !== null) && (
-          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-            <div>
-              {roll.duration_days !== null && roll.duration_days !== undefined ? (
-                <>
-                  {roll.duration_days} {roll.duration_days === 1 ? 'day' : 'days'} loaded
-                </>
-              ) : (
-                <span className="text-gray-400">—</span>
-              )}
-            </div>
-            {(roll.film_cost !== null || roll.dev_cost !== null) && (
-              <div>
-                {roll.film_cost !== null && `${formatCost(roll.film_cost)} film`}
-                {roll.film_cost !== null && roll.dev_cost !== null && ' + '}
-                {roll.dev_cost !== null && `${formatCost(roll.dev_cost)} dev`}
+            {/* Cost Per Shot Section with Hover Effect */}
+            {calculateCostPerShot() !== null && (
+              <div 
+                className="relative font-semibold text-gray-800 dark:text-gray-200 flex-shrink-0 ml-2 flex items-center"
+                onMouseEnter={() => setHoveringCost(true)}
+                onMouseLeave={() => setHoveringCost(false)}
+              >
+                {/* Invisible placeholder to maintain height */}
+                <div className="invisible whitespace-nowrap">
+                  {formatCost(calculateCostPerShot())} <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">per shot</span>
+                </div>
+                
+                {/* Cost Per Shot View */}
+                <div 
+                  className={`absolute inset-y-0 right-0 flex items-center transition-opacity duration-300 whitespace-nowrap ${
+                    hoveringCost && (roll.film_cost !== null || roll.dev_cost !== null) ? 'opacity-0' : 'opacity-100'
+                  }`}
+                >
+                  {formatCost(calculateCostPerShot())} <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">per shot</span>
+                </div>
+                
+                {/* Cost Breakdown View (shown on hover) */}
+                {(roll.film_cost !== null || roll.dev_cost !== null) && (
+                  <div 
+                    className={`absolute inset-y-0 right-0 flex items-center transition-opacity duration-300 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400 font-normal ${
+                      hoveringCost ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    {roll.film_cost !== null && `${formatCost(roll.film_cost)} film`}
+                    {roll.film_cost !== null && roll.dev_cost !== null && ' + '}
+                    {roll.dev_cost !== null && `${formatCost(roll.dev_cost)} dev`}
+                  </div>
+                )}
               </div>
             )}
           </div>
