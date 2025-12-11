@@ -28,8 +28,14 @@ const DEFAULT_CONFIG = {
  * @returns {number} Scaled value for screen rendering
  */
 function mm2screen(value_mm) {
-    return value_mm / 10;
+    // TODO: scale differently based on canister size
+    // 35: / 10
+    // 120: / 13.5
+    return value_mm / 13.5;
 }
+
+// TODO: put this inside a config
+const IS_FILM_120 = true;
 
 /**
  * Create a film canister mesh with texture
@@ -40,13 +46,22 @@ function mm2screen(value_mm) {
  * @returns {THREE.Group} Canister group with mesh
  */
 export function createCanister(textureUrl, options = {}) {
+
     const group = new THREE.Group();
 
     // Canister dimensions in mm converted to screen units
-    const radius = mm2screen(12.13);
-    const bodyHeight = mm2screen(47.09 - 5.72);
-    const capHeight = mm2screen(2.5);
-    const height = bodyHeight - capHeight * 2;
+    let radius, height, capHeight, topCapRadius;
+    if (IS_FILM_120) {
+        topCapRadius = mm2screen(25.1 / 2);
+        radius = topCapRadius * 0.9;
+        height = mm2screen(62.7);
+        capHeight = mm2screen(1.25);
+    } else {
+        radius = mm2screen(12.13);
+        capHeight = mm2screen(2.5);
+        height = mm2screen(47.09 - 5.72) - capHeight * 2;
+        topCapRadius = radius * 1.035;
+    }
 
     // Load texture
     const textureLoader = new THREE.TextureLoader();
@@ -89,10 +104,13 @@ export function createCanister(textureUrl, options = {}) {
 
     // Canister body (cylinder) with custom shader for saturation boost
     const bodyGeometry = new THREE.CylinderGeometry(radius, radius, height, 32);
+
+    // Material is different between 120 and 35mm canisters
+    // 120 uses a more matte finish
     const bodyMaterial = new THREE.MeshStandardMaterial({
         map: texture,
         metalness: 0.1,
-        roughness: 0.15,
+        roughness: IS_FILM_120 ? 0.6 : 0.15,
     });
     
     // Custom shader to boost saturation and crush colors
@@ -133,12 +151,11 @@ export function createCanister(textureUrl, options = {}) {
     group.add(body);
 
     // Top and bottom caps
-    const topCapRadius = radius * 1.035;
     const capGeometry = new THREE.CylinderGeometry(topCapRadius, topCapRadius, capHeight, 32);
     const capMaterial = new THREE.MeshStandardMaterial({
         color: 0x333333,
-        metalness: 0.5,
-        roughness: 0.1,
+        metalness: IS_FILM_120 ? 0.1 : 0.5,
+        roughness: IS_FILM_120 ? 0.3 : 0.1,
     });
     
     const topCap = new THREE.Mesh(capGeometry, capMaterial);
@@ -152,56 +169,29 @@ export function createCanister(textureUrl, options = {}) {
     group.add(bottomCap);
 
     // Spool ring (hollow cylinder on top)
-    const spoolCapRadiusOuter = mm2screen(11.21 / 2);
-    const spoolCapRadiusInner = mm2screen(9.47 / 2);
-    const spoolCapHeight = mm2screen(5.72);
-    const spoolMaterial = new THREE.MeshStandardMaterial({
-        color: 0x333333,
-        metalness: 0.1,
-        roughness: 0.3,
-    });
+    if (!IS_FILM_120) {
+        const spoolCapRadiusOuter = mm2screen(11.21 / 2);
+        const spoolCapHeight = mm2screen(5.72);
+        const spoolMaterial = new THREE.MeshStandardMaterial({
+            color: 0x333333,
+            metalness: 0.1,
+            roughness: 0.3,
+        });
 
-    // Outer cylinder wall
-    const spoolRingGeometry = new THREE.CylinderGeometry(
-        spoolCapRadiusOuter, 
-        spoolCapRadiusOuter, 
-        spoolCapHeight, 
-        32,
-        1,
-        true // Open ended
-    );
-    const spoolRing = new THREE.Mesh(spoolRingGeometry, spoolMaterial);
-    spoolRing.position.y = height / 2 + capHeight / 2 + spoolCapHeight / 2;
-    spoolRing.castShadow = true;
-    group.add(spoolRing);
-
-    // Inner cylinder wall
-    const spoolInnerWallGeometry = new THREE.CylinderGeometry(
-        spoolCapRadiusInner,
-        spoolCapRadiusInner,
-        spoolCapHeight,
-        32,
-        1,
-        false // Closed ends
-    );
-    const spoolInnerWall = new THREE.Mesh(spoolInnerWallGeometry, spoolMaterial);
-    spoolInnerWall.position.y = height / 2 + capHeight / 2 + spoolCapHeight / 2;
-    spoolInnerWall.castShadow = true;
-    // group.add(spoolInnerWall);
-
-    // Top ring cap
-    const topRingGeometry = new THREE.RingGeometry(spoolCapRadiusInner, spoolCapRadiusOuter, 32);
-    const topRing = new THREE.Mesh(topRingGeometry, spoolMaterial);
-    topRing.rotation.x = -Math.PI / 2;
-    topRing.position.y = height / 2 + capHeight / 2 + spoolCapHeight;
-    topRing.castShadow = true;
-    // group.add(topRing);
-
-    // Bottom ring cap (inside surface)
-    const bottomRing = new THREE.Mesh(topRingGeometry, spoolMaterial);
-    bottomRing.rotation.x = Math.PI / 2;
-    bottomRing.position.y = height / 2 + capHeight / 2;
-    // group.add(bottomRing);
+        // Outer cylinder wall
+        const spoolRingGeometry = new THREE.CylinderGeometry(
+            spoolCapRadiusOuter, 
+            spoolCapRadiusOuter, 
+            spoolCapHeight, 
+            32,
+            1,
+            true // Open ended
+        );
+        const spoolRing = new THREE.Mesh(spoolRingGeometry, spoolMaterial);
+        spoolRing.position.y = height / 2 + capHeight / 2 + spoolCapHeight / 2;
+        spoolRing.castShadow = true;
+        group.add(spoolRing);
+    }
 
     // Rotate to show the label front (opposite side from seam)
     group.rotation.y = -Math.PI;
@@ -300,7 +290,15 @@ export function setupScene(config = {}) {
         const groundMaterial = new THREE.ShadowMaterial({ opacity: 0.45 });
         const ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2;
-        ground.position.y = -mm2screen(47.09 - 6.72) / 2;
+
+        // TODO: not hardcode based on canister size
+        if (IS_FILM_120) {
+            ground.position.y = -mm2screen(62.7) / 2 - mm2screen(2.5);
+        } else {
+            ground.position.y = -mm2screen(47.09 - 6.72) / 2;
+        }
+
+
         ground.receiveShadow = true;
         scene.add(ground);
     }
