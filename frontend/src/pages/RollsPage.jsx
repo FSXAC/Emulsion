@@ -96,7 +96,8 @@ export default function RollsPage() {
   const [searchHelpModal, setSearchHelpModal] = useState(false);
 
   // Search state
-  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [searchQuery, setSearchQuery] = useState(initialSearch); // Actual search query (triggers API)
+  const [searchInputValue, setSearchInputValue] = useState(initialSearch); // Input field value (doesn't trigger API)
   const [activeFilters, setActiveFilters] = useState(parseSearchQuery(initialSearch));
 
   // Pagination state for NEW and SCANNED columns
@@ -223,9 +224,17 @@ export default function RollsPage() {
     setSearchParams(params);
   };
 
-  // Handle search query change
-  const handleSearchChange = (query) => {
-    setSearchQuery(query);
+  // Handle search input change (only updates input value, doesn't trigger search)
+  const handleSearchInputChange = (query) => {
+    setSearchInputValue(query);
+    // Update active filters for display purposes only
+    setActiveFilters(parseSearchQuery(query));
+  };
+
+  // Handle search submission (triggers actual search)
+  const handleSearchSubmit = (query) => {
+    setSearchQuery(query); // This triggers the useEffect and API call
+    setSearchInputValue(query); // Keep input in sync
     setActiveFilters(parseSearchQuery(query));
     
     // Update URL params
@@ -241,7 +250,8 @@ export default function RollsPage() {
 
   // Handle search clear
   const handleSearchClear = () => {
-    setSearchQuery('');
+    setSearchQuery(''); // This triggers the useEffect and API call
+    setSearchInputValue(''); // Clear input
     setActiveFilters([]);
     
     // Update URL params (keep chemistry if present)
@@ -267,7 +277,8 @@ export default function RollsPage() {
       })
       .join(' ');
     
-    setSearchQuery(newQuery);
+    setSearchQuery(newQuery); // This triggers the useEffect and API call
+    setSearchInputValue(newQuery); // Keep input in sync
     
     // Update URL params
     const params = {};
@@ -282,7 +293,8 @@ export default function RollsPage() {
 
   // Clear all filters
   const handleClearAllFilters = () => {
-    setSearchQuery('');
+    setSearchQuery(''); // This triggers the useEffect and API call
+    setSearchInputValue(''); // Clear input
     setActiveFilters([]);
     
     // Update URL params (keep chemistry if present)
@@ -649,8 +661,9 @@ export default function RollsPage() {
       <div className="mb-4">
         <div className="relative">
           <SearchBar
-            value={searchQuery}
-            onChange={handleSearchChange}
+            value={searchInputValue}
+            onChange={handleSearchInputChange}
+            onSearch={handleSearchSubmit}
             onClear={handleSearchClear}
             onShowHelp={() => setSearchHelpModal(true)}
             placeholder="Search rolls... (e.g., format:120 status:loaded)"
