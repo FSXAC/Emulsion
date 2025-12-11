@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import Icon from './Icon';
 
 /**
- * SearchBar component with syntax support and debouncing
+ * SearchBar component with syntax support
  * 
  * Features:
- * - Debounced search input (300ms delay)
+ * - Manual search on Enter key or arrow button click
  * - Clear button when text is present
  * - Optional syntax help button
  * - Mobile-friendly with appropriate keyboard
@@ -18,10 +18,8 @@ export default function SearchBar({
   onShowHelp,
   placeholder = 'Search rolls... (e.g., format:120 status:loaded)',
   showSyntaxHelp = true,
-  debounceMs = 700,
 }) {
   const [localValue, setLocalValue] = useState(value);
-  const debounceTimerRef = useRef(null);
   const inputRef = useRef(null);
 
   // Sync with external value changes
@@ -29,41 +27,31 @@ export default function SearchBar({
     setLocalValue(value);
   }, [value]);
 
-  // Handle input change with debouncing
+  // Handle input change (only update local state, don't search)
   const handleChange = (e) => {
     const newValue = e.target.value;
     setLocalValue(newValue);
-
-    // Clear existing debounce timer
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
+    // Update onChange for controlled component behavior, but don't trigger search
+    if (onChange) {
+      onChange(newValue);
     }
-
-    // Set new debounce timer
-    debounceTimerRef.current = setTimeout(() => {
-      if (onChange) {
-        onChange(newValue);
-      }
-      if (onSearch) {
-        onSearch(newValue);
-      }
-    }, debounceMs);
   };
 
-  // Handle immediate search (e.g., on Enter key)
+  // Handle search submission
+  const handleSearch = () => {
+    // Trigger search - use onSearch if provided, otherwise fall back to onChange
+    if (onSearch) {
+      onSearch(localValue);
+    } else if (onChange) {
+      onChange(localValue);
+    }
+  };
+
+  // Handle keyboard events
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      // Clear debounce timer and search immediately
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-      
-      if (onChange) {
-        onChange(localValue);
-      }
-      if (onSearch) {
-        onSearch(localValue);
-      }
+      e.preventDefault();
+      handleSearch();
     } else if (e.key === 'Escape') {
       // Clear search on Escape
       handleClear();
@@ -75,10 +63,6 @@ export default function SearchBar({
   const handleClear = () => {
     setLocalValue('');
     
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-    
     if (onChange) {
       onChange('');
     }
@@ -88,15 +72,6 @@ export default function SearchBar({
     
     inputRef.current?.focus();
   };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="flex items-center gap-2">
@@ -116,7 +91,7 @@ export default function SearchBar({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className="
-            w-full pl-10 pr-10 py-2.5
+            w-full pl-10 pr-24 py-2.5
             text-sm
             border border-gray-300 dark:border-gray-600 
             rounded-lg 
@@ -129,24 +104,46 @@ export default function SearchBar({
           aria-label="Search film rolls"
         />
 
-        {/* Clear button - inside search bar */}
-        {localValue && (
-          <button
-            onClick={handleClear}
-            className="
-              absolute right-2 top-1/2 -translate-y-1/2
-              p-1 rounded-full
-              text-gray-400 dark:text-gray-500
-              hover:text-gray-600 dark:hover:text-gray-300
-              hover:bg-gray-100 dark:hover:bg-gray-700
-              transition-colors
-            "
-            aria-label="Clear search"
-            type="button"
-          >
-            <Icon name="x" size={16} />
-          </button>
-        )}
+        {/* Action buttons container - inside search bar */}
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          {/* Search/Submit button */}
+          {localValue && (
+            <button
+              onClick={handleSearch}
+              className="
+                p-1 rounded-full
+                text-film-cyan dark:text-film-cyan
+                hover:text-film-cyan/80 dark:hover:text-film-cyan/80
+                hover:bg-film-cyan/10 dark:hover:bg-film-cyan/20
+                transition-colors
+              "
+              aria-label="Search"
+              type="button"
+              title="Search (Enter)"
+            >
+              <Icon name="arrowRight" size={16} />
+            </button>
+          )}
+
+          {/* Clear button */}
+          {localValue && (
+            <button
+              onClick={handleClear}
+              className="
+                p-1 rounded-full
+                text-gray-400 dark:text-gray-500
+                hover:text-gray-600 dark:hover:text-gray-300
+                hover:bg-gray-100 dark:hover:bg-gray-700
+                transition-colors
+              "
+              aria-label="Clear search"
+              type="button"
+              title="Clear (Esc)"
+            >
+              <Icon name="x" size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Help button - matches input height */}

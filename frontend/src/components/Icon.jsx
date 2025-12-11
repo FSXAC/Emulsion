@@ -21,7 +21,8 @@ import {
   Download,
   Search,
   HelpCircle,
-  Info
+  Info,
+  ArrowRight
 } from 'lucide-react';
 
 /**
@@ -57,6 +58,7 @@ const iconMap = {
   'search': Search,
   'help': HelpCircle,
   'info': Info,
+  'arrowRight': ArrowRight,
 };
 
 export default function Icon({ name, className = '', size = 16, ...props }) {

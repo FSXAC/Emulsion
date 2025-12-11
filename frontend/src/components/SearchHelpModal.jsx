@@ -176,7 +176,7 @@ export default function SearchHelpModal({ isOpen, onClose }) {
               <li>Use quotes for values with spaces: <code className="px-1 bg-blue-100 dark:bg-blue-900/50 rounded">stock:"Kodak Portra 400"</code></li>
               <li>Search is case-insensitive</li>
               <li><kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded text-xs font-mono">⌘K</kbd> or <kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded text-xs font-mono">Ctrl+K</kbd> to focus search</li>
-              <li><kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded text-xs font-mono">Enter</kbd> to search immediately</li>
+              <li><kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded text-xs font-mono">Enter</kbd> or click the arrow button to search</li>
               <li><kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded text-xs font-mono">Esc</kbd> to clear search</li>
             </ul>
           </div>
