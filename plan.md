@@ -652,13 +652,13 @@ Store search query in URL params for bookmarking/sharing:
 #### Implementation Strategy
 
 **Phase 13.1: Backend Search Parser**
-- [ ] 13.1.1 Create `SearchParser` class in `backend/app/api/search.py`
-- [ ] 13.1.2 Implement simple text search (OR across multiple fields)
-- [ ] 13.1.3 Implement field-specific syntax parsing (regex or simple parser)
-- [ ] 13.1.4 Implement comparison operators (>, <, >=, <=, =)
-- [ ] 13.1.5 Build SQLAlchemy filter expressions from parsed tokens
-- [ ] 13.1.6 Handle special cases (chemistry name lookup, date parsing, cost calculations)
-- [ ] 13.1.7 Add unit tests for search parser
+- [X] 13.1.1 Create `SearchParser` class in `backend/app/api/search.py`
+- [X] 13.1.2 Implement simple text search (OR across multiple fields)
+- [X] 13.1.3 Implement field-specific syntax parsing (regex or simple parser)
+- [X] 13.1.4 Implement comparison operators (>, <, >=, <=, =)
+- [X] 13.1.5 Build SQLAlchemy filter expressions from parsed tokens
+- [X] 13.1.6 Handle special cases (chemistry name lookup, date parsing, cost calculations)
+- [X] 13.1.7 Add unit tests for search parser
 
 **Phase 13.2: Backend API Integration**
 - [ ] 13.2.1 Add `search` parameter to `GET /api/rolls` endpoint
