@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Icon from './Icon';
 
 /**
@@ -6,6 +7,16 @@ import Icon from './Icon';
  * Shows documentation for search syntax with examples
  */
 export default function SearchHelpModal({ isOpen, onClose }) {
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleBackdropClick = (e) => {

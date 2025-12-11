@@ -8,6 +8,16 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
   const [error, setError] = useState(null);
   const [selectedBatchId, setSelectedBatchId] = useState(null);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     if (isOpen) {
       fetchChemistry();

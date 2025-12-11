@@ -11,6 +11,16 @@ const DatePickerModal = ({ isOpen, onClose, onConfirm, title, defaultDate = null
     }
   }, [isOpen, defaultDate]);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {

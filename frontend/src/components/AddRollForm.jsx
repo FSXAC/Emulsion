@@ -20,6 +20,16 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
   const [filmStockSuggestions, setFilmStockSuggestions] = useState([]);
   const [orderIdSuggestions, setOrderIdSuggestions] = useState([]);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }
+  }, [isOpen]);
+
   // Populate form with initial data when provided (for duplication)
   useEffect(() => {
     if (isOpen && initialData) {

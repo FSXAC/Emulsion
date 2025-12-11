@@ -13,6 +13,16 @@ const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
     }
   }, [isOpen, roll]);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {

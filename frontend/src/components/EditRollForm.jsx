@@ -23,6 +23,16 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
   const [filmStockSuggestions, setFilmStockSuggestions] = useState([]);
   const [orderIdSuggestions, setOrderIdSuggestions] = useState([]);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }
+  }, [isOpen]);
+
   // Fetch suggestions when modal opens
   useEffect(() => {
     if (isOpen) {
