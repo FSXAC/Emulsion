@@ -239,7 +239,17 @@ class SearchParser:
         return None
     
     def _build_chemistry_filter(self, operator: str, value: str) -> Any:
-        """Build filter for chemistry batch by name lookup."""
+        """Build filter for chemistry batch by name or UUID lookup."""
+        # First, check if value is a valid UUID (for direct chemistry links)
+        try:
+            import uuid
+            uuid_obj = uuid.UUID(value)
+            # Valid UUID - filter directly by chemistry_id
+            return FilmRoll.chemistry_id == value
+        except (ValueError, AttributeError):
+            # Not a UUID - treat as name search
+            pass
+        
         # Query chemistry batches by name
         chemistry_batches = self.db.query(ChemistryBatch).filter(
             ChemistryBatch.name.ilike(f"%{value}%")
