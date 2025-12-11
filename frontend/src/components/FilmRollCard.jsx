@@ -240,7 +240,7 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
               >
                 {/* Invisible placeholder to maintain height */}
                 <div className="invisible whitespace-nowrap">
-                  {formatCost(calculateCostPerShot())} <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">per shot</span>
+                  {formatCost(calculateCostPerShot())} <span className="ml-1 text-xs text-gray-500 dark:text-gray-400 font-normal">per shot</span>
                 </div>
                 
                 {/* Cost Per Shot View */}
@@ -249,7 +249,7 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
                     hoveringCost && (roll.film_cost !== null || roll.dev_cost !== null) ? 'opacity-0' : 'opacity-100'
                   }`}
                 >
-                  {formatCost(calculateCostPerShot())} <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">per shot</span>
+                  {formatCost(calculateCostPerShot())} <span className="ml-1 text-xs text-gray-500 dark:text-gray-400 font-normal">per shot</span>
                 </div>
                 
                 {/* Cost Breakdown View (shown on hover) */}
