@@ -18,7 +18,10 @@ import {
   AlertTriangle,
   RotateCw,
   Copy,
-  Download
+  Download,
+  Search,
+  HelpCircle,
+  Info
 } from 'lucide-react';
 
 /**
@@ -46,10 +49,14 @@ const iconMap = {
   'lightbulb': Lightbulb,
   'image': Image,
   'close': X,
+  'x': X,
   'warning': AlertTriangle,
   'rotate': RotateCw,
   'copy': Copy,
   'download': Download,
+  'search': Search,
+  'help': HelpCircle,
+  'info': Info,
 };
 
 export default function Icon({ name, className = '', size = 16, ...props }) {

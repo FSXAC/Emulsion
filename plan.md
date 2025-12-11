@@ -667,13 +667,13 @@ Store search query in URL params for bookmarking/sharing:
 - [X] 13.2.4 Test search endpoint with various queries
 - [X] 13.2.5 Update API documentation (OpenAPI/Swagger)
 
-**Phase 13.3: Frontend Search UI**
-- [ ] 13.3.1 Create `SearchBar` component with debounced input
-- [ ] 13.3.2 Create `SearchHelpModal` component with syntax reference
-- [ ] 13.3.3 Create `ActiveFilters` component for pill badges
-- [ ] 13.3.4 Add search bar to RollsPage header
-- [ ] 13.3.5 Style search UI for mobile and desktop
-- [ ] 13.3.6 Add keyboard shortcuts (Cmd/Ctrl+K to focus search)
+**Phase 13.3: Frontend Search UI** ✅
+- [X] 13.3.1 Create `SearchBar` component with debounced input
+- [X] 13.3.2 Create `SearchHelpModal` component with syntax reference
+- [X] 13.3.3 Create `ActiveFilters` component for pill badges
+- [X] 13.3.4 Add search bar to RollsPage header
+- [X] 13.3.5 Style search UI for mobile and desktop
+- [X] 13.3.6 Add keyboard shortcuts (Cmd/Ctrl+K to focus search)
 
 **Phase 13.4: Frontend Search Integration**
 - [ ] 13.4.1 Add search state to RollsPage

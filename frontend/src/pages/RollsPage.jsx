@@ -21,6 +21,9 @@ import EditRollForm from '../components/EditRollForm';
 import AddRollForm from '../components/AddRollForm';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
+import SearchBar from '../components/SearchBar';
+import SearchHelpModal from '../components/SearchHelpModal';
+import ActiveFilters from '../components/ActiveFilters';
 import { getRolls, createRoll, updateRoll, deleteRoll, loadRoll, unloadRoll, assignChemistry, rateRoll } from '../services/rolls';
 import { getChemistryBatch } from '../services/chemistry';
 
@@ -54,6 +57,11 @@ export default function RollsPage() {
   const [ratingModal, setRatingModal] = useState({ isOpen: false, roll: null });
   const [editRollModal, setEditRollModal] = useState({ isOpen: false, roll: null });
   const [addRollModal, setAddRollModal] = useState({ isOpen: false, initialData: null });
+  const [searchHelpModal, setSearchHelpModal] = useState(false);
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilters, setActiveFilters] = useState([]);
 
   // Pagination state for NEW and SCANNED columns
   const [visibleCounts, setVisibleCounts] = useState({
@@ -80,6 +88,20 @@ export default function RollsPage() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Keyboard shortcuts (Cmd/Ctrl+K for search)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        // Focus search input
+        document.querySelector('input[aria-label="Search film rolls"]')?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   // Configure drag sensors - disabled on mobile
@@ -147,6 +169,79 @@ export default function RollsPage() {
 
   const clearChemistryFilter = () => {
     setSearchParams({});
+  };
+
+  // Parse search query into active filters for display
+  const parseSearchQuery = (query) => {
+    if (!query.trim()) {
+      return [];
+    }
+
+    const filters = [];
+    const tokens = query.match(/(\w+:(>=|<=|>|<|=)?[^\s]+|\S+)/g) || [];
+
+    tokens.forEach((token) => {
+      // Match field:operator:value or field:value patterns
+      const fieldMatch = token.match(/^(\w+):(>=|<=|>|<|=)?(.+)$/);
+      
+      if (fieldMatch) {
+        const [, field, operator, value] = fieldMatch;
+        filters.push({
+          field,
+          operator: operator || ':',
+          value,
+        });
+      } else {
+        // Plain text search
+        filters.push({
+          field: null,
+          operator: null,
+          value: token,
+        });
+      }
+    });
+
+    return filters;
+  };
+
+  // Handle search query change
+  const handleSearchChange = (query) => {
+    setSearchQuery(query);
+    setActiveFilters(parseSearchQuery(query));
+    // Note: Actual API search will be implemented in Phase 13.4
+  };
+
+  // Handle search clear
+  const handleSearchClear = () => {
+    setSearchQuery('');
+    setActiveFilters([]);
+    // Note: Actual API search will be implemented in Phase 13.4
+  };
+
+  // Remove individual filter
+  const handleRemoveFilter = (index) => {
+    const newFilters = activeFilters.filter((_, i) => i !== index);
+    setActiveFilters(newFilters);
+    
+    // Reconstruct search query from remaining filters
+    const newQuery = newFilters
+      .map((f) => {
+        if (f.field) {
+          return `${f.field}${f.operator === ':' ? ':' : f.operator}${f.value}`;
+        }
+        return f.value;
+      })
+      .join(' ');
+    
+    setSearchQuery(newQuery);
+    // Note: Actual API search will be implemented in Phase 13.4
+  };
+
+  // Clear all filters
+  const handleClearAllFilters = () => {
+    setSearchQuery('');
+    setActiveFilters([]);
+    // Note: Actual API search will be implemented in Phase 13.4
   };
 
   // Group rolls by status
@@ -488,6 +583,38 @@ export default function RollsPage() {
         </button>
       </div>
 
+      {/* Search Bar */}
+      <div className="mb-4">
+        <SearchBar
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onClear={handleSearchClear}
+          onShowHelp={() => setSearchHelpModal(true)}
+          placeholder="Search rolls... (try: format:120 status:loaded, or press ? for help)"
+        />
+        
+        {/* Keyboard shortcut hint */}
+        {!isMobile && !searchQuery && (
+          <div className="mt-2 text-xs text-gray-400 dark:text-gray-600 flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs">
+              {navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}+K
+            </kbd>
+            <span>to focus search</span>
+          </div>
+        )}
+
+        {/* Active Filters */}
+        {activeFilters.length > 0 && (
+          <div className="mt-3">
+            <ActiveFilters
+              filters={activeFilters}
+              onRemoveFilter={handleRemoveFilter}
+              onClearAll={handleClearAllFilters}
+            />
+          </div>
+        )}
+      </div>
+
       {/* Chemistry Filter Banner */}
       {chemistryFilter && chemistryBatch && (
         <div className="mb-4 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg flex items-center justify-between">
@@ -586,6 +713,11 @@ export default function RollsPage() {
         onClose={() => setAddRollModal({ isOpen: false, initialData: null })}
         onSubmit={handleAddRoll}
         initialData={addRollModal.initialData}
+      />
+
+      <SearchHelpModal
+        isOpen={searchHelpModal}
+        onClose={() => setSearchHelpModal(false)}
       />
     </div>
   );
