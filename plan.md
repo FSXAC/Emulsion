@@ -589,7 +589,7 @@ Features:
 - Input field with search icon
 - Clear button (X) when text is present
 - Syntax help tooltip/popover (shows available fields and operators)
-- Debounced search (wait 300ms after user stops typing)
+- Debounced search (wait 700ms after user stops typing)
 - Mobile-friendly with appropriate keyboard (search button on mobile keyboards)
 
 **2. Search Help Modal**

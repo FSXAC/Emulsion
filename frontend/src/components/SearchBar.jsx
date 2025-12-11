@@ -18,7 +18,7 @@ export default function SearchBar({
   onShowHelp,
   placeholder = 'Search rolls... (e.g., format:120 status:loaded)',
   showSyntaxHelp = true,
-  debounceMs = 300,
+  debounceMs = 700,
 }) {
   const [localValue, setLocalValue] = useState(value);
   const debounceTimerRef = useRef(null);
