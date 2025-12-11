@@ -25,17 +25,15 @@ const DEFAULT_CONFIG = {
 /**
  * Convert millimeters to screen units (1/10 scale)
  * @param {number} value_mm - Value in millimeters
+ * @param {boolean} is120 - Whether this is a 120 format canister
  * @returns {number} Scaled value for screen rendering
  */
-function mm2screen(value_mm) {
-    // TODO: scale differently based on canister size
+function mm2screen(value_mm, is120 = false) {
+    // Scale differently based on canister size
     // 35: / 10
     // 120: / 13.5
-    return value_mm / 13.5;
+    return is120 ? value_mm / 13.5 : value_mm / 10;
 }
-
-// TODO: put this inside a config
-const IS_FILM_120 = true;
 
 /**
  * Create a film canister mesh with texture
@@ -43,23 +41,24 @@ const IS_FILM_120 = true;
  * @param {Object} options - Canister options
  * @param {number} options.textureRotation - Rotation angle in radians (0, Math.PI/2, Math.PI, etc.)
  * @param {boolean} options.autoRotateTexture - Auto-rotate vertical images to horizontal (default: true)
+ * @param {boolean} options.is120 - Whether to render 120 format canister (default: false for 35mm)
  * @returns {THREE.Group} Canister group with mesh
  */
 export function createCanister(textureUrl, options = {}) {
-
+    const is120 = options.is120 ?? false;
     const group = new THREE.Group();
 
     // Canister dimensions in mm converted to screen units
     let radius, height, capHeight, topCapRadius;
-    if (IS_FILM_120) {
-        topCapRadius = mm2screen(25.1 / 2);
-        radius = topCapRadius * 0.9;
-        height = mm2screen(62.7);
-        capHeight = mm2screen(1.25);
+    if (is120) {
+        topCapRadius = mm2screen(25.1 / 2, true);
+        radius = topCapRadius * 0.8;
+        height = mm2screen(62.7, true);
+        capHeight = mm2screen(1.25, true);
     } else {
-        radius = mm2screen(12.13);
-        capHeight = mm2screen(2.5);
-        height = mm2screen(47.09 - 5.72) - capHeight * 2;
+        radius = mm2screen(12.13, false);
+        capHeight = mm2screen(2.5, false);
+        height = mm2screen(47.09 - 5.72, false) - capHeight * 2;
         topCapRadius = radius * 1.035;
     }
 
@@ -110,7 +109,7 @@ export function createCanister(textureUrl, options = {}) {
     const bodyMaterial = new THREE.MeshStandardMaterial({
         map: texture,
         metalness: 0.1,
-        roughness: IS_FILM_120 ? 0.6 : 0.15,
+        roughness: is120 ? 0.6 : 0.15,
     });
     
     // Custom shader to boost saturation and crush colors
@@ -154,8 +153,8 @@ export function createCanister(textureUrl, options = {}) {
     const capGeometry = new THREE.CylinderGeometry(topCapRadius, topCapRadius, capHeight, 32);
     const capMaterial = new THREE.MeshStandardMaterial({
         color: 0x333333,
-        metalness: IS_FILM_120 ? 0.1 : 0.5,
-        roughness: IS_FILM_120 ? 0.3 : 0.1,
+        metalness: is120 ? 0.1 : 0.5,
+        roughness: is120 ? 0.3 : 0.1,
     });
     
     const topCap = new THREE.Mesh(capGeometry, capMaterial);
@@ -169,9 +168,9 @@ export function createCanister(textureUrl, options = {}) {
     group.add(bottomCap);
 
     // Spool ring (hollow cylinder on top)
-    if (!IS_FILM_120) {
-        const spoolCapRadiusOuter = mm2screen(11.21 / 2);
-        const spoolCapHeight = mm2screen(5.72);
+    if (!is120) {
+        const spoolCapRadiusOuter = mm2screen(11.21 / 2, false);
+        const spoolCapHeight = mm2screen(5.72, false);
         const spoolMaterial = new THREE.MeshStandardMaterial({
             color: 0x333333,
             metalness: 0.1,
@@ -202,10 +201,12 @@ export function createCanister(textureUrl, options = {}) {
 /**
  * Set up scene with lighting
  * @param {Object} config - Scene configuration
+ * @param {boolean} config.is120 - Whether rendering 120 format canister
  * @returns {Object} Scene, camera, and renderer
  */
 export function setupScene(config = {}) {
     const cfg = { ...DEFAULT_CONFIG, ...config };
+    const is120 = cfg.is120 ?? false;
 
     // Scene
     const scene = new THREE.Scene();
@@ -291,13 +292,12 @@ export function setupScene(config = {}) {
         const ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2;
 
-        // TODO: not hardcode based on canister size
-        if (IS_FILM_120) {
-            ground.position.y = -mm2screen(62.7) / 2 - mm2screen(2.5);
+        // Position based on canister size
+        if (is120) {
+            ground.position.y = -mm2screen(62.7, true) / 2 - mm2screen(2.5, true);
         } else {
-            ground.position.y = -mm2screen(47.09 - 6.72) / 2;
+            ground.position.y = -mm2screen(47.09 - 6.72, false) / 2;
         }
-
 
         ground.receiveShadow = true;
         scene.add(ground);

@@ -11,6 +11,7 @@ export default function CanisterDemo() {
   const [textureFile, setTextureFile] = useState(null);
   const [texturePreview, setTexturePreview] = useState('/sample-label.svg');
   const [thumbnail, setThumbnail] = useState(null);
+  const [is120, setIs120] = useState(false);
 
   const handleTextureUpload = (e) => {
     const file = e.target.files[0];
@@ -62,6 +63,32 @@ export default function CanisterDemo() {
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-lg shadow">
               <h2 className="text-lg font-semibold mb-4">1. Upload Label Texture</h2>
+              
+              {/* Format Toggle */}
+              <div className="mb-4 flex items-center gap-3">
+                <label className="text-sm font-medium text-gray-700">Film Format:</label>
+                <button
+                  onClick={() => setIs120(false)}
+                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                    !is120
+                      ? 'bg-film-cyan text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  35mm
+                </button>
+                <button
+                  onClick={() => setIs120(true)}
+                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                    is120
+                      ? 'bg-film-cyan text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  120
+                </button>
+              </div>
+
               <input
                 type="file"
                 accept="image/*"
@@ -75,7 +102,9 @@ export default function CanisterDemo() {
                   cursor-pointer"
               />
               <p className="text-xs text-gray-500 mt-2">
-                Best results with rectangular labels (aspect ratio 2:1 or 3:1)
+                {is120 
+                  ? 'Best results with square labels (aspect ratio 1:1)' 
+                  : 'Best results with rectangular labels (aspect ratio 2:1 or 3:1)'}
               </p>
 
               {texturePreview && (
@@ -123,6 +152,7 @@ export default function CanisterDemo() {
                   backgroundColor: null, // Transparent background
                   autoRotate: false,
                   enableOrbit: false,
+                  is120: is120,
                 }}
               />
             ) : (
