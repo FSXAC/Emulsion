@@ -685,10 +685,10 @@ Store search query in URL params for bookmarking/sharing:
 - [X] 13.4.7 Add loading state for search (spinner or skeleton)
 
 **Phase 13.5: Testing & Polish**
-- [ ] 13.5.1 Test search with various syntax combinations
-- [ ] 13.5.2 Test mobile search experience (keyboard, touch, readability)
-- [ ] 13.5.3 Test URL state persistence (bookmark, refresh, share)
-- [ ] 13.5.4 Test backward compatibility with chemistry filter
+- [X] 13.5.1 Test search with various syntax combinations
+- [X] 13.5.2 Test mobile search experience (keyboard, touch, readability)
+- [X] 13.5.3 Test URL state persistence (bookmark, refresh, share)
+- [X] 13.5.4 Test backward compatibility with chemistry filter
 - [ ] 13.5.5 Add error handling for invalid syntax
 - [ ] 13.5.6 Optimize search performance (index considerations)
 - [ ] 13.5.7 Add analytics/telemetry for search usage (optional)
@@ -756,15 +756,15 @@ Store search query in URL params for bookmarking/sharing:
 ### Future Enhancements (Out of Scope for Phase 13)
 
 **Advanced Features:**
-- [ ] Saved searches / search presets
-- [ ] Search history (recent searches)
-- [ ] Auto-complete for field names and values
-- [ ] Boolean operators: AND, OR, NOT (e.g., `(format:120 OR format:35mm) AND status:loaded`)
-- [ ] Fuzzy text matching (Levenshtein distance)
-- [ ] Search result sorting (by date, cost, rating, etc.)
-- [ ] Export search results to CSV
-- [ ] Search within search (refine results)
-- [ ] Visual query builder (drag-and-drop UI for filters)
+- [ ] ~~Saved searches / search presets~~ (not planned)
+- [ ] ~~Search history (recent searches)~~ (not planned)
+- [ ] Auto-complete for field names and values (Maybe?)
+- [ ] Boolean operators: AND, OR, NOT (e.g., `(format:120 OR format:35mm) AND status:loaded`) (maybe?)
+- [ ] Fuzzy text matching (Levenshtein distance) (maybe?)
+- [ ] Search result sorting (by date, cost, rating, etc.) (maybe?)
+- [ ] ~~Export search results to CSV~~ (Nope!)
+- [ ] ~~Search within search (refine results)~~ (nope)
+- [ ] ~~Visual query builder (drag-and-drop UI for filters)~~ (nope)
 
 **Performance Optimizations:**
 - [ ] Full-text search index (SQLite FTS5)
@@ -772,8 +772,4 @@ Store search query in URL params for bookmarking/sharing:
 - [ ] Incremental search (search-as-you-type with streaming results)
 - [ ] Search result highlighting
 
-**Analytics:**
-- [ ] Track most common searches
-- [ ] Track search success rate (results found vs. no results)
-- [ ] A/B test different syntax designs
 

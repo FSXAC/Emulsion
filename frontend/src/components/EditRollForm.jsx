@@ -89,6 +89,26 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
     }
   };
 
+  const handlePushPullWheel = (e) => {
+    e.preventDefault();
+    const step = 0.5;
+    const min = -3;
+    const max = 3;
+    const currentValue = parseFloat(formData.push_pull_stops) || 0;
+    
+    // Determine scroll direction: negative deltaY = scroll up = increment
+    const delta = e.deltaY < 0 ? step : -step;
+    const newValue = Math.max(min, Math.min(max, currentValue + delta));
+    
+    // Round to nearest 0.5 to handle floating point precision
+    const roundedValue = Math.round(newValue * 2) / 2;
+    
+    setFormData(prev => ({
+      ...prev,
+      push_pull_stops: roundedValue
+    }));
+  };
+
   const validate = () => {
     const newErrors = {};
 
@@ -364,18 +384,41 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
               <label htmlFor="push_pull_stops" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Push/Pull
               </label>
-              <input
-                type="number"
-                id="push_pull_stops"
-                name="push_pull_stops"
-                value={formData.push_pull_stops}
-                onChange={handleChange}
-                step="0.5"
-                min="-3"
-                max="3"
-                placeholder="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan"
-              />
+              <div className="flex items-center gap-3">
+                <div className="flex-1 relative">
+                  <input
+                    type="range"
+                    id="push_pull_stops"
+                    name="push_pull_stops"
+                    value={formData.push_pull_stops}
+                    onChange={handleChange}
+                    onWheel={handlePushPullWheel}
+                    step="0.5"
+                    min="-3"
+                    max="3"
+                    list="push_pull_marks"
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-film-cyan"
+                  />
+                  <datalist id="push_pull_marks">
+                    <option value="-3" label="-3"></option>
+                    <option value="-2.5" label="-2.5"></option>
+                    <option value="-2" label="-2"></option>
+                    <option value="-1.5" label="-1.5"></option>
+                    <option value="-1" label="-1"></option>
+                    <option value="-0.5" label="-0.5"></option>
+                    <option value="0" label="0"></option>
+                    <option value="0.5" label="0.5"></option>
+                    <option value="1" label="1"></option>
+                    <option value="1.5" label="1.5"></option>
+                    <option value="2" label="2"></option>
+                    <option value="2.5" label="2.5"></option>
+                    <option value="3" label="3"></option>
+                  </datalist>
+                </div>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[3rem] text-right">
+                  {formData.push_pull_stops > 0 ? '+' : ''}{formData.push_pull_stops}
+                </span>
+              </div>
             </div>
           </div>
 
