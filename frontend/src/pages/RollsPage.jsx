@@ -41,8 +41,44 @@ const showToast = (message, type = 'success') => {
   }, 3000);
 };
 
+// Parse search query into active filters (utility function)
+const parseSearchQuery = (query) => {
+  if (!query.trim()) {
+    return [];
+  }
+
+  const filters = [];
+  const tokens = query.match(/(\w+:(>=|<=|>|<|=)?[^\s]+|\S+)/g) || [];
+
+  tokens.forEach((token) => {
+    // Match field:operator:value or field:value patterns
+    const fieldMatch = token.match(/^(\w+):(>=|<=|>|<|=)?(.+)$/);
+    
+    if (fieldMatch) {
+      const [, field, operator, value] = fieldMatch;
+      filters.push({
+        field,
+        operator: operator || ':',
+        value,
+      });
+    } else {
+      // Plain text search
+      filters.push({
+        field: null,
+        operator: null,
+        value: token,
+      });
+    }
+  });
+
+  return filters;
+};
+
 export default function RollsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Initialize search from URL params
+  const initialSearch = searchParams.get('search') || '';
   const chemistryFilter = searchParams.get('chemistry');
 
   const [rolls, setRolls] = useState([]);
@@ -60,8 +96,8 @@ export default function RollsPage() {
   const [searchHelpModal, setSearchHelpModal] = useState(false);
 
   // Search state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilters, setActiveFilters] = useState([]);
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [activeFilters, setActiveFilters] = useState(parseSearchQuery(initialSearch));
 
   // Pagination state for NEW and SCANNED columns
   const [visibleCounts, setVisibleCounts] = useState({
@@ -116,7 +152,7 @@ export default function RollsPage() {
     })
   );
 
-  // Fetch rolls on mount and when chemistry filter changes
+  // Fetch rolls on mount and when search or chemistry filter changes
   useEffect(() => {
     fetchRolls();
     if (chemistryFilter) {
@@ -124,7 +160,7 @@ export default function RollsPage() {
     } else {
       setChemistryBatch(null);
     }
-  }, [chemistryFilter]);
+  }, [searchQuery, chemistryFilter]);
 
   const fetchChemistryBatch = async () => {
     try {
@@ -139,7 +175,23 @@ export default function RollsPage() {
     try {
       setLoading(true);
       setError(null);
-      const data = await getRolls();
+      
+      // Build search query
+      let finalSearchQuery = searchQuery;
+      
+      // Convert legacy chemistry filter to search syntax
+      if (chemistryFilter && !searchQuery.includes('chemistry:')) {
+        const chemistrySearch = `chemistry:${chemistryFilter}`;
+        finalSearchQuery = searchQuery 
+          ? `${searchQuery} ${chemistrySearch}`
+          : chemistrySearch;
+      }
+      
+      // Call API with search parameter
+      const data = await getRolls({ 
+        search: finalSearchQuery || null 
+      });
+      
       // Handle different response formats
       let allRolls = [];
       if (Array.isArray(data)) {
@@ -153,11 +205,6 @@ export default function RollsPage() {
         allRolls = [];
       }
 
-      // Filter by chemistry if specified
-      if (chemistryFilter) {
-        allRolls = allRolls.filter(roll => roll.chemistry_id === chemistryFilter);
-      }
-
       setRolls(allRolls);
     } catch (err) {
       console.error('Failed to fetch rolls:', err);
@@ -168,54 +215,41 @@ export default function RollsPage() {
   };
 
   const clearChemistryFilter = () => {
-    setSearchParams({});
-  };
-
-  // Parse search query into active filters for display
-  const parseSearchQuery = (query) => {
-    if (!query.trim()) {
-      return [];
+    // Keep search param if it exists, only remove chemistry
+    const params = {};
+    if (searchQuery) {
+      params.search = searchQuery;
     }
-
-    const filters = [];
-    const tokens = query.match(/(\w+:(>=|<=|>|<|=)?[^\s]+|\S+)/g) || [];
-
-    tokens.forEach((token) => {
-      // Match field:operator:value or field:value patterns
-      const fieldMatch = token.match(/^(\w+):(>=|<=|>|<|=)?(.+)$/);
-      
-      if (fieldMatch) {
-        const [, field, operator, value] = fieldMatch;
-        filters.push({
-          field,
-          operator: operator || ':',
-          value,
-        });
-      } else {
-        // Plain text search
-        filters.push({
-          field: null,
-          operator: null,
-          value: token,
-        });
-      }
-    });
-
-    return filters;
+    setSearchParams(params);
   };
 
   // Handle search query change
   const handleSearchChange = (query) => {
     setSearchQuery(query);
     setActiveFilters(parseSearchQuery(query));
-    // Note: Actual API search will be implemented in Phase 13.4
+    
+    // Update URL params
+    const params = {};
+    if (query) {
+      params.search = query;
+    }
+    if (chemistryFilter) {
+      params.chemistry = chemistryFilter;
+    }
+    setSearchParams(params);
   };
 
   // Handle search clear
   const handleSearchClear = () => {
     setSearchQuery('');
     setActiveFilters([]);
-    // Note: Actual API search will be implemented in Phase 13.4
+    
+    // Update URL params (keep chemistry if present)
+    const params = {};
+    if (chemistryFilter) {
+      params.chemistry = chemistryFilter;
+    }
+    setSearchParams(params);
   };
 
   // Remove individual filter
@@ -234,14 +268,29 @@ export default function RollsPage() {
       .join(' ');
     
     setSearchQuery(newQuery);
-    // Note: Actual API search will be implemented in Phase 13.4
+    
+    // Update URL params
+    const params = {};
+    if (newQuery) {
+      params.search = newQuery;
+    }
+    if (chemistryFilter) {
+      params.chemistry = chemistryFilter;
+    }
+    setSearchParams(params);
   };
 
   // Clear all filters
   const handleClearAllFilters = () => {
     setSearchQuery('');
     setActiveFilters([]);
-    // Note: Actual API search will be implemented in Phase 13.4
+    
+    // Update URL params (keep chemistry if present)
+    const params = {};
+    if (chemistryFilter) {
+      params.chemistry = chemistryFilter;
+    }
+    setSearchParams(params);
   };
 
   // Group rolls by status
@@ -261,9 +310,16 @@ export default function RollsPage() {
     return acc;
   }, {});
 
-  // Apply pagination to NEW and SCANNED columns
+  // Apply pagination to NEW and SCANNED columns (disabled when searching)
   const getVisibleRolls = (status) => {
     const allRolls = rollsByStatus[status] || [];
+    
+    // Show all results when searching
+    if (searchQuery) {
+      return allRolls;
+    }
+    
+    // Otherwise paginate NEW and SCANNED columns
     if (status === 'NEW' || status === 'SCANNED') {
       return allRolls.slice(0, visibleCounts[status]);
     }
@@ -272,6 +328,12 @@ export default function RollsPage() {
 
   const hasMoreRolls = (status) => {
     const allRolls = rollsByStatus[status] || [];
+    
+    // No "load more" when searching
+    if (searchQuery) {
+      return false;
+    }
+    
     return (status === 'NEW' || status === 'SCANNED') && allRolls.length > visibleCounts[status];
   };
 
@@ -585,13 +647,22 @@ export default function RollsPage() {
 
       {/* Search Bar */}
       <div className="mb-4">
-        <SearchBar
-          value={searchQuery}
-          onChange={handleSearchChange}
-          onClear={handleSearchClear}
-          onShowHelp={() => setSearchHelpModal(true)}
-          placeholder="Search rolls... (try: format:120 status:loaded, or press ? for help)"
-        />
+        <div className="relative">
+          <SearchBar
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onClear={handleSearchClear}
+            onShowHelp={() => setSearchHelpModal(true)}
+            placeholder="Search rolls... (try: format:120 status:loaded, or press ? for help)"
+          />
+          
+          {/* Loading indicator overlay */}
+          {loading && searchQuery && (
+            <div className="absolute right-20 top-1/2 -translate-y-1/2 pointer-events-none">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-film-cyan border-t-transparent"></div>
+            </div>
+          )}
+        </div>
         
         {/* Keyboard shortcut hint */}
         {!isMobile && !searchQuery && (
@@ -615,8 +686,27 @@ export default function RollsPage() {
         )}
       </div>
 
+      {/* Search Results Banner */}
+      {searchQuery && !loading && (
+        <div className="mb-4 p-3 bg-film-cyan/10 dark:bg-film-cyan/20 border border-film-cyan/30 dark:border-film-cyan/40 rounded-lg">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm font-medium text-film-cyan dark:text-film-cyan/90 flex items-center gap-1">
+              <Icon name="search" size={16} /> Search results:
+            </span>
+            <span className="text-sm text-gray-700 dark:text-gray-300 font-semibold">
+              {rolls.length} roll{rolls.length !== 1 ? 's' : ''} found
+            </span>
+            {rolls.length > 0 && (
+              <span className="text-xs text-gray-600 dark:text-gray-400">
+                (showing all matching rolls)
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Chemistry Filter Banner */}
-      {chemistryFilter && chemistryBatch && (
+      {chemistryFilter && chemistryBatch && !searchQuery && (
         <div className="mb-4 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-purple-900 dark:text-purple-300 flex items-center gap-1">

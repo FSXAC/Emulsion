@@ -675,14 +675,14 @@ Store search query in URL params for bookmarking/sharing:
 - [X] 13.3.5 Style search UI for mobile and desktop
 - [X] 13.3.6 Add keyboard shortcuts (Cmd/Ctrl+K to focus search)
 
-**Phase 13.4: Frontend Search Integration**
-- [ ] 13.4.1 Add search state to RollsPage
-- [ ] 13.4.2 Modify `fetchRolls()` to send search parameter
-- [ ] 13.4.3 Parse search query on frontend for active filter display
-- [ ] 13.4.4 Handle search results display (show all matching, group by status)
-- [ ] 13.4.5 Add URL state management (sync search with URL params)
-- [ ] 13.4.6 Convert existing chemistry filter to search syntax
-- [ ] 13.4.7 Add loading state for search (spinner or skeleton)
+**Phase 13.4: Frontend Search Integration** ✅
+- [X] 13.4.1 Add search state to RollsPage
+- [X] 13.4.2 Modify `fetchRolls()` to send search parameter
+- [X] 13.4.3 Parse search query on frontend for active filter display
+- [X] 13.4.4 Handle search results display (show all matching, group by status)
+- [X] 13.4.5 Add URL state management (sync search with URL params)
+- [X] 13.4.6 Convert existing chemistry filter to search syntax
+- [X] 13.4.7 Add loading state for search (spinner or skeleton)
 
 **Phase 13.5: Testing & Polish**
 - [ ] 13.5.1 Test search with various syntax combinations

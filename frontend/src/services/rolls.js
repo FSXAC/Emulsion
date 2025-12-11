@@ -6,10 +6,19 @@ import api from './api';
  */
 
 // List all film rolls with optional filtering and pagination
-export const getRolls = async ({ skip = 0, limit = 999, status = null, orderId = null } = {}) => {
-  const params = { skip, limit };
-  if (status) params.status = status;
-  if (orderId) params.order_id = orderId;
+export const getRolls = async ({ skip = 0, limit = 999, status = null, orderId = null, search = null } = {}) => {
+  const params = {};
+  
+  // If search is provided, use it exclusively (no pagination)
+  if (search) {
+    params.search = search;
+  } else {
+    // Otherwise use legacy filters with pagination
+    params.skip = skip;
+    params.limit = limit;
+    if (status) params.status = status;
+    if (orderId) params.order_id = orderId;
+  }
   
   return api.get('/api/rolls', { params });
 };
