@@ -290,8 +290,6 @@ date_taken      : Timestamp
 └─────────────────────┘
 ```
 
-**Touch-friendly**: Cards are 150px+ wide for easy dragging on mobile
-
 ### 3. Add/Edit Film Roll Modal
 - Film stock name (autocomplete from existing)
 - Format dropdown (35mm, 120, etc.)
@@ -370,33 +368,6 @@ date_taken      : Timestamp
   - PATCH `/api/rolls/{id}/unload` - Set date_unloaded
   - PATCH `/api/rolls/{id}/chemistry` - Associate chemistry batch
   - PATCH `/api/rolls/{id}/rating` - Set stars rating
-
----
-
-## MVP Scope
-
-**Completed**:
-- ✅ Film roll CRUD operations
-- ✅ Chemistry batch management with C41 dev time calculations
-- ✅ Drag-and-drop Kanban board UI
-- ✅ Auto-status calculation based on field presence
-- ✅ Cost calculations (dev_cost, total_cost, cost_per_shot)
-- ✅ Status transition endpoints with validation
-- ✅ Duplicate functionality for quick entry
-- ✅ Autocomplete for film stock names and order IDs
-
-**Remaining**:
-- [ ] Import existing spreadsheet data
-- [ ] Mobile responsive optimizations
-- [ ] Loading states and error handling improvements
-- [ ] Database backup automation
-
-**Out of Scope (Future)**:
-- ❌ Shot metadata integration
-- ❌ Camera tracking
-- ❌ Historical audit logs
-- ❌ Advanced statistics dashboard
-- ❌ PWA/offline support
 
 ---
 
@@ -514,260 +485,295 @@ date_taken      : Timestamp
 
 ---
 
-## Implementation Log
+## Phase 13: Advanced Search & Filter System
 
-### Task 1.4: Create Database Models
-**Files Created:**
-- `backend/app/models/base.py` - Base model configuration with `DeclarativeBase`, `TimestampMixin` (created_at/updated_at), and UUID generation utility
-- `backend/app/models/film_roll.py` - `FilmRoll` model with all schema fields and calculated properties:
-  - `status` property: Derives status from field presence (NEW/LOADED/EXPOSED/DEVELOPED/SCANNED)
-  - `dev_cost`, `total_cost`, `cost_per_shot`, `duration_days` properties with null handling
-  - Special logic for "not mine" rolls (excludes film_cost from total_cost)
-- `backend/app/models/chemistry_batch.py` - `ChemistryBatch` model with:
-  - Cost tracking fields and `rolls_offset` for manual adjustments
-  - `batch_cost`, `rolls_developed`, `cost_per_roll` calculated properties
-  - `calc_c41_dev_time()` method for C41 development time calculation
-  - `development_time_seconds` and `development_time_formatted` properties
-- `backend/app/models/__init__.py` - Module exports for easy imports
+### Overview
+Expand the current chemistry-ID filtering to support comprehensive search and filter capabilities with syntax-based queries.
 
-**What It Does:**
-Defines the SQLAlchemy ORM models that map Python classes to database tables. Implements all business logic for status derivation, cost calculations, and C41 development time as computed properties. Handles edge cases gracefully by returning None for division-by-zero or missing data scenarios.
+### Requirements
+1. **Backward Compatibility**: Maintain existing chemistry filter from URL params (`?chemistry=<id>`)
+2. **Unified Search Interface**: Single search bar with syntax support
+3. **Full Dataset Search**: Search across all rolls, not just paginated visible rolls
+4. **Filter Syntax**: Support both simple text search and field-specific queries
+5. **Responsive Design**: Search UI works on mobile and desktop
 
-### Task 1.5: Set Up SQLite Database Connection
-**Files Created:**
-- `backend/app/core/config.py` - Application settings using Pydantic Settings:
-  - Loads configuration from environment variables or `.env` file
-  - Database URL defaults to `sqlite:///~/emulsion_data/emulsion.db`
-  - `get_database_path()` method creates database directory if needed
-  - CORS origins configuration
-- `backend/app/core/database.py` - Database connection and session management:
-  - SQLAlchemy engine with SQLite pragma for foreign key constraints
-  - `SessionLocal` session factory for database operations
-  - `get_db()` dependency function for FastAPI endpoints
-  - `init_db()` function to create all tables on startup
-- `backend/app/core/__init__.py` - Core module exports
-- `backend/.env.example` - Example environment configuration file
+### Search Syntax Design
 
-**Files Modified:**
-- `backend/app/main.py` - Added database initialization on startup, imported settings for CORS configuration
+#### Simple Text Search (Default)
+When user enters plain text without syntax:
+- Searches across: `film_stock_name`, `notes`, `order_id`
+- Case-insensitive partial matching
+- Example: `"portra"` matches "Kodak Portra 400", "Portra 160", etc.
 
-**What It Does:**
-Establishes SQLite database connection with proper configuration for local single-user deployment. The database file will be created at `backend/data/emulsion.db` relative to the project directory. Enables foreign key constraints (disabled by default in SQLite) and provides a dependency injection pattern (`get_db()`) for database sessions in FastAPI endpoints. Automatically creates tables on application startup if they don't exist.
+#### Field-Specific Syntax
+Format: `field:value` or `field:"value with spaces"`
 
-### Task 1.6: Create Basic FastAPI App with Health Check Endpoint
-**Files Modified:**
-- `backend/app/main.py` - Enhanced health check endpoint to include database connectivity check
+**Supported Fields:**
+- `format:120` - Film format (35mm, 120, HF, etc.)
+- `stock:portra` - Film stock name (partial match)
+- `status:loaded` - Roll status (NEW, LOADED, EXPOSED, DEVELOPED, SCANNED)
+- `order:42` - Order ID (exact or partial match)
+- `stars:4` - Star rating (exact match, also supports `stars:>=4`, `stars:<=3`)
+- `mine:false` or `not_mine:true` - Friend's rolls filter
+- `push:+1` or `pull:-1` - Push/pull stops
+- `chemistry:<name>` - Chemistry batch name (partial match)
+- `cost:>10` or `cost:<5` - Cost range filters
+- `date:2024-12` - Date filters (YYYY-MM format for month, YYYY-MM-DD for specific date)
 
-**What It Does:**
-Completes the basic FastAPI application setup with a comprehensive health check endpoint. The `/health` endpoint now returns:
-- `status`: "healthy" if database is connected, "degraded" otherwise
-- `database`: Connection status ("connected" or "disconnected")
-- `version`: API version
+**Comparison Operators:**
+- `field:value` - Exact match (or partial for text fields)
+- `field:>value` - Greater than (for numeric/date fields)
+- `field:>=value` - Greater than or equal
+- `field:<value` - Less than
+- `field:<=value` - Less than or equal
 
-The application includes:
-- Root endpoint (`/`) returning API information
-- Health check endpoint (`/health`) for monitoring
-- CORS middleware configured for local frontend development
-- Database initialization on startup via `@app.on_event("startup")`
-- Auto-generated API docs at `/docs` (Swagger UI) and `/redoc` (ReDoc)
+**Multiple Filters:**
+- Space-separated: `format:120 status:loaded` (AND logic)
+- Future: Support OR with `|` operator: `format:120|35mm`
 
-### Task 1.7: Test Backend Server Runs Successfully
-**Test Results:**
-✅ Server starts successfully with `uvicorn app.main:app --reload`
-✅ Database file created at `backend/data/emulsion.db`
-✅ Database tables created automatically on startup (`film_rolls`, `chemistry_batches`)
-✅ Health check endpoint returns `{"status":"healthy","database":"connected","version":"0.1.0"}`
-✅ Root endpoint accessible at http://localhost:8200
-✅ Interactive API documentation available at http://localhost:8200/docs
+**Examples:**
+- `format:120` - All 120 format rolls
+- `status:loaded stock:portra` - Loaded Portra rolls
+- `stars:>=4` - Highly rated rolls (4-5 stars)
+- `format:120 not_mine:true` - Friend's 120 rolls
+- `chemistry:c41 status:developed` - Rolls developed with C41 chemistry
+- `date:2024-12` - Rolls from December 2024
+- `cost:>15` - Expensive rolls (film cost + dev cost > $15)
 
-**What Was Verified:**
-- SQLAlchemy engine connects to SQLite database successfully
-- Foreign key constraints enabled (SQLite pragma applied)
-- Database tables created with proper schema (UUIDs, timestamps, relationships)
-- FastAPI application starts without errors
-- CORS middleware configured for frontend access
+### Architecture Plan
 
-**Phase 1 Complete!** Backend foundation is ready. Ready to move to Phase 2: Backend API - Film Rolls.
+#### Backend Changes
 
-### Task 2.1-2.7: Film Rolls API Implementation
-**Files Created:**
-- `backend/app/api/__init__.py` - API router configuration with `/api` prefix
-- `backend/app/api/schemas/__init__.py` - Pydantic schemas package exports
-- `backend/app/api/schemas/film_roll.py` - Film roll Pydantic schemas:
-  - `FilmRollBase`: Base schema with all fields
-  - `FilmRollCreate`: Schema for POST requests (all required fields)
-  - `FilmRollUpdate`: Schema for PUT requests (all fields optional)
-  - `FilmRollResponse`: Response schema with computed fields (status, costs, duration)
-  - `FilmRollList`: Schema for list responses with pagination
-- `backend/app/api/schemas/chemistry_batch.py` - Chemistry batch schemas (for Phase 3)
-- `backend/app/api/rolls.py` - Film rolls CRUD endpoints:
-  - `GET /api/rolls` - List all rolls with pagination and filtering (skip, limit, status, order_id)
-  - `POST /api/rolls` - Create new roll with validation
-  - `GET /api/rolls/{roll_id}` - Get single roll by ID
-  - `PUT /api/rolls/{roll_id}` - Update existing roll (partial updates supported)
-  - `DELETE /api/rolls/{roll_id}` - Delete roll (returns 204 No Content)
-- `backend/app/api/chemistry.py` - Placeholder for Phase 3
+**1. Enhanced API Endpoint**
+- Modify `GET /api/rolls` to accept search query parameter
+- Add `search: Optional[str] = Query(None)` parameter
+- Implement query parser in backend to handle syntax
+- Return all matching rolls (remove pagination limit when searching)
 
-**Files Modified:**
-- `backend/app/main.py` - Included API router, all endpoints now available under `/api` prefix
+**New File**: `backend/app/api/search.py`
+```python
+class SearchParser:
+    """Parse search syntax and build SQLAlchemy filters"""
+    
+    def parse(self, query: str) -> List[Filter]:
+        # Parse field:value syntax
+        # Build SQLAlchemy filter expressions
+        # Handle comparison operators
+        pass
+    
+    def parse_simple_text(self, query: str) -> List[Filter]:
+        # Search across multiple text fields (OR logic)
+        pass
+```
 
-**What It Does:**
-Implements complete CRUD API for film rolls with:
-- **Validation**: Pydantic schemas validate all input data (field types, ranges, required fields)
-- **Status Calculation**: Automatically computed from field presence (already in model @property)
-- **Cost Calculations**: dev_cost, total_cost, cost_per_shot computed on-the-fly (model @properties)
-- **Chemistry Validation**: Checks chemistry_id exists when creating/updating rolls
-- **Filtering**: Query parameters for status and order_id filtering
-- **Pagination**: Skip/limit parameters for large datasets
-- **Error Handling**: Returns 404 for not found, 422 for validation errors
-- **Response Models**: Clean JSON responses with computed fields included
+**Modified Files:**
+- `backend/app/api/rolls.py` - Add search parameter and integrate SearchParser
+- `backend/app/api/schemas/film_roll.py` - Add SearchQuery schema if needed
 
-**API Endpoints Available:**
-- `GET /api/rolls?skip=0&limit=100&status=NEW&order_id=42` - List/filter rolls
-- `POST /api/rolls` - Create roll
-- `GET /api/rolls/{id}` - Get single roll
-- `PUT /api/rolls/{id}` - Update roll
-- `DELETE /api/rolls/{id}` - Delete roll
+#### Frontend Changes
 
-All endpoints documented at http://localhost:8200/docs with interactive testing.
+**1. Search Component**
+**New File**: `frontend/src/components/SearchBar.jsx`
+```jsx
+<SearchBar
+  value={searchQuery}
+  onChange={setSearchQuery}
+  onSearch={handleSearch}
+  onClear={handleClearSearch}
+  placeholder="Search rolls... (e.g., format:120 status:loaded)"
+  showSyntaxHelp={true}
+/>
+```
 
-### Task 3.1-3.6: Chemistry Batches API Implementation
-**Files Modified:**
-- `backend/app/api/chemistry.py` - Chemistry batches CRUD endpoints:
-  - `GET /api/chemistry` - List all batches with pagination and filtering (skip, limit, active_only, chemistry_type)
-  - `POST /api/chemistry` - Create new batch
-  - `GET /api/chemistry/{batch_id}` - Get single batch by ID
-  - `PUT /api/chemistry/{batch_id}` - Update existing batch (partial updates supported)
-  - `DELETE /api/chemistry/{batch_id}` - Delete batch (returns 204 No Content)
+Features:
+- Input field with search icon
+- Clear button (X) when text is present
+- Syntax help tooltip/popover (shows available fields and operators)
+- Debounced search (wait 300ms after user stops typing)
+- Mobile-friendly with appropriate keyboard (search button on mobile keyboards)
 
-**What It Does:**
-Implements complete CRUD API for chemistry batches with:
-- **Validation**: Pydantic schemas validate all input data (costs, dates, chemistry_type)
-- **Computed Fields**: rolls_developed, batch_cost, cost_per_roll automatically calculated
-- **C41 Development Time**: development_time_formatted and development_time_seconds computed for C41 batches
-- **rolls_offset Support**: Manual adjustment field affects roll count and dev time calculations
-- **Active Filtering**: Query parameter to filter only non-retired batches
-- **Type Filtering**: Query parameter to filter by chemistry_type (C41, E6, BW, etc.)
-- **Error Handling**: Returns 404 for not found, 422 for validation errors
+**2. Search Help Modal**
+**New File**: `frontend/src/components/SearchHelpModal.jsx`
+- Triggered by "?" icon next to search bar
+- Shows examples of search syntax
+- Lists all available fields and operators
+- Can be dismissed or closed
 
-**API Endpoints Available:**
-- `GET /api/chemistry?skip=0&limit=100&active_only=true&chemistry_type=C41` - List/filter batches
-- `POST /api/chemistry` - Create batch
-- `GET /api/chemistry/{id}` - Get single batch
-- `PUT /api/chemistry/{id}` - Update batch
-- `DELETE /api/chemistry/{id}` - Delete batch
+**3. Active Filter Display**
+**New File**: `frontend/src/components/ActiveFilters.jsx`
+```jsx
+<ActiveFilters
+  filters={parsedFilters}
+  onRemoveFilter={handleRemoveFilter}
+  onClearAll={handleClearAllFilters}
+/>
+```
 
-**Note:** rolls_developed and C41 dev time are already implemented in the model (@property methods).
+Shows pill-style badges for each active filter:
+- `[format: 120] [x]`
+- `[status: loaded] [x]`
+- "Clear all" button
 
-### Task 2.8 & 3.7: Test Backend APIs
-**Test Results:**
-✅ Chemistry batch creation (POST /api/chemistry) working
-✅ Chemistry batch retrieval (GET /api/chemistry) working  
-✅ Film roll creation (POST /api/rolls) working with chemistry_id validation
-✅ Film roll retrieval (GET /api/rolls) working
-✅ Computed fields rendering correctly in responses:
-  - Chemistry: `batch_cost`, `rolls_developed`, `cost_per_roll`, `development_time_formatted`, `is_active`
-  - Film rolls: `status`, `dev_cost`, `total_cost`, `cost_per_shot`, `duration_days`
-✅ Timestamp serialization fixed (datetime → ISO 8601 strings)
-✅ Interactive API documentation at http://localhost:8200/docs functional
+**4. Update RollsPage**
+**Modified File**: `frontend/src/pages/RollsPage.jsx`
 
-**Issues Fixed:**
-- Changed `created_at` and `updated_at` from `str` to `datetime` in response schemas to match SQLAlchemy model types
+Changes:
+- Add search state: `const [searchQuery, setSearchQuery] = useState('')`
+- Add parsed filters state: `const [activeFilters, setActiveFilters] = useState([])`
+- Modify `fetchRolls()` to accept search parameter
+- Add search bar to header area (below title, above Kanban board)
+- When searching, show all matching rolls (remove pagination for NEW/SCANNED)
+- Maintain chemistry filter compatibility (convert to search syntax internally)
+- Show "Search Results" header when search is active with result count
 
-**Phase 2 & 3 Complete!** Backend API fully functional with CRUD operations for both film rolls and chemistry batches. Ready to move to Phase 4: Backend - Roll/Chemistry Integration (PATCH endpoints for status transitions).
+Layout:
+```
+┌──────────────────────────────────────────────┐
+│ Film Rolls                      [+ Add Roll] │
+│ Drag rolls between columns...                │
+├──────────────────────────────────────────────┤
+│ 🔍 [Search bar with syntax help]   [?]  [x]  │
+│ Active: [format:120][x] [stars:>=4][x] Clear │
+├──────────────────────────────────────────────┤
+│ [Chemistry Filter Banner if active]          │
+├──────────────────────────────────────────────┤
+│ Search Results: 12 rolls found               │ <- Only when searching
+├──────────────────────────────────────────────┤
+│ [Kanban Board Columns]                       │
+└──────────────────────────────────────────────┘
+```
 
-### Task 4.1-4.5: Roll/Chemistry Integration PATCH Endpoints
-**Files Created:**
-- `backend/app/api/schemas/actions.py` - Pydantic schemas for PATCH action requests:
-  - `LoadRollRequest`: Schema for loading roll (date_loaded)
-  - `UnloadRollRequest`: Schema for unloading roll (date_unloaded, optional actual_exposures)
-  - `AssignChemistryRequest`: Schema for assigning chemistry (chemistry_id)
-  - `RateRollRequest`: Schema for rating roll (stars 0-5)
+**5. URL State Management**
+Store search query in URL params for bookmarking/sharing:
+- `?search=format:120+status:loaded`
+- `?chemistry=<id>` - Convert to `chemistry:<id>` search syntax internally
+- Use `useSearchParams` from React Router
 
-**Files Modified:**
-- `backend/app/api/schemas/__init__.py` - Added action schema exports
-- `backend/app/api/rolls.py` - Added four PATCH endpoints for status transitions:
-  - `PATCH /api/rolls/{id}/load` - Set date_loaded (NEW → LOADED)
-  - `PATCH /api/rolls/{id}/unload` - Set date_unloaded and optional actual_exposures (LOADED → EXPOSED)
-  - `PATCH /api/rolls/{id}/chemistry` - Associate chemistry_id with validation (EXPOSED → DEVELOPED)
-  - `PATCH /api/rolls/{id}/rating` - Set stars rating (DEVELOPED → SCANNED)
+#### Implementation Strategy
 
-**What It Does:**
-Implements specialized PATCH endpoints for drag-and-drop UI interactions:
-- **Load Roll**: Sets date_loaded when user drags roll to "LOADED" column or camera zone
-- **Unload Roll**: Sets date_unloaded (and optionally actual_exposures) when dragging to "EXPOSED" column
-- **Assign Chemistry**: Associates roll with chemistry batch when dragging to "DEVELOPED" column, validates chemistry exists
-- **Rate Roll**: Sets star rating when dragging to "SCANNED" column or clicking rating
+**Phase 13.1: Backend Search Parser**
+- [ ] 13.1.1 Create `SearchParser` class in `backend/app/api/search.py`
+- [ ] 13.1.2 Implement simple text search (OR across multiple fields)
+- [ ] 13.1.3 Implement field-specific syntax parsing (regex or simple parser)
+- [ ] 13.1.4 Implement comparison operators (>, <, >=, <=, =)
+- [ ] 13.1.5 Build SQLAlchemy filter expressions from parsed tokens
+- [ ] 13.1.6 Handle special cases (chemistry name lookup, date parsing, cost calculations)
+- [ ] 13.1.7 Add unit tests for search parser
 
-**Key Features:**
-- Each endpoint modifies only the relevant fields for that action
-- Status is automatically recalculated based on field presence (model @property)
-- Chemistry validation ensures chemistry_id exists before assignment
-- Roll count for chemistry batch automatically updated via SQLAlchemy relationship
-- Returns full FilmRollResponse with updated computed fields (status, costs, etc.)
+**Phase 13.2: Backend API Integration**
+- [ ] 13.2.1 Add `search` parameter to `GET /api/rolls` endpoint
+- [ ] 13.2.2 Integrate SearchParser into rolls endpoint
+- [ ] 13.2.3 Remove pagination limit when search is active (return all results)
+- [ ] 13.2.4 Test search endpoint with various queries
+- [ ] 13.2.5 Update API documentation (OpenAPI/Swagger)
 
-**Status Transition Flow:**
-1. NEW (no fields set)
-2. LOADED (has date_loaded) ← PATCH /load
-3. EXPOSED (has date_unloaded) ← PATCH /unload  
-4. DEVELOPED (has chemistry_id) ← PATCH /chemistry
-5. SCANNED (has stars) ← PATCH /rating
+**Phase 13.3: Frontend Search UI**
+- [ ] 13.3.1 Create `SearchBar` component with debounced input
+- [ ] 13.3.2 Create `SearchHelpModal` component with syntax reference
+- [ ] 13.3.3 Create `ActiveFilters` component for pill badges
+- [ ] 13.3.4 Add search bar to RollsPage header
+- [ ] 13.3.5 Style search UI for mobile and desktop
+- [ ] 13.3.6 Add keyboard shortcuts (Cmd/Ctrl+K to focus search)
 
-Note: Transitions are flexible - rolls can move between any states as fields are set/unset.
+**Phase 13.4: Frontend Search Integration**
+- [ ] 13.4.1 Add search state to RollsPage
+- [ ] 13.4.2 Modify `fetchRolls()` to send search parameter
+- [ ] 13.4.3 Parse search query on frontend for active filter display
+- [ ] 13.4.4 Handle search results display (show all matching, group by status)
+- [ ] 13.4.5 Add URL state management (sync search with URL params)
+- [ ] 13.4.6 Convert existing chemistry filter to search syntax
+- [ ] 13.4.7 Add loading state for search (spinner or skeleton)
 
-### Task 4.6: Test Status Transitions
-**Test Results:**
-✅ Status transitions work correctly through all states (NEW → LOADED → EXPOSED → DEVELOPED → SCANNED)
-✅ PATCH /api/rolls/{id}/load sets date_loaded and transitions to LOADED
-✅ PATCH /api/rolls/{id}/unload sets date_unloaded and transitions to EXPOSED
-✅ PATCH /api/rolls/{id}/chemistry validates chemistry_id and transitions to DEVELOPED
-✅ PATCH /api/rolls/{id}/rating sets stars and actual_exposures, transitions to SCANNED
-✅ Computed fields (dev_cost, total_cost, cost_per_shot) calculate correctly
-✅ Chemistry batch rolls_developed count increments automatically when roll assigned
+**Phase 13.5: Testing & Polish**
+- [ ] 13.5.1 Test search with various syntax combinations
+- [ ] 13.5.2 Test mobile search experience (keyboard, touch, readability)
+- [ ] 13.5.3 Test URL state persistence (bookmark, refresh, share)
+- [ ] 13.5.4 Test backward compatibility with chemistry filter
+- [ ] 13.5.5 Add error handling for invalid syntax
+- [ ] 13.5.6 Optimize search performance (index considerations)
+- [ ] 13.5.7 Add analytics/telemetry for search usage (optional)
 
-**Refinements Made:**
-- Fixed status logic to require `stars > 0` (not just `!= None`) for SCANNED status
-- Changed rating validation from 0-5 to 1-5 stars
-- Removed `actual_exposures` from unload endpoint (not known until scanning)
-- Added `actual_exposures` to rating endpoint (known after scanning reveals successful frames)
+### Technical Considerations
 
-**Phase 4 Complete!** Backend API fully functional with status transitions. Ready for Phase 5: Frontend Foundation.
+**Backend Performance:**
+- For simple queries, SQLite full-text search is overkill (100-1000 rolls expected)
+- SQLAlchemy filter expressions should be sufficient
+- Consider adding indexes if search becomes slow:
+  - `CREATE INDEX idx_film_stock_name ON film_rolls(film_stock_name)`
+  - `CREATE INDEX idx_order_id ON film_rolls(order_id)`
+  - `CREATE INDEX idx_status_computed` - Not possible (computed field), filter in Python if needed
 
-### Task 5.1: Initialize Vite + React Project
-**Commands Run:**
-- `npm create vite@latest frontend -- --template react` - Created Vite project with React template (JavaScript)
-- `npm install` - Installed base dependencies (React 19, React-DOM, Vite)
+**Chemistry Name Lookup:**
+- When user searches `chemistry:c41`, need to:
+  1. Query chemistry_batches table for name match
+  2. Get list of chemistry IDs
+  3. Filter film_rolls by chemistry_id IN (list)
+- Cache chemistry lookups to avoid repeated queries
 
-**What Was Created:**
-- Project structure with `src/`, `public/` directories
-- Base configuration files: `vite.config.js`, `package.json`, `index.html`
-- Default React components and entry points
-- Dev server configuration (runs on port 5173)
+**Date Parsing:**
+- Support multiple formats: `YYYY-MM-DD`, `YYYY-MM`, `YYYY`
+- Use Python `dateutil.parser` or manual parsing
+- Handle invalid dates gracefully
 
-### Task 5.2: Install Dependencies
-**Packages Added to package.json:**
-- **Drag & Drop**: `@dnd-kit/core@^6.1.0`, `@dnd-kit/sortable@^8.0.0`, `@dnd-kit/utilities@^3.2.2`
-- **HTTP Client**: `axios@^1.7.2`
-- **Animations**: `framer-motion@^11.2.10`
-- **Routing**: `react-router-dom@^7.3.0`
-- **Styling**: `tailwindcss@^3.4.4`, `postcss@^8.4.38`, `autoprefixer@^10.4.19`
+**Cost Filtering:**
+- `cost` refers to `total_cost` (film + dev)
+- This is a computed field, so need to:
+  - Option A: Calculate in Python after fetch (slow for large datasets)
+  - Option B: Use SQL expression in query (complex but faster)
+  - Recommendation: Start with Option A for MVP, optimize later
 
-**Command Run:**
-- `npm install` - Installed all dependencies
+**Status Filtering:**
+- Status is computed field (cannot index or filter in SQL directly)
+- Current implementation fetches all and filters in Python
+- For search, this is acceptable (search returns smaller subset anyway)
+- Future optimization: Add `status` column and trigger to keep it in sync
 
-### Task 5.3: Configure Tailwind CSS
-**Files Created:**
-- `frontend/tailwind.config.js` - Tailwind configuration with custom film photography color palette:
-  - `film-black`, `film-gray`, `film-silver`, `film-red`, `film-amber`, `film-cyan`
-  - Content paths configured to scan all JSX files
-- `frontend/postcss.config.js` - PostCSS configuration for Tailwind and Autoprefixer
+### User Experience Considerations
 
-**Files Modified:**
-- `frontend/src/index.css` - Replaced default CSS with Tailwind directives and custom component classes:
-  - Base styles for body and global elements
-  - Component classes: `.film-card`, `.status-column`, `.btn-primary`, `.btn-secondary`
-  - Utility classes: `.touch-friendly` (48px min size for mobile)
-  - Drag-and-drop specific styles
+**Progressive Disclosure:**
+- Show simple search box by default
+- Add "?" icon for syntax help
+- Show example syntax in placeholder text
+- Highlight syntax in search input (future: color-code field names)
 
-**What It Does:**
-Tailwind CSS is now fully configured and ready to use throughout the application. Custom classes are defined for common UI patterns (film cards, status columns, buttons). The styling follows a clean, modern design with film photography-inspired colors.
+**Error Handling:**
+- Invalid syntax: Show error message below search bar
+- No results: Show "No rolls found" message with suggestion to clear filters
+- Invalid field names: Show "Unknown field: xyz" with link to help
+
+**Mobile Optimization:**
+- Search bar should be prominent but not overwhelming
+- Syntax help should be accessible (modal or expandable section)
+- Active filters should wrap gracefully on small screens
+- Consider voice input for search (browser feature)
+
+**Accessibility:**
+- Search bar should have proper ARIA labels
+- Keyboard navigation (Tab, Enter, Escape)
+- Screen reader announcements for search results count
+- Focus management (focus search bar on Cmd/Ctrl+K)
+
+### Future Enhancements (Out of Scope for Phase 13)
+
+**Advanced Features:**
+- [ ] Saved searches / search presets
+- [ ] Search history (recent searches)
+- [ ] Auto-complete for field names and values
+- [ ] Boolean operators: AND, OR, NOT (e.g., `(format:120 OR format:35mm) AND status:loaded`)
+- [ ] Fuzzy text matching (Levenshtein distance)
+- [ ] Search result sorting (by date, cost, rating, etc.)
+- [ ] Export search results to CSV
+- [ ] Search within search (refine results)
+- [ ] Visual query builder (drag-and-drop UI for filters)
+
+**Performance Optimizations:**
+- [ ] Full-text search index (SQLite FTS5)
+- [ ] Cached search results (Redis/in-memory)
+- [ ] Incremental search (search-as-you-type with streaming results)
+- [ ] Search result highlighting
+
+**Analytics:**
+- [ ] Track most common searches
+- [ ] Track search success rate (results found vs. no results)
+- [ ] A/B test different syntax designs
+
