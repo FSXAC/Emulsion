@@ -68,14 +68,14 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full m-0 sm:m-4 min-h-screen sm:min-h-0 max-h-screen sm:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">Select Chemistry Batch</h2>
-          <p className="text-sm text-gray-600 mt-1">
+        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Select Chemistry Batch</h2>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
             Choose which chemistry batch was used to develop this roll
           </p>
           {roll && (
@@ -86,7 +86,7 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
           {loading && (
             <div className="text-center py-8 text-gray-500">
               Loading chemistry batches...
@@ -193,12 +193,12 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
-          <div className="flex gap-3">
+        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-3 bg-white hover:bg-gray-100 text-gray-800 border border-gray-300 rounded-lg font-medium transition-colors"
+              className="flex-1 px-4 py-2.5 sm:py-3 bg-white hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg font-medium transition-colors text-sm sm:text-base"
             >
               Cancel
             </button>
@@ -206,7 +206,7 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
               type="submit"
               form="chemistry-form"
               disabled={!selectedBatchId || loading}
-              className="flex-1 px-4 py-3 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2.5 sm:py-3 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             >
               Assign Chemistry
             </button>

@@ -148,18 +148,18 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 overflow-y-auto"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full my-8">
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">Add Chemistry Batch</h2>
-          <p className="text-sm text-gray-600 mt-1">Create a new chemistry batch for film development</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh]">
+        {/* Header - Fixed */}
+        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Add Chemistry Batch</h2>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Create a new chemistry batch for developing</p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="px-6 py-4">
+        {/* Form - Scrollable */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Batch Name */}
             <div className="md:col-span-2">

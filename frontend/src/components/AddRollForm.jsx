@@ -161,18 +161,18 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 overflow-y-auto"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full my-8">
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh]">
+        {/* Header - Fixed */}
+        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-bold text-gray-900">Add New Film Roll</h2>
           <p className="text-sm text-gray-600 mt-1">Enter details for the new film roll</p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="px-6 py-4">
+        {/* Form - Scrollable */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Order ID */}
             <div>
@@ -365,14 +365,14 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
+              className="flex-1 px-4 py-2.5 sm:py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-colors text-sm sm:text-base"
               disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2.5 sm:py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Adding...' : 'Add Roll'}

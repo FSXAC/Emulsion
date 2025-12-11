@@ -168,10 +168,10 @@ const EditChemistryForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, b
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 overflow-y-auto"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full my-8">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh]">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900">Edit Chemistry Batch</h2>
@@ -185,8 +185,8 @@ const EditChemistryForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, b
           </p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="px-6 py-4">
+        {/* Form - Scrollable */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Batch Name */}
             <div className="md:col-span-2">
