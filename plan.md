@@ -661,11 +661,11 @@ Store search query in URL params for bookmarking/sharing:
 - [X] 13.1.7 Add unit tests for search parser
 
 **Phase 13.2: Backend API Integration**
-- [ ] 13.2.1 Add `search` parameter to `GET /api/rolls` endpoint
-- [ ] 13.2.2 Integrate SearchParser into rolls endpoint
-- [ ] 13.2.3 Remove pagination limit when search is active (return all results)
-- [ ] 13.2.4 Test search endpoint with various queries
-- [ ] 13.2.5 Update API documentation (OpenAPI/Swagger)
+- [X] 13.2.1 Add `search` parameter to `GET /api/rolls` endpoint
+- [X] 13.2.2 Integrate SearchParser into rolls endpoint
+- [X] 13.2.3 Remove pagination limit when search is active (return all results)
+- [X] 13.2.4 Test search endpoint with various queries
+- [X] 13.2.5 Update API documentation (OpenAPI/Swagger)
 
 **Phase 13.3: Frontend Search UI**
 - [ ] 13.3.1 Create `SearchBar` component with debounced input

@@ -3,6 +3,7 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
 
 from app.core.database import get_db
 from app.models import FilmRoll, ChemistryBatch
@@ -18,6 +19,7 @@ from app.api.schemas.actions import (
     AssignChemistryRequest,
     RateRollRequest,
 )
+from app.api.search import SearchParser
 
 router = APIRouter()
 
@@ -26,28 +28,75 @@ router = APIRouter()
 def list_film_rolls(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of records to return"),
-    status: Optional[str] = Query(None, description="Filter by status"),
-    order_id: Optional[str] = Query(None, description="Filter by order ID"),
+    status: Optional[str] = Query(None, description="Filter by status (legacy, use search instead)"),
+    order_id: Optional[str] = Query(None, description="Filter by order ID (legacy, use search instead)"),
+    search: Optional[str] = Query(None, description="Search query with syntax support (e.g., 'format:120 status:loaded' or 'portra')"),
     db: Session = Depends(get_db),
 ):
     """
     Get list of all film rolls with optional filtering.
     
+    Supports two filtering modes:
+    1. Legacy filters (status, order_id) - for backward compatibility
+    2. Search syntax - powerful query language with field-specific filters
+    
+    Search syntax examples:
+    - Simple text: "portra" (searches across stock name, order ID, notes)
+    - Field-specific: "format:120 status:loaded"
+    - Comparisons: "stars:>=4 cost:<10"
+    - Chemistry: "chemistry:c41"
+    - Date ranges: "date:2024-12"
+    
+    When search is active, pagination limits are removed to show all matching results.
     Status is computed on-the-fly from field presence.
     """
     query = db.query(FilmRoll)
+    computed_filters = []
     
-    # Note: Status filtering is tricky since it's computed. 
-    # For MVP, we'll fetch all and filter in Python if status is requested
-    if order_id:
-        query = query.filter(FilmRoll.order_id == order_id)
+    # Use search parser if search query provided
+    if search:
+        parser = SearchParser(db)
+        
+        try:
+            # Parse search query
+            tokens = parser.parse(search)
+            
+            # Build filters
+            sql_filters, computed_filters = parser.build_filters(tokens)
+            
+            # Apply SQL filters
+            if sql_filters:
+                query = query.filter(and_(*sql_filters))
+            
+            # When searching, fetch all results (no pagination)
+            total = query.count()
+            rolls = query.all()
+            
+            # Apply computed filters (status, cost)
+            if computed_filters:
+                rolls = parser.apply_computed_filters(rolls, computed_filters)
+                total = len(rolls)  # Update total after filtering
+        
+        except Exception as e:
+            # If search parsing fails, return error
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid search query: {str(e)}"
+            )
     
-    total = query.count()
-    rolls = query.offset(skip).limit(limit).all()
-    
-    # Filter by status in Python if requested
-    if status:
-        rolls = [r for r in rolls if r.status == status.upper()]
+    else:
+        # Legacy filtering (for backward compatibility)
+        # Note: Status filtering is tricky since it's computed. 
+        # For MVP, we'll fetch all and filter in Python if status is requested
+        if order_id:
+            query = query.filter(FilmRoll.order_id == order_id)
+        
+        total = query.count()
+        rolls = query.offset(skip).limit(limit).all()
+        
+        # Filter by status in Python if requested
+        if status:
+            rolls = [r for r in rolls if r.status == status.upper()]
     
     return FilmRollList(rolls=rolls, total=total)
 
