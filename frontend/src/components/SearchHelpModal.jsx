@@ -158,14 +158,15 @@ export default function SearchHelpModal({ isOpen, onClose }) {
           {/* Tips */}
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2 flex items-center gap-2">
-              <Icon name="info" size={16} /> Tips
+              <Icon name="info" size={16} /> Tips & Shortcuts
             </h3>
             <ul className="text-sm text-blue-800 dark:text-blue-400 space-y-1 list-disc list-inside">
               <li>Combine multiple filters with spaces (AND logic)</li>
               <li>Use quotes for values with spaces: <code className="px-1 bg-blue-100 dark:bg-blue-900/50 rounded">stock:"Kodak Portra 400"</code></li>
               <li>Search is case-insensitive</li>
-              <li>Press Enter to search immediately</li>
-              <li>Press Escape to clear search</li>
+              <li><kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded text-xs font-mono">⌘K</kbd> or <kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded text-xs font-mono">Ctrl+K</kbd> to focus search</li>
+              <li><kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded text-xs font-mono">Enter</kbd> to search immediately</li>
+              <li><kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded text-xs font-mono">Esc</kbd> to clear search</li>
             </ul>
           </div>
         </div>

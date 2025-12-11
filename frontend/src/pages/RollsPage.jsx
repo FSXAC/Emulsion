@@ -653,26 +653,16 @@ export default function RollsPage() {
             onChange={handleSearchChange}
             onClear={handleSearchClear}
             onShowHelp={() => setSearchHelpModal(true)}
-            placeholder="Search rolls... (try: format:120 status:loaded, or press ? for help)"
+            placeholder="Search rolls... (e.g., format:120 status:loaded)"
           />
           
           {/* Loading indicator overlay */}
           {loading && searchQuery && (
-            <div className="absolute right-20 top-1/2 -translate-y-1/2 pointer-events-none">
+            <div className="absolute right-14 top-1/2 -translate-y-1/2 pointer-events-none">
               <div className="animate-spin rounded-full h-4 w-4 border-2 border-film-cyan border-t-transparent"></div>
             </div>
           )}
         </div>
-        
-        {/* Keyboard shortcut hint */}
-        {!isMobile && !searchQuery && (
-          <div className="mt-2 text-xs text-gray-400 dark:text-gray-600 flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs">
-              {navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}+K
-            </kbd>
-            <span>to focus search</span>
-          </div>
-        )}
 
         {/* Active Filters */}
         {activeFilters.length > 0 && (
