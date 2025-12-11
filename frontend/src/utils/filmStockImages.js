@@ -24,6 +24,11 @@ import reflx400 from '../assets/film-stocks/reflx-400.png';
 import unknownRollIcon from '../assets/film-stocks/unknown.png';
 
 
+// 120 film
+import kodakEktar100_120 from '../assets/film-stocks/kodak-ektar-100-120.png';
+import kentmere400_120 from '../assets/film-stocks/kentmere-400-120.png';
+import unknownRollIcon120 from '../assets/film-stocks/unknown-120.png';
+
 // Direct mapping from exact film stock names to images
 const filmStockImageMap = {
   // Fujifilm stocks
@@ -66,6 +71,11 @@ const filmStockImageMap = {
   'Cinestill 400D': cinestill400D,
 };
 
+const filmStockImageMap120 = {
+  'Kodak Ektar 100': kodakEktar100_120,
+  'Kentmere Pan 400': kentmere400_120,
+};
+
 /**
  * Normalize a film stock name for fuzzy matching
  * Removes spaces, dashes, and converts to lowercase
@@ -78,23 +88,28 @@ const normalizeFilmStockName = (name) => {
  * Get the image URL for a given film stock name
  * 
  * @param {string} filmStockName - The name of the film stock
- * @param {string} filmFormat - The film format (e.g., '35mm', '120') - currently unused but available for future use
+ * @param {string} filmFormat - The film format (e.g., '35mm', '120')
  * @returns {string} - The image URL or path to the icon
  */
 export const getFilmStockImage = (filmStockName, filmFormat = '35mm') => {
   if (!filmStockName) {
-    return unknownRollIcon;
+    return filmFormat === '120' ? unknownRollIcon120 : unknownRollIcon;
   }
 
-  // Try exact match first
-  if (filmStockImageMap[filmStockName]) {
-    return filmStockImageMap[filmStockName];
+  // Select the appropriate map based on format
+  const is120 = filmFormat === '120';
+  const primaryMap = is120 ? filmStockImageMap120 : filmStockImageMap;
+  const fallbackMap = is120 ? filmStockImageMap : null; // 120 can fallback to 35mm if no 120 version exists
+
+  // Try exact match first in primary map
+  if (primaryMap[filmStockName]) {
+    return primaryMap[filmStockName];
   }
 
-  // Try fuzzy match by normalizing both the input and map keys
+  // Try fuzzy match in primary map
   const normalizedInput = normalizeFilmStockName(filmStockName);
   
-  const matchedKey = Object.keys(filmStockImageMap).find(key => {
+  let matchedKey = Object.keys(primaryMap).find(key => {
     const normalizedKey = normalizeFilmStockName(key);
     return normalizedKey === normalizedInput || 
            normalizedKey.includes(normalizedInput) ||
@@ -102,11 +117,31 @@ export const getFilmStockImage = (filmStockName, filmFormat = '35mm') => {
   });
 
   if (matchedKey) {
-    return filmStockImageMap[matchedKey];
+    return primaryMap[matchedKey];
   }
 
-  // No match found, return default unknown icon
-  return unknownRollIcon;
+  // For 120, try fallback to 35mm map if no 120-specific image found
+  if (is120 && fallbackMap) {
+    // Try exact match in fallback
+    if (fallbackMap[filmStockName]) {
+      return fallbackMap[filmStockName];
+    }
+
+    // Try fuzzy match in fallback
+    matchedKey = Object.keys(fallbackMap).find(key => {
+      const normalizedKey = normalizeFilmStockName(key);
+      return normalizedKey === normalizedInput || 
+             normalizedKey.includes(normalizedInput) ||
+             normalizedInput.includes(normalizedKey);
+    });
+
+    if (matchedKey) {
+      return fallbackMap[matchedKey];
+    }
+  }
+
+  // No match found, return default unknown icon based on format
+  return is120 ? unknownRollIcon120 : unknownRollIcon;
 };
 
 /**
