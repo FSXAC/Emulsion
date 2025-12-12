@@ -144,10 +144,8 @@ frontend/package.json (add recharts)
 
 #### Phase 14.8: Gallery Tab
 - [ ] 14.8.1 Create Gallery tab component
-- [ ] 14.8.2 Display grid of rolls with film stock thumbnails
-- [ ] 14.8.3 Add filters (format, status, rating)
-- [ ] 14.8.4 Click thumbnail to open EditRollForm
-- [ ] 14.8.5 Add sorting options
+- [ ] 14.8.2 Display grid of rolls with (unique) film stock thumbnails
+- [ ] 14.8.3 Refine the UI and visual for the gallery so clean and pleasing it's like an Apple store product page
 
 #### Phase 14.9: Date Range Filters
 - [ ] 14.9.1 Add date range selector UI

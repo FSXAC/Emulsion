@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend, ScatterChart, Scatter, ZAxis } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend, ScatterChart, Scatter, ZAxis, LineChart, Line, ComposedChart } from 'recharts';
 import StatCard from '../components/StatCard';
 import Icon from '../components/Icon';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { getRolls } from '../services/rolls';
 import { getChemistry } from '../services/chemistry';
+import { getFilmStockImage } from '../utils/filmStockImages';
 import {
   calculateTotalSpending,
   calculateTotalShots,
@@ -21,6 +22,10 @@ import {
   findMostExpensiveRoll,
   findCheapestPerShot,
   toChartData,
+  calculateRollsLoadedPerMonth,
+  calculateRollsUnloadedPerMonth,
+  calculateDurationDistribution,
+  getUniqueFilmStocks,
 } from '../utils/statsCalculator';
 
 export default function StatsPage() {
@@ -64,7 +69,8 @@ export default function StatsPage() {
   const tabs = [
     { id: 'overview', label: 'Overview', icon: 'chart' },
     { id: 'costs', label: 'Costs', icon: 'dollar' },
-    { id: 'gallery', label: 'Gallery', icon: 'film', disabled: true }, // Future feature
+    { id: 'timeline', label: 'Timeline', icon: 'clock' },
+    { id: 'gallery', label: 'Gallery', icon: 'film' },
   ];
 
   if (loading) {
@@ -135,6 +141,9 @@ export default function StatsPage() {
         )}
         {activeTab === 'costs' && (
           <CostsTab rolls={rolls} chemistry={chemistry} />
+        )}
+        {activeTab === 'timeline' && (
+          <TimelineTab rolls={rolls} />
         )}
         {activeTab === 'gallery' && (
           <GalleryTab rolls={rolls} />
@@ -290,19 +299,432 @@ function CostsTab({ rolls, chemistry }) {
   );
 }
 
-// Gallery Tab Component (Placeholder for Phase 14.8)
-function GalleryTab({ rolls }) {
-  return (
-    <div className="space-y-6">
-      <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
-        <Icon name="film" size={48} className="mx-auto mb-4 text-gray-400" />
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-          Gallery Coming Soon
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Browse your film canister collection here
+// Timeline Tab Component - Phase 14.5
+function TimelineTab({ rolls }) {
+  const rollsLoadedPerMonth = calculateRollsLoadedPerMonth(rolls);
+  const rollsUnloadedPerMonth = calculateRollsUnloadedPerMonth(rolls);
+  const durationDistribution = calculateDurationDistribution(rolls);
+
+  // Calculate summary stats
+  const rollsWithDuration = rolls.filter(r => r.duration_days !== null && r.duration_days !== undefined);
+  const avgDuration = rollsWithDuration.length > 0
+    ? rollsWithDuration.reduce((sum, r) => sum + r.duration_days, 0) / rollsWithDuration.length
+    : 0;
+  
+  const rollsWithLoadDate = rolls.filter(r => r.date_loaded).length;
+  const rollsWithUnloadDate = rolls.filter(r => r.date_unloaded).length;
+
+  if (rolls.length === 0) {
+    return (
+      <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700">
+        <div className="mb-4 flex justify-center">
+          <Icon name="clock" size={64} className="text-gray-400" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No timeline data yet</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          Start tracking load/unload dates to see timeline visualizations
         </p>
       </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Rolls Loaded"
+          value={rollsWithLoadDate.toString()}
+          icon="camera"
+          color="cyan"
+          subtitle="With load dates"
+        />
+        <StatCard
+          title="Rolls Unloaded"
+          value={rollsWithUnloadDate.toString()}
+          icon="check"
+          color="green"
+          subtitle="Completed rolls"
+        />
+        <StatCard
+          title="Avg Duration"
+          value={avgDuration > 0 ? Math.round(avgDuration).toString() : 'N/A'}
+          icon="clock"
+          color="purple"
+          subtitle={avgDuration > 0 ? 'days in camera' : 'No data'}
+        />
+        <StatCard
+          title="Currently Loaded"
+          value={rolls.filter(r => r.status === 'LOADED').length.toString()}
+          icon="film"
+          color="amber"
+          subtitle="In cameras now"
+        />
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <RollsLoadedTimelineChart data={rollsLoadedPerMonth} />
+        <RollsUnloadedTimelineChart data={rollsUnloadedPerMonth} />
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
+        <DurationDistributionChart data={durationDistribution} />
+      </div>
+    </div>
+  );
+}
+
+// Gallery Tab Component - Phase 14.8
+function GalleryTab({ rolls }) {
+  const [filterFormat, setFilterFormat] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [sortBy, setSortBy] = useState('count'); // 'count', 'name', 'rating'
+
+  const uniqueFilmStocks = getUniqueFilmStocks(rolls);
+  
+  // Apply filters
+  let filteredStocks = uniqueFilmStocks;
+  
+  if (filterFormat !== 'all') {
+    filteredStocks = filteredStocks.filter(stock => stock.format === filterFormat);
+  }
+  
+  if (filterStatus !== 'all') {
+    filteredStocks = filteredStocks.filter(stock => 
+      stock.rolls.some(roll => roll.status === filterStatus)
+    );
+  }
+
+  // Apply sorting
+  if (sortBy === 'name') {
+    filteredStocks.sort((a, b) => a.filmStock.localeCompare(b.filmStock));
+  } else if (sortBy === 'rating') {
+    filteredStocks.sort((a, b) => (b.roll.stars || 0) - (a.roll.stars || 0));
+  }
+  // Default is already sorted by count
+
+  // Get unique formats and statuses for filters
+  const formats = [...new Set(rolls.map(r => r.film_format))].sort();
+  const statuses = ['NEW', 'LOADED', 'EXPOSED', 'DEVELOPED', 'SCANNED'];
+
+  if (rolls.length === 0) {
+    return (
+      <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700">
+        <div className="mb-4 flex justify-center">
+          <Icon name="film" size={64} className="text-gray-400" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No film stocks yet</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          Start adding film rolls to build your collection gallery
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Filters and Sorting */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+        <div className="flex flex-wrap gap-4 items-center">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Format:
+            </label>
+            <select
+              value={filterFormat}
+              onChange={(e) => setFilterFormat(e.target.value)}
+              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-film-cyan"
+            >
+              <option value="all">All Formats</option>
+              {formats.map(format => (
+                <option key={format} value={format}>{format}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Status:
+            </label>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-film-cyan"
+            >
+              <option value="all">All Statuses</option>
+              {statuses.map(status => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 ml-auto">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Sort by:
+            </label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-film-cyan"
+            >
+              <option value="count">Most Used</option>
+              <option value="name">Name</option>
+              <option value="rating">Rating</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+          Showing {filteredStocks.length} unique film stock{filteredStocks.length !== 1 ? 's' : ''}
+        </div>
+      </div>
+
+      {/* Film Stock Grid */}
+      {filteredStocks.length === 0 ? (
+        <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+          <Icon name="search" size={48} className="mx-auto mb-4 text-gray-400" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+            No matching film stocks
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Try adjusting your filters
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {filteredStocks.map((stock, index) => (
+            <FilmStockGalleryCard key={`${stock.filmStock}-${stock.format}-${index}`} stock={stock} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Film Stock Gallery Card Component
+function FilmStockGalleryCard({ stock }) {
+  return (
+    <div className="group relative bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg hover:border-film-cyan dark:hover:border-film-cyan transition-all duration-300">
+      {/* Film Stock Image */}
+      <div className="aspect-[3/4] overflow-hidden bg-gray-100 dark:bg-gray-900">
+        <img
+          src={getFilmStockImage(stock.filmStock, stock.format)}
+          alt={stock.filmStock}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+      </div>
+
+      {/* Info Overlay */}
+      <div className="p-3 space-y-1.5">
+        {/* Film Stock Name */}
+        <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 leading-tight line-clamp-2">
+          {stock.filmStock}
+        </h4>
+
+        {/* Format */}
+        <div className="text-xs text-gray-500 dark:text-gray-400">
+          {stock.format}
+        </div>
+
+        {/* Count Badge */}
+        <div className="flex items-center justify-between pt-1">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-film-cyan/10 text-film-cyan border border-film-cyan/20">
+            <Icon name="film" size={12} />
+            {stock.count} {stock.count === 1 ? 'roll' : 'rolls'}
+          </span>
+
+          {/* Rating */}
+          {stock.roll.stars > 0 && (
+            <div className="flex items-center gap-0.5">
+              {Array.from({ length: 5 }, (_, i) => (
+                <Icon
+                  key={i}
+                  name="star"
+                  size={12}
+                  className={`${i < stock.roll.stars ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Hover Effect Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+    </div>
+  );
+}
+
+// Rolls Loaded Timeline Chart
+function RollsLoadedTimelineChart({ data }) {
+  if (data.length === 0) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Rolls Loaded Per Month</h3>
+        <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+          <div className="text-center">
+            <Icon name="camera" size={48} className="mx-auto mb-2 text-gray-400" />
+            <p className="text-sm text-gray-500 dark:text-gray-400">No load date data</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Rolls Loaded Per Month</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <ComposedChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+          <XAxis 
+            dataKey="month" 
+            stroke="#6b7280"
+            className="dark:stroke-gray-400"
+            style={{ fontSize: '11px' }}
+            angle={-45}
+            textAnchor="end"
+            height={60}
+          />
+          <YAxis 
+            stroke="#6b7280"
+            className="dark:stroke-gray-400"
+            style={{ fontSize: '12px' }}
+            allowDecimals={false}
+          />
+          <Tooltip 
+            contentStyle={{
+              backgroundColor: 'rgba(255, 255, 255, 0.98)',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '14px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}
+            wrapperStyle={{ zIndex: 1000 }}
+          />
+          <Bar dataKey="count" fill="#0891b2" radius={[8, 8, 0, 0]} />
+          <Line type="monotone" dataKey="count" stroke="#8b5cf6" strokeWidth={2} dot={{ r: 4 }} />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// Rolls Unloaded Timeline Chart
+function RollsUnloadedTimelineChart({ data }) {
+  if (data.length === 0) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Rolls Unloaded Per Month</h3>
+        <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+          <div className="text-center">
+            <Icon name="check" size={48} className="mx-auto mb-2 text-gray-400" />
+            <p className="text-sm text-gray-500 dark:text-gray-400">No unload date data</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Rolls Unloaded Per Month</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <ComposedChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+          <XAxis 
+            dataKey="month" 
+            stroke="#6b7280"
+            className="dark:stroke-gray-400"
+            style={{ fontSize: '11px' }}
+            angle={-45}
+            textAnchor="end"
+            height={60}
+          />
+          <YAxis 
+            stroke="#6b7280"
+            className="dark:stroke-gray-400"
+            style={{ fontSize: '12px' }}
+            allowDecimals={false}
+          />
+          <Tooltip 
+            contentStyle={{
+              backgroundColor: 'rgba(255, 255, 255, 0.98)',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '14px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}
+            wrapperStyle={{ zIndex: 1000 }}
+          />
+          <Bar dataKey="count" fill="#10b981" radius={[8, 8, 0, 0]} />
+          <Line type="monotone" dataKey="count" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// Duration Distribution Chart
+function DurationDistributionChart({ data }) {
+  const hasData = data.some(d => d.count > 0);
+
+  if (!hasData) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Duration in Camera Distribution</h3>
+        <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+          <div className="text-center">
+            <Icon name="clock" size={48} className="mx-auto mb-2 text-gray-400" />
+            <p className="text-sm text-gray-500 dark:text-gray-400">No duration data</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+              Track both load and unload dates to see duration analysis
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Duration in Camera Distribution</h3>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+        How long do your rolls stay in the camera before being unloaded?
+      </p>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+          <XAxis 
+            dataKey="range" 
+            stroke="#6b7280"
+            className="dark:stroke-gray-400"
+            style={{ fontSize: '12px' }}
+            angle={-15}
+            textAnchor="end"
+            height={70}
+          />
+          <YAxis 
+            stroke="#6b7280"
+            className="dark:stroke-gray-400"
+            style={{ fontSize: '12px' }}
+            allowDecimals={false}
+          />
+          <Tooltip 
+            contentStyle={{
+              backgroundColor: 'rgba(255, 255, 255, 0.98)',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '14px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}
+            wrapperStyle={{ zIndex: 1000 }}
+            cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
+          />
+          <Bar dataKey="count" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 }

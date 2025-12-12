@@ -316,3 +316,120 @@ export function toChartData(distribution, keyName = 'name', valueName = 'count')
     [valueName]: value,
   }));
 }
+
+/**
+ * Calculate rolls loaded per month for timeline visualization
+ * 
+ * @param {Array} rolls - Array of film roll objects
+ * @returns {Array} Array of {month: 'YYYY-MM', count: number} objects, sorted chronologically
+ */
+export function calculateRollsLoadedPerMonth(rolls) {
+  const monthCounts = rolls.reduce((acc, roll) => {
+    if (roll.date_loaded) {
+      // Extract YYYY-MM from date
+      const month = roll.date_loaded.substring(0, 7); // Assumes ISO format YYYY-MM-DD
+      acc[month] = (acc[month] || 0) + 1;
+    }
+    return acc;
+  }, {});
+
+  // Convert to array and sort chronologically
+  return Object.entries(monthCounts)
+    .map(([month, count]) => ({ month, count }))
+    .sort((a, b) => a.month.localeCompare(b.month));
+}
+
+/**
+ * Calculate rolls unloaded per month for timeline visualization
+ * 
+ * @param {Array} rolls - Array of film roll objects
+ * @returns {Array} Array of {month: 'YYYY-MM', count: number} objects, sorted chronologically
+ */
+export function calculateRollsUnloadedPerMonth(rolls) {
+  const monthCounts = rolls.reduce((acc, roll) => {
+    if (roll.date_unloaded) {
+      // Extract YYYY-MM from date
+      const month = roll.date_unloaded.substring(0, 7); // Assumes ISO format YYYY-MM-DD
+      acc[month] = (acc[month] || 0) + 1;
+    }
+    return acc;
+  }, {});
+
+  // Convert to array and sort chronologically
+  return Object.entries(monthCounts)
+    .map(([month, count]) => ({ month, count }))
+    .sort((a, b) => a.month.localeCompare(b.month));
+}
+
+/**
+ * Calculate duration distribution (days in camera)
+ * Groups rolls by duration ranges for histogram visualization
+ * 
+ * @param {Array} rolls - Array of film roll objects
+ * @returns {Array} Array of {range: string, count: number} objects
+ */
+export function calculateDurationDistribution(rolls) {
+  const ranges = {
+    '0-7 days': 0,
+    '8-14 days': 0,
+    '15-30 days': 0,
+    '31-60 days': 0,
+    '61-90 days': 0,
+    '91-180 days': 0,
+    '180+ days': 0,
+  };
+
+  rolls.forEach((roll) => {
+    const duration = roll.duration_days;
+    if (duration !== null && duration !== undefined && duration >= 0) {
+      if (duration <= 7) ranges['0-7 days']++;
+      else if (duration <= 14) ranges['8-14 days']++;
+      else if (duration <= 30) ranges['15-30 days']++;
+      else if (duration <= 60) ranges['31-60 days']++;
+      else if (duration <= 90) ranges['61-90 days']++;
+      else if (duration <= 180) ranges['91-180 days']++;
+      else ranges['180+ days']++;
+    }
+  });
+
+  return Object.entries(ranges).map(([range, count]) => ({ range, count }));
+}
+
+/**
+ * Get unique film stocks with their representative rolls
+ * For gallery display - returns one representative roll per unique film stock
+ * 
+ * @param {Array} rolls - Array of film roll objects
+ * @returns {Array} Array of {filmStock, format, roll, count} objects
+ */
+export function getUniqueFilmStocks(rolls) {
+  const stockMap = new Map();
+
+  rolls.forEach((roll) => {
+    const key = `${roll.film_stock_name || 'Unknown'}-${roll.film_format || 'Unknown'}`;
+    
+    if (!stockMap.has(key)) {
+      stockMap.set(key, {
+        filmStock: roll.film_stock_name || 'Unknown',
+        format: roll.film_format || 'Unknown',
+        roll: roll, // Representative roll for this stock
+        count: 1,
+        rolls: [roll],
+      });
+    } else {
+      const entry = stockMap.get(key);
+      entry.count++;
+      entry.rolls.push(roll);
+      
+      // Update representative roll to highest rated or most recent
+      if (roll.stars > (entry.roll.stars || 0)) {
+        entry.roll = roll;
+      } else if (roll.stars === entry.roll.stars && roll.date_loaded > entry.roll.date_loaded) {
+        entry.roll = roll;
+      }
+    }
+  });
+
+  // Convert to array and sort by count descending
+  return Array.from(stockMap.values()).sort((a, b) => b.count - a.count);
+}
