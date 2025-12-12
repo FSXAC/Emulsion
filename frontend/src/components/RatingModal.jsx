@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import Icon from './Icon';
+import { useSound } from '../hooks/useSound';
 
 const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
+  const { playClick } = useSound();
   const [stars, setStars] = useState(3);
   const [actualExposures, setActualExposures] = useState('');
   const [hoveredStar, setHoveredStar] = useState(null);
@@ -35,6 +37,7 @@ const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
       return;
     }
     
+    playClick();
     onConfirm(stars, exposures);
     onClose();
   };

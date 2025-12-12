@@ -3,10 +3,12 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getFilmStockImage } from '../utils/filmStockImages';
 import Icon from './Icon';
+import { useSound } from '../hooks/useSound';
 
 const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
   const [hoveringDates, setHoveringDates] = useState(false);
   const [hoveringCost, setHoveringCost] = useState(false);
+  const { playTick } = useSound();
   const {
     attributes,
     listeners,
@@ -85,6 +87,7 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
       {...(isMobile ? {} : attributes)}
       {...(isMobile ? {} : listeners)}
       onClick={handleClick}
+      onMouseEnter={playTick}
       className={`
         bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-md
         p-2 mb-2 ${isMobile ? 'cursor-pointer' : 'cursor-grab active:cursor-grabbing'}

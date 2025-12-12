@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import Icon from './Icon';
+import { useSound } from '../hooks/useSound';
 
 /**
  * SearchHelpModal component

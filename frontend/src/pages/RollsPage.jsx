@@ -26,6 +26,7 @@ import SearchHelpModal from '../components/SearchHelpModal';
 import ActiveFilters from '../components/ActiveFilters';
 import { getRolls, createRoll, updateRoll, deleteRoll, loadRoll, unloadRoll, assignChemistry, rateRoll } from '../services/rolls';
 import { getChemistryBatch } from '../services/chemistry';
+import { useSound } from '../hooks/useSound';
 
 // Simple toast notification function
 const showToast = (message, type = 'success') => {
@@ -76,6 +77,7 @@ const parseSearchQuery = (query) => {
 
 export default function RollsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { playCardPickup, playCardSlide, playTransLoad, playTransUnload, playTransDeveloped, playTransScanned } = useSound();
   
   // Initialize search from URL params
   const initialSearch = searchParams.get('search') || '';
@@ -368,6 +370,7 @@ export default function RollsPage() {
     const { active } = event;
     const roll = rolls.find((r) => r.id === active.id);
     setActiveRoll(roll);
+    playCardPickup();
   };
 
   // Handle drag end
@@ -376,7 +379,10 @@ export default function RollsPage() {
     setActiveRoll(null);
 
     // Validate drop target
-    if (!over) return;
+    if (!over) {
+      playCardSlide();
+      return;
+    }
 
     // Get the target status - check if it's a column or a card
     let targetStatus;
@@ -386,11 +392,15 @@ export default function RollsPage() {
       targetStatus = over.id;
     } else {
       // Dropped on a card or invalid target - don't do anything
+      playCardSlide();
       return;
     }
 
     const roll = rolls.find((r) => r.id === active.id);
-    if (!roll || roll.status === targetStatus) return;
+    if (!roll || roll.status === targetStatus) {
+      playCardSlide();
+      return;
+    }
 
     try {
       let updatedRoll;
@@ -428,10 +438,12 @@ export default function RollsPage() {
         // Forward transitions - only allow sequential moves (one step at a time)
         if (targetIndex - currentIndex > 1) {
           showToast('Please move rolls one status at a time in the forward direction', 'error');
+          playCardSlide();
           return;
         }
 
         // Handle forward transitions - show modals for user input
+        // Note: drag end sound will play when modal confirms
         switch (targetStatus) {
           case 'LOADED':
             // Show date picker modal for load date
@@ -454,6 +466,7 @@ export default function RollsPage() {
             return;
 
           default:
+            playCardSlide();
             return;
         }
       }
@@ -462,6 +475,18 @@ export default function RollsPage() {
       setRolls((prevRolls) =>
         prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
       );
+
+      // Play transition sound based on target status (backward transitions don't play transition sounds)
+      if (isForward && updatedRoll.status === 'LOADED') {
+        playTransLoad();
+      } else if (isForward && updatedRoll.status === 'EXPOSED') {
+        playTransUnload();
+      } else if (isForward && updatedRoll.status === 'DEVELOPED') {
+        playTransDeveloped();
+      } else if (isForward && updatedRoll.status === 'SCANNED') {
+        playTransScanned();
+      }
+      playCardSlide();
 
       // Show success message
       const statusMessages = {
@@ -475,6 +500,7 @@ export default function RollsPage() {
     } catch (err) {
       console.error('Failed to update roll status:', err);
       showToast(`Failed to update roll: ${err.message}`, 'error');
+      playCardSlide(); // Still play card slide sound even on error
       // Optionally refresh to ensure UI is in sync
       fetchRolls();
     }
@@ -499,9 +525,18 @@ export default function RollsPage() {
       setRolls((prevRolls) =>
         prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
       );
+
+      // Play transition and drag end sounds
+      if (action === 'load') {
+        playTransLoad();
+      } else if (action === 'unload') {
+        playTransUnload();
+      }
+      playCardSlide();
     } catch (err) {
       console.error('Failed to update date:', err);
       showToast(`Failed to update roll: ${err.message}`, 'error');
+      playCardSlide();
     }
   };
 
@@ -517,10 +552,15 @@ export default function RollsPage() {
       // (chemistry cost is amortized across all rolls using that batch)
       await fetchRolls();
 
+      // Play transition sound for developed status
+      playTransDeveloped();
+      playCardSlide();
+
       showToast('Chemistry batch assigned successfully');
     } catch (err) {
       console.error('Failed to assign chemistry:', err);
       showToast(`Failed to assign chemistry: ${err.message}`, 'error');
+      playCardSlide();
     }
   };
 
@@ -537,10 +577,15 @@ export default function RollsPage() {
         prevRolls.map((r) => (r.id === updatedRoll.id ? updatedRoll : r))
       );
 
+      // Play transition sound for scanned status
+      playTransScanned();
+      playCardSlide();
+
       showToast(`Roll rated ${stars} star${stars !== 1 ? 's' : ''}`);
     } catch (err) {
       console.error('Failed to rate roll:', err);
       showToast(`Failed to rate roll: ${err.message}`, 'error');
+      playCardSlide();
     }
   };
 

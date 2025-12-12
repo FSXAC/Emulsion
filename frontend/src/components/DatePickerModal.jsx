@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useSound } from '../hooks/useSound';
 
 const DatePickerModal = ({ isOpen, onClose, onConfirm, title, defaultDate = null }) => {
+  const { playClick } = useSound();
   const [selectedDate, setSelectedDate] = useState(defaultDate || new Date().toISOString().split('T')[0]);
 
   useEffect(() => {
@@ -26,6 +28,7 @@ const DatePickerModal = ({ isOpen, onClose, onConfirm, title, defaultDate = null
   const handleSubmit = (e) => {
     e.preventDefault();
     if (selectedDate) {
+      playClick();
       onConfirm(selectedDate);
       onClose();
     }

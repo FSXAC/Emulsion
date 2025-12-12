@@ -3,8 +3,10 @@ import AutocompleteInput from './AutocompleteInput';
 import { getRolls } from '../services/rolls';
 import Icon from './Icon';
 import { getFilmStockImage } from '../utils/filmStockImages';
+import { useSound } from '../hooks/useSound';
 
 const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, onStatusChange }) => {
+  const { playClick } = useSound();
   const [formData, setFormData] = useState({
     order_id: '',
     film_stock_name: '',
@@ -131,6 +133,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
 
     if (!validate()) return;
 
+    playClick();
     setIsSubmitting(true);
     try {
       // Convert string values to proper types
