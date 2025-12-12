@@ -23,6 +23,10 @@ import reflx800 from '../assets/film-stocks/reflx-800.png';
 import reflx400 from '../assets/film-stocks/reflx-400.png';
 import unknownRollIcon from '../assets/film-stocks/unknown.png';
 
+// These are for 35mm but the images are actually of disposable cameras
+import fujiQuickSnapIcon from '../assets/film-stocks/fuji-quicksnap-400.png';
+import kodakFunSaver800Icon from '../assets/film-stocks/kodak-funsaver-800.png';
+
 
 // 120 film
 import kodakEktar100_120 from '../assets/film-stocks/kodak-ektar-100-120.png';
@@ -69,6 +73,10 @@ const filmStockImageMap = {
   'Cinestill 800T': cinestill800T,
   'Cinestill 50D': cinestill50D,
   'Cinestill 400D': cinestill400D,
+
+  // Disposable cameras (35mm)
+  'Fujifilm QuickSnap 400': fujiQuickSnapIcon,
+  'Kodak FunSaver 800': kodakFunSaver800Icon,
 };
 
 const filmStockImageMap120 = {
