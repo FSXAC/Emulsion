@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useSound } from '../hooks/useSound';
+import { formatDateForInput } from '../utils/dateUtils';
 
 const DatePickerModal = ({ isOpen, onClose, onConfirm, title, defaultDate = null }) => {
   const { playClick } = useSound();
-  const [selectedDate, setSelectedDate] = useState(defaultDate || new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(defaultDate || formatDateForInput(new Date()));
 
   useEffect(() => {
     if (isOpen && defaultDate) {
       setSelectedDate(defaultDate);
     } else if (isOpen) {
-      setSelectedDate(new Date().toISOString().split('T')[0]);
+      setSelectedDate(formatDateForInput(new Date()));
     }
   }, [isOpen, defaultDate]);
 
@@ -75,7 +76,7 @@ const DatePickerModal = ({ isOpen, onClose, onConfirm, title, defaultDate = null
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+                onClick={() => setSelectedDate(formatDateForInput(new Date()))}
                 className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               >
                 Today
@@ -85,7 +86,7 @@ const DatePickerModal = ({ isOpen, onClose, onConfirm, title, defaultDate = null
                 onClick={() => {
                   const yesterday = new Date();
                   yesterday.setDate(yesterday.getDate() - 1);
-                  setSelectedDate(yesterday.toISOString().split('T')[0]);
+                  setSelectedDate(formatDateForInput(yesterday));
                 }}
                 className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               >
@@ -96,7 +97,7 @@ const DatePickerModal = ({ isOpen, onClose, onConfirm, title, defaultDate = null
                 onClick={() => {
                   const weekAgo = new Date();
                   weekAgo.setDate(weekAgo.getDate() - 7);
-                  setSelectedDate(weekAgo.toISOString().split('T')[0]);
+                  setSelectedDate(formatDateForInput(weekAgo));
                 }}
                 className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               >

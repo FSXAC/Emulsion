@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getFilmStockImage } from '../utils/filmStockImages';
+import { formatDateForDisplay } from '../utils/dateUtils';
 import Icon from './Icon';
 import { useSound } from '../hooks/useSound';
 
@@ -29,13 +30,6 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
     if (!isDragging && onClick) {
       onClick(roll);
     }
-  };
-
-  // Format date helper
-  const formatDate = (dateString) => {
-    if (!dateString) return null;
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   // Format cost helper
@@ -189,12 +183,12 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
                 <div className="invisible whitespace-nowrap">
                   {roll.date_loaded && roll.date_unloaded ? (
                     <>
-                      <span className="font-bold">{formatDate(roll.date_loaded)}</span>
+                      <span className="font-bold">{formatDateForDisplay(roll.date_loaded)}</span>
                       <span className="text-xs text-gray-500 dark:text-gray-400 font-normal mx-1">→</span>
-                      <span className="font-bold">{formatDate(roll.date_unloaded)}</span>
+                      <span className="font-bold">{formatDateForDisplay(roll.date_unloaded)}</span>
                     </>
                   ) : roll.date_loaded ? (
-                    <span className="font-bold">{formatDate(roll.date_loaded)}</span>
+                    <span className="font-bold">{formatDateForDisplay(roll.date_loaded)}</span>
                   ) : null}
                 </div>
                 
@@ -208,12 +202,12 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
                 >
                   {roll.date_loaded && roll.date_unloaded ? (
                     <>
-                      <span className="font-bold">{formatDate(roll.date_loaded)}</span>
+                      <span className="font-bold">{formatDateForDisplay(roll.date_loaded)}</span>
                       <span className="text-xs text-gray-500 dark:text-gray-400 font-normal mx-1">→</span>
-                      <span className="font-bold">{formatDate(roll.date_unloaded)}</span>
+                      <span className="font-bold">{formatDateForDisplay(roll.date_unloaded)}</span>
                     </>
                   ) : roll.date_loaded ? (
-                    <span className="font-bold">{formatDate(roll.date_loaded)}</span>
+                    <span className="font-bold">{formatDateForDisplay(roll.date_loaded)}</span>
                   ) : null}
                 </div>
                 

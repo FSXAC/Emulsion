@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getChemistry } from '../services/chemistry';
+import { formatDateForDisplay } from '../utils/dateUtils';
 import Icon from './Icon';
 import { useSound } from '../hooks/useSound';
 
@@ -62,15 +63,6 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
   };
 
   const formatCost = (cost) => {
@@ -174,7 +166,7 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
                           
                           {batch.date_mixed && (
                             <div>
-                              <span className="font-medium">Mixed:</span> {formatDate(batch.date_mixed)}
+                              <span className="font-medium">Mixed:</span> {formatDateForDisplay(batch.date_mixed, { month: 'short', day: 'numeric', year: 'numeric' })}
                             </div>
                           )}
                           
