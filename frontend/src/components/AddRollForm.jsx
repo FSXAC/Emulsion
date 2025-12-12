@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import AutocompleteInput from './AutocompleteInput';
 import { getRolls } from '../services/rolls';
 import Icon from './Icon';
+import { useSound } from '../hooks/useSound';
 
 const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
+  const { playClick } = useSound();
   const [formData, setFormData] = useState({
     order_id: '',
     film_stock_name: '',
@@ -118,6 +120,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
     
     if (!validate()) return;
 
+    playClick();
     setIsSubmitting(true);
     try {
       // Convert string values to proper types

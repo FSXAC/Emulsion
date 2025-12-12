@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { getChemistry } from '../services/chemistry';
 import Icon from './Icon';
+import { useSound } from '../hooks/useSound';
 
 const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
+  const { playClick } = useSound();
   const [chemistryBatches, setChemistryBatches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -50,6 +52,7 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (selectedBatchId) {
+      playClick();
       onConfirm(selectedBatchId);
       onClose();
     }
