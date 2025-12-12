@@ -32,8 +32,8 @@ export default function ChemistryPage() {
 
   // Pagination state
   const [visibleCounts, setVisibleCounts] = useState({
-    active: 4,
-    retired: 4,
+    active: 6,
+    retired: 6,
   });
 
   // Fetch chemistry batches on mount
@@ -182,14 +182,14 @@ export default function ChemistryPage() {
   const loadMoreActive = () => {
     setVisibleCounts(prev => ({
       ...prev,
-      active: prev.active + 8,
+      active: prev.active + 12,
     }));
   };
 
   const loadMoreRetired = () => {
     setVisibleCounts(prev => ({
       ...prev,
-      retired: prev.retired + 8,
+      retired: prev.retired + 12,
     }));
   };
 
@@ -260,7 +260,7 @@ export default function ChemistryPage() {
                 <h3 className="text-lg font-semibold text-gray-900">Active</h3>
                 <span className="text-sm text-gray-500">({activeBatches.length})</span>
               </div>
-              <div className="grid gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {visibleActiveBatches.map((batch) => (
                   <div
                     key={batch.id}
@@ -368,7 +368,7 @@ export default function ChemistryPage() {
                 <h3 className="text-lg font-semibold text-gray-900">Retired</h3>
                 <span className="text-sm text-gray-500">({retiredBatches.length})</span>
               </div>
-              <div className="grid gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {visibleRetiredBatches.map((batch) => (
                   <div
                     key={batch.id}
