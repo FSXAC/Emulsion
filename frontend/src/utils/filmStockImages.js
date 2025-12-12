@@ -6,7 +6,10 @@ import fuji400Icon from '../assets/film-stocks/fuji-400.png';
 import fuji200Icon from '../assets/film-stocks/fuji-200.png';
 import fujiSuperiaXTRA200Icon from '../assets/film-stocks/fuji-superia-xtra-200.png';
 import fujiSuperiaXTRA100Icon from '../assets/film-stocks/fuji-superia-xtra-100.png';
+import ilfordDelta100Icon from '../assets/film-stocks/ilford-delta-100.png';
 import ilfordDelta400Icon from '../assets/film-stocks/ilford-delta-400.png';
+import ilfordDelta3200Icon from '../assets/film-stocks/ilford-delta-3200.png';
+import ilfordFP4Plus125Icon from '../assets/film-stocks/ilford-fp4-125.png';
 import ilfordHp5Plus400Icon from '../assets/film-stocks/ilford-hp5.png';
 import ilfordSfx200Icon from '../assets/film-stocks/ilford-sfx-200.png';
 import kentmerePan100Icon from '../assets/film-stocks/kentmere-200.png';
@@ -18,16 +21,23 @@ import kodakPro100Icon from '../assets/film-stocks/kodak-pro-100.png';
 import kodakPortra400Icon from '../assets/film-stocks/kodak-portra-400.png';
 import kodakVision3500TIcon from '../assets/film-stocks/kodak-vision3-500t.png';
 import kodakEktar100Icon from '../assets/film-stocks/kodak-ektar-100.png';
+import kodakTriX400Icon from '../assets/film-stocks/kodak-trix-400.png';
+import kodakTMax400Icon from '../assets/film-stocks/kodak-tmax-400.png';
 import fomapan100Icon from '../assets/film-stocks/fomapan-100.png';
 import harmanPhoenix200Icon from '../assets/film-stocks/harman-phoenix-200.png';
 import harmanPhoenix200IIIcon from '../assets/film-stocks/harman-phoenix-200-ii.png';
 import flicAurora800 from '../assets/film-stocks/flic-aurora-800.png';
+import flicUltrapan100 from '../assets/film-stocks/flic-ultrapan-100.png';
 import cinestill800T from '../assets/film-stocks/cinestill-800t.png';
 import cinestill50D from '../assets/film-stocks/cinestill-50d.png';
 import cinestill400D from '../assets/film-stocks/cinestill-400d.png';
 import reflx800 from '../assets/film-stocks/reflx-800.png';
 import reflx400 from '../assets/film-stocks/reflx-400.png';
 import onesec640t from '../assets/film-stocks/onesec-640t.png';
+import onesec800t from '../assets/film-stocks/onesec-800t.png';
+import rolleiRetro400sIcon from '../assets/film-stocks/rollei-retro-400s.png';
+import rolleiInfrared400Icon from '../assets/film-stocks/rollei-infrared.png';
+import rolleiRPX400Icon from '../assets/film-stocks/rollei-rpx-400.png';
 import unknownRollIcon from '../assets/film-stocks/unknown.png';
 
 // These are for 35mm but the images are actually of disposable cameras
@@ -36,7 +46,13 @@ import kodakFunSaver800Icon from '../assets/film-stocks/kodak-funsaver-800.png';
 
 
 // 120 film
+import ilfordDelta100_120 from '../assets/film-stocks/ilford-delta-100-120.png';
+import ilfordDelta400_120 from '../assets/film-stocks/ilford-delta-400-120.png';
+import ilfordFP4Plus125_120 from '../assets/film-stocks/ilford-fp4-125-120.png';
+import ilfordHP5Plus400_120 from '../assets/film-stocks/ilford-hp5-400-120.png';
+import kodakGold200_120 from '../assets/film-stocks/kodak-gold-200-120.png';
 import kodakEktar100_120 from '../assets/film-stocks/kodak-ektar-100-120.png';
+import kentmere100_120 from '../assets/film-stocks/kentmere-100-120.png';
 import kentmere400_120 from '../assets/film-stocks/kentmere-400-120.png';
 import unknownRollIcon120 from '../assets/film-stocks/unknown-120.png';
 
@@ -50,7 +66,10 @@ const filmStockImageMap = {
   'Fujicolor Superia 400': fuji400Icon,
   
   // Ilford stocks
+  'Ilford Delta 100': ilfordDelta100Icon,
   'Ilford Delta 400': ilfordDelta400Icon,
+  'Ilford Delta 3200': ilfordDelta3200Icon,
+  'Ilford FP4 Plus 125': ilfordFP4Plus125Icon,
   'Ilford HP5 Plus 400': ilfordHp5Plus400Icon,
   'Ilford SFX 200': ilfordSfx200Icon,
   
@@ -68,12 +87,20 @@ const filmStockImageMap = {
   'Kodak ColorPlus 200': kodakColorPlus200Icon,
   'Kodak Portra 400': kodakPortra400Icon,
   'Kodak Vision3 500T': kodakVision3500TIcon,
+  'Kodak Tri-X 400': kodakTriX400Icon,
+  'Kodak T-Max 400': kodakTMax400Icon,
+  
+  // Rollei stocks
+  'Rollei Retro 400S': rolleiRetro400sIcon,
+  'Rollei Infrared 400': rolleiInfrared400Icon,
+  'Rollei RPX 400': rolleiRPX400Icon,
   
   // Fomapan stocks
   'Fomapan 100': fomapan100Icon,
   
   // OneSec stocks
   'OneSec 640T': onesec640t,
+  'OneSec 800T': onesec800t,
   
   // Harman stocks
   'Harman Phoenix 200': harmanPhoenix200Icon,
@@ -85,6 +112,7 @@ const filmStockImageMap = {
 
   // Flic film stocks
   'Flic Film Aurora 800': flicAurora800,
+  'Flic Film Ultrapan 100': flicUltrapan100,
 
   // Cinestill stocks
   'Cinestill 800T': cinestill800T,
@@ -99,6 +127,12 @@ const filmStockImageMap = {
 const filmStockImageMap120 = {
   'Kodak Ektar 100': kodakEktar100_120,
   'Kentmere Pan 400': kentmere400_120,
+  'Kentmere Pan 100': kentmere100_120,
+  'Kodak Gold 200': kodakGold200_120,
+  'Ilford Delta 100': ilfordDelta100_120,
+  'Ilford Delta 400': ilfordDelta400_120,
+  'Ilford FP4 Plus 125': ilfordFP4Plus125_120,
+  'Ilford HP5 Plus 400': ilfordHP5Plus400_120,
 };
 
 /**
