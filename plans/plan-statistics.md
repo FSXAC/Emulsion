@@ -85,22 +85,22 @@ frontend/package.json (add recharts)
 ### **HIGH PRIORITY**
 
 #### Phase 14.1: Page Setup & Navigation ⭐
-- [ ] 14.1.1 Install Recharts (`npm install recharts`)
-- [ ] 14.1.2 Create `StatsPage.jsx` with tab interface skeleton
-- [ ] 14.1.3 Create `StatCard.jsx` component for metric cards
-- [ ] 14.1.4 Add `/stats` route to `App.jsx`
-- [ ] 14.1.5 Add "Stats" link in `Layout.jsx` navigation
-- [ ] 14.1.6 Test navigation and tab switching
+- [X] 14.1.1 Install Recharts (`npm install recharts`)
+- [X] 14.1.2 Create `StatsPage.jsx` with tab interface skeleton
+- [X] 14.1.3 Create `StatCard.jsx` component for metric cards
+- [X] 14.1.4 Add `/stats` route to `App.jsx`
+- [X] 14.1.5 Add "Stats" link in `Layout.jsx` navigation
+- [X] 14.1.6 Test navigation and tab switching
 
 #### Phase 14.2: Core Metrics (Overview Tab) ⭐
-- [ ] 14.2.1 Create `statsCalculator.js` utility
-- [ ] 14.2.2 Fetch all rolls and chemistry in StatsPage
-- [ ] 14.2.3 Calculate total spending (handle not_mine correctly)
-- [ ] 14.2.4 Calculate total shots (actual_exposures || expected_exposures)
-- [ ] 14.2.5 Calculate total rolls count
-- [ ] 14.2.6 Calculate average cost per shot
-- [ ] 14.2.7 Display 4 metric cards in grid
-- [ ] 14.2.8 Add loading and error states
+- [X] 14.2.1 Create `statsCalculator.js` utility
+- [X] 14.2.2 Fetch all rolls and chemistry in StatsPage
+- [X] 14.2.3 Calculate total spending (handle not_mine correctly)
+- [X] 14.2.4 Calculate total shots (actual_exposures || expected_exposures)
+- [X] 14.2.5 Calculate total rolls count
+- [X] 14.2.6 Calculate average cost per shot
+- [X] 14.2.7 Display 4 metric cards in grid
+- [X] 14.2.8 Add loading and error states
 
 #### Phase 14.3: Status & Format Charts (Overview Tab) ⭐
 - [ ] 14.3.1 Calculate rolls by status distribution

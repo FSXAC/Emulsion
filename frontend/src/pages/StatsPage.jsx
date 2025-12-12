@@ -5,6 +5,11 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { getRolls } from '../services/rolls';
 import { getChemistry } from '../services/chemistry';
+import {
+  calculateTotalSpending,
+  calculateTotalShots,
+  calculateAvgCostPerShot,
+} from '../utils/statsCalculator';
 
 export default function StatsPage() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -129,11 +134,11 @@ export default function StatsPage() {
 
 // Overview Tab Component
 function OverviewTab({ rolls, chemistry }) {
-  // Placeholder metrics - will be calculated in Phase 14.2
-  const totalSpending = 0;
-  const totalShots = 0;
+  // Calculate core metrics
+  const totalSpending = calculateTotalSpending(rolls);
+  const totalShots = calculateTotalShots(rolls);
   const totalRolls = rolls.length;
-  const avgCostPerShot = 0;
+  const avgCostPerShot = calculateAvgCostPerShot(totalSpending, totalShots);
 
   if (rolls.length === 0) {
     return (
