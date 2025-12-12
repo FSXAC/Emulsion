@@ -41,9 +41,9 @@ class DevelopmentChartBase(BaseModel):
     temperature_celsius: Decimal = Field(
         ...,
         gt=0,
-        le=50,
-        description="Development temperature in Celsius",
-        examples=[20.0, 24.0, 20.5]
+        le=100,
+        description="Development temperature in Celsius (typically 15-30°C, up to 100°C for some processes)",
+        examples=[20.0, 24.0, 38.0]
     )
     development_time_seconds: int = Field(
         ...,
@@ -76,7 +76,7 @@ class DevelopmentChartUpdate(BaseModel):
     developer: Optional[str] = Field(None, min_length=1, max_length=200)
     iso_rating: Optional[int] = Field(None, gt=0, le=25600)
     dilution_ratio: Optional[str] = Field(None, min_length=1, max_length=50)
-    temperature_celsius: Optional[Decimal] = Field(None, gt=0, le=50)
+    temperature_celsius: Optional[Decimal] = Field(None, gt=0, le=100)
     development_time_seconds: Optional[int] = Field(None, gt=0)
     agitation_notes: Optional[str] = Field(None, max_length=500)
     notes: Optional[str] = None

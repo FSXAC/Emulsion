@@ -3,6 +3,7 @@
 from decimal import Decimal
 from typing import Optional
 
+import sqlalchemy
 from sqlalchemy import Integer, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -29,6 +30,14 @@ class DevelopmentChart(Base, TimestampMixin):
     """
 
     __tablename__ = "development_chart"
+    __table_args__ = (
+        # Unique constraint to prevent duplicate entries
+        # This ensures data integrity and prevents race conditions
+        sqlalchemy.UniqueConstraint(
+            'film_stock', 'developer', 'iso_rating', 'dilution_ratio', 'temperature_celsius',
+            name='uix_dev_chart_combination'
+        ),
+    )
 
     # Primary key
     id: Mapped[str] = mapped_column(

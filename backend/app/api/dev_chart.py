@@ -69,35 +69,41 @@ def create_dev_chart_entry(
     
     Adds a new timing datapoint for a specific combination of film stock,
     developer, ISO rating, dilution ratio, and temperature.
-    """
-    # Check if exact combination already exists
-    existing = db.query(DevelopmentChart).filter(
-        and_(
-            DevelopmentChart.film_stock == entry_data.film_stock,
-            DevelopmentChart.developer == entry_data.developer,
-            DevelopmentChart.iso_rating == entry_data.iso_rating,
-            DevelopmentChart.dilution_ratio == entry_data.dilution_ratio,
-            DevelopmentChart.temperature_celsius == entry_data.temperature_celsius,
-        )
-    ).first()
     
-    if existing:
+    Note: Database-level unique constraint prevents duplicate entries.
+    """
+    from sqlalchemy.exc import IntegrityError
+    
+    # Create new entry
+    new_entry = DevelopmentChart(**entry_data.model_dump())
+    db.add(new_entry)
+    
+    try:
+        db.commit()
+        db.refresh(new_entry)
+        return new_entry
+    except IntegrityError:
+        db.rollback()
+        # Entry already exists - provide helpful error message
+        existing = db.query(DevelopmentChart).filter(
+            and_(
+                DevelopmentChart.film_stock == entry_data.film_stock,
+                DevelopmentChart.developer == entry_data.developer,
+                DevelopmentChart.iso_rating == entry_data.iso_rating,
+                DevelopmentChart.dilution_ratio == entry_data.dilution_ratio,
+                DevelopmentChart.temperature_celsius == entry_data.temperature_celsius,
+            )
+        ).first()
+        
+        entry_id = existing.id if existing else "unknown"
         raise HTTPException(
             status_code=409,
             detail=(
                 f"Entry already exists for {entry_data.film_stock} + {entry_data.developer} "
                 f"at ISO {entry_data.iso_rating}, {entry_data.dilution_ratio}, {entry_data.temperature_celsius}°C. "
-                f"Use PUT to update existing entry (ID: {existing.id})"
+                f"Use PUT to update existing entry (ID: {entry_id})"
             )
         )
-    
-    # Create new entry
-    new_entry = DevelopmentChart(**entry_data.model_dump())
-    db.add(new_entry)
-    db.commit()
-    db.refresh(new_entry)
-    
-    return new_entry
 
 
 @router.get("/{entry_id}", response_model=DevelopmentChartResponse)

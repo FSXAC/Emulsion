@@ -33,6 +33,7 @@ def parse_time_to_seconds(time_str: str) -> int:
     - "6:30" -> 390 seconds
     - "390" -> 390 seconds
     - "11:00" -> 660 seconds
+    - "390.5" -> 390 seconds (truncates decimals)
     
     Args:
         time_str: Time string to parse
@@ -42,10 +43,6 @@ def parse_time_to_seconds(time_str: str) -> int:
     """
     time_str = time_str.strip()
     
-    # If it's just a number, return it as-is
-    if time_str.isdigit():
-        return int(time_str)
-    
     # If it's in MM:SS format
     if ":" in time_str:
         parts = time_str.split(":")
@@ -53,7 +50,12 @@ def parse_time_to_seconds(time_str: str) -> int:
         seconds = int(parts[1]) if len(parts) > 1 else 0
         return minutes * 60 + seconds
     
-    raise ValueError(f"Invalid time format: {time_str}")
+    # Otherwise try to parse as a number (handles integers, floats, etc.)
+    try:
+        # Convert to float first to handle decimals, then to int (truncates)
+        return int(float(time_str))
+    except ValueError:
+        raise ValueError(f"Invalid time format: {time_str}. Expected MM:SS or number of seconds.")
 
 
 def import_from_csv(csv_path: Path, db_path: Path, skip_duplicates: bool = True):
@@ -85,12 +87,8 @@ def import_from_csv(csv_path: Path, db_path: Path, skip_duplicates: bool = True)
             
             for row_num, row in enumerate(reader, start=2):  # Start at 2 (1 is header)
                 try:
-                    # Parse development time if it's in MM:SS format
-                    dev_time = row['development_time_seconds'].strip()
-                    if ':' in dev_time:
-                        dev_time_seconds = parse_time_to_seconds(dev_time)
-                    else:
-                        dev_time_seconds = int(dev_time)
+                    # Parse development time using the helper function
+                    dev_time_seconds = parse_time_to_seconds(row['development_time_seconds'])
                     
                     # Check if entry already exists
                     existing = session.query(DevelopmentChart).filter(
