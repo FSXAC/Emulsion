@@ -3,6 +3,9 @@
  */
 
 import fuji400Icon from '../assets/film-stocks/fuji-400.png';
+import fuji200Icon from '../assets/film-stocks/fuji-200.png';
+import fujiSuperiaXTRA200Icon from '../assets/film-stocks/fuji-superia-xtra-200.png';
+import fujiSuperiaXTRA100Icon from '../assets/film-stocks/fuji-superia-xtra-100.png';
 import ilfordDelta400Icon from '../assets/film-stocks/ilford-delta-400.png';
 import ilfordHp5Plus400Icon from '../assets/film-stocks/ilford-hp5.png';
 import ilfordSfx200Icon from '../assets/film-stocks/ilford-sfx-200.png';
@@ -12,7 +15,10 @@ import kodakUltra400Icon from '../assets/film-stocks/kodak-400.png';
 import kodak200Icon from '../assets/film-stocks/kodak-200.png';
 import kodakColorPlus200Icon from '../assets/film-stocks/kodak-colorplus-200.png';
 import kodakPro100Icon from '../assets/film-stocks/kodak-pro-100.png';
+import kodakPortra400Icon from '../assets/film-stocks/kodak-portra-400.png';
+import kodakVision3500TIcon from '../assets/film-stocks/kodak-vision3-500t.png';
 import kodakEktar100Icon from '../assets/film-stocks/kodak-ektar-100.png';
+import fomapan100Icon from '../assets/film-stocks/fomapan-100.png';
 import harmanPhoenix200Icon from '../assets/film-stocks/harman-phoenix-200.png';
 import harmanPhoenix200IIIcon from '../assets/film-stocks/harman-phoenix-200-ii.png';
 import flicAurora800 from '../assets/film-stocks/flic-aurora-800.png';
@@ -21,6 +27,7 @@ import cinestill50D from '../assets/film-stocks/cinestill-50d.png';
 import cinestill400D from '../assets/film-stocks/cinestill-400d.png';
 import reflx800 from '../assets/film-stocks/reflx-800.png';
 import reflx400 from '../assets/film-stocks/reflx-400.png';
+import onesec640t from '../assets/film-stocks/onesec-640t.png';
 import unknownRollIcon from '../assets/film-stocks/unknown.png';
 
 // These are for 35mm but the images are actually of disposable cameras
@@ -37,7 +44,9 @@ import unknownRollIcon120 from '../assets/film-stocks/unknown-120.png';
 const filmStockImageMap = {
   // Fujifilm stocks
   'Fujifilm 400': fuji400Icon,
-  'Fujicolor Superia X-TRA 200': fuji400Icon,
+  'Fujifilm 200': fuji200Icon,
+  'Fujicolor Superia X-TRA 200': fujiSuperiaXTRA200Icon,
+  'Fujicolor Superia X-TRA 100': fujiSuperiaXTRA100Icon,
   'Fujicolor Superia 400': fuji400Icon,
   
   // Ilford stocks
@@ -57,6 +66,14 @@ const filmStockImageMap = {
   'Kodak Pro Image 100': kodakPro100Icon,
   'Kodak Ektar 100': kodakEktar100Icon,
   'Kodak ColorPlus 200': kodakColorPlus200Icon,
+  'Kodak Portra 400': kodakPortra400Icon,
+  'Kodak Vision3 500T': kodakVision3500TIcon,
+  
+  // Fomapan stocks
+  'Fomapan 100': fomapan100Icon,
+  
+  // OneSec stocks
+  'OneSec 640T': onesec640t,
   
   // Harman stocks
   'Harman Phoenix 200': harmanPhoenix200Icon,
