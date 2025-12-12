@@ -22,7 +22,8 @@ import {
   Search,
   HelpCircle,
   Info,
-  ArrowRight
+  ArrowRight,
+  BarChart3
 } from 'lucide-react';
 
 /**
@@ -38,6 +39,7 @@ const iconMap = {
   'checkCircle': CheckCircle,
   'chemistry': Beaker,
   'star': Star,
+  'chart': BarChart3,
   
   // UI Actions
   'calendar': Calendar,

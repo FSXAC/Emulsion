@@ -7,6 +7,7 @@ export default function Layout({ children }) {
   const navItems = [
     { path: '/rolls', label: 'Film Rolls', icon: 'film' },
     { path: '/chemistry', label: 'Chemistry', icon: 'chemistry' },
+    { path: '/stats', label: 'Statistics', icon: 'chart' },
   ];
   
   return (
