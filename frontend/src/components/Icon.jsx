@@ -23,7 +23,8 @@ import {
   HelpCircle,
   Info,
   ArrowRight,
-  BarChart3
+  BarChart3,
+  Menu
 } from 'lucide-react';
 
 /**
@@ -61,6 +62,7 @@ const iconMap = {
   'help': HelpCircle,
   'info': Info,
   'arrowRight': ArrowRight,
+  'menu': Menu,
 };
 
 export default function Icon({ name, className = '', size = 16, ...props }) {
