@@ -103,36 +103,36 @@ frontend/package.json (add recharts)
 - [X] 14.2.8 Add loading and error states
 
 #### Phase 14.3: Status & Format Charts (Overview Tab) ⭐
-- [ ] 14.3.1 Calculate rolls by status distribution
-- [ ] 14.3.2 Calculate rolls by format distribution
-- [ ] 14.3.3 Create bar chart for status (Recharts BarChart)
-- [ ] 14.3.4 Create bar chart for format
-- [ ] 14.3.5 Style charts with Tailwind colors (film-cyan, etc.)
-- [ ] 14.3.6 Make charts responsive
+- [X] 14.3.1 Calculate rolls by status distribution
+- [X] 14.3.2 Calculate rolls by format distribution
+- [X] 14.3.3 Create bar chart for status (Recharts BarChart)
+- [X] 14.3.4 Create bar chart for format
+- [X] 14.3.5 Style charts with Tailwind colors (film-cyan, etc.)
+- [X] 14.3.6 Make charts responsive
 
 #### Phase 14.4: Film Stock & Rating Charts (Overview Tab) ⭐
-- [ ] 14.4.1 Calculate top 10 film stocks by usage count
-- [ ] 14.4.2 Calculate rating distribution (1-5 stars)
-- [ ] 14.4.3 Create bar chart for top film stocks
-- [ ] 14.4.4 Create bar chart for rating distribution
-- [ ] 14.4.5 Add "No ratings yet" empty state
+- [X] 14.4.1 Calculate top 10 film stocks by usage count
+- [X] 14.4.2 Calculate rating distribution (1-5 stars)
+- [X] 14.4.3 Create bar chart for top film stocks
+- [X] 14.4.4 Create bar chart for rating distribution
+- [X] 14.4.5 Add "No ratings yet" empty state
 
 #### Phase 14.6: Cost Analysis (Costs Tab) ⭐
-- [ ] 14.6.1 Create Costs tab component
-- [ ] 14.6.2 Calculate film cost vs dev cost breakdown
-- [ ] 14.6.3 Calculate chemistry usage by batch
-- [ ] 14.6.4 Create pie chart for cost breakdown
-- [ ] 14.6.5 Create pie chart for chemistry usage
-- [ ] 14.6.6 Show cost-per-roll for each chemistry batch
-- [ ] 14.6.7 Add "Most expensive roll" and "Cheapest per shot" cards
+- [X] 14.6.1 Create Costs tab component
+- [X] 14.6.2 Calculate film cost vs dev cost breakdown
+- [X] 14.6.3 Calculate chemistry usage by batch
+- [X] 14.6.4 Create pie chart for cost breakdown
+- [X] 14.6.5 Create pie chart for chemistry usage
+- [X] 14.6.6 Show cost-per-roll for each chemistry batch
+- [X] 14.6.7 Add "Most expensive roll" and "Cheapest per shot" cards
 
 #### Phase 14.7: Polish & Responsive Design ⭐
-- [ ] 14.7.1 Ensure all charts responsive (mobile/tablet/desktop)
-- [ ] 14.7.2 Add empty states ("No data yet" messages)
-- [ ] 14.7.3 Add chart tooltips (hover for details)
-- [ ] 14.7.4 Test dark mode for all charts/cards
-- [ ] 14.7.5 Add smooth transitions between tabs
-- [ ] 14.7.6 Test with small and large datasets
+- [X] 14.7.1 Ensure all charts responsive (mobile/tablet/desktop)
+- [X] 14.7.2 Add empty states ("No data yet" messages)
+- [X] 14.7.3 Add chart tooltips (hover for details)
+- [X] 14.7.4 Test dark mode for all charts/cards
+- [X] 14.7.5 Add smooth transitions between tabs
+- [X] 14.7.6 Test with small and large datasets
 
 ### **LOW PRIORITY (Future)**
 

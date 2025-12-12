@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend, ScatterChart, Scatter, ZAxis } from 'recharts';
 import StatCard from '../components/StatCard';
 import Icon from '../components/Icon';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -12,6 +12,14 @@ import {
   calculateAvgCostPerShot,
   calculateStatusDistribution,
   calculateFormatDistribution,
+  calculateTopFilmStocks,
+  calculateRatingDistribution,
+  calculateAverageRating,
+  calculateFilmStockStats,
+  calculateCostBreakdown,
+  calculateChemistryUsage,
+  findMostExpensiveRoll,
+  findCheapestPerShot,
   toChartData,
 } from '../utils/statsCalculator';
 
@@ -121,7 +129,7 @@ export default function StatsPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="space-y-6">
+      <div className="space-y-6 animate-fade-in">
         {activeTab === 'overview' && (
           <OverviewTab rolls={rolls} chemistry={chemistry} />
         )}
@@ -143,6 +151,7 @@ function OverviewTab({ rolls, chemistry }) {
   const totalShots = calculateTotalShots(rolls);
   const totalRolls = rolls.length;
   const avgCostPerShot = calculateAvgCostPerShot(totalSpending, totalShots);
+  const avgRating = calculateAverageRating(rolls);
 
   if (rolls.length === 0) {
     return (
@@ -184,11 +193,11 @@ function OverviewTab({ rolls, chemistry }) {
           subtitle="All formats"
         />
         <StatCard
-          title="Avg Cost/Shot"
-          value={totalShots > 0 ? `$${avgCostPerShot.toFixed(2)}` : 'N/A'}
+          title="Avg Rating"
+          value={avgRating > 0 ? avgRating.toFixed(2) : 'N/A'}
           icon="star"
           color="amber"
-          subtitle="Film + development"
+          subtitle={avgRating > 0 ? `${avgRating.toFixed(1)} stars` : 'No ratings yet'}
         />
       </div>
 
@@ -199,26 +208,84 @@ function OverviewTab({ rolls, chemistry }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartPlaceholder title="Top Film Stocks" />
-        <ChartPlaceholder title="Rating Distribution" />
+        <TopFilmStocksChart rolls={rolls} />
+        <RatingDistributionChart rolls={rolls} />
+      </div>
+
+      {/* Film Stock Value Analysis */}
+      <div className="grid grid-cols-1 gap-6">
+        <FilmStockValueChart rolls={rolls} />
       </div>
     </div>
   );
 }
 
-// Costs Tab Component (Placeholder for Phase 14.6)
+// Costs Tab Component
 function CostsTab({ rolls, chemistry }) {
-  return (
-    <div className="space-y-6">
-      <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
-        <Icon name="dollar" size={48} className="mx-auto mb-4 text-gray-400" />
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-          Cost Analysis Coming Soon
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Detailed cost breakdowns and chemistry usage will be available here
+  // Calculate cost metrics
+  const costBreakdown = calculateCostBreakdown(rolls);
+  const chemistryUsage = calculateChemistryUsage(rolls, chemistry);
+  const mostExpensiveRoll = findMostExpensiveRoll(rolls);
+  const cheapestPerShot = findCheapestPerShot(rolls);
+
+  if (rolls.length === 0) {
+    return (
+      <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700">
+        <div className="mb-4 flex justify-center">
+          <Icon name="dollar" size={64} className="text-gray-400" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No cost data yet</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          Start tracking costs to see analysis
         </p>
       </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Cost Highlights */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Film Cost"
+          value={`$${costBreakdown.filmCost.toFixed(2)}`}
+          icon="film"
+          color="purple"
+          subtitle="Stock purchases"
+        />
+        <StatCard
+          title="Dev Cost"
+          value={`$${costBreakdown.devCost.toFixed(2)}`}
+          icon="flask"
+          color="cyan"
+          subtitle="Development"
+        />
+        <StatCard
+          title="Most Expensive"
+          value={mostExpensiveRoll ? `$${calculateRollTotalCost(mostExpensiveRoll).toFixed(2)}` : 'N/A'}
+          icon="alert"
+          color="red"
+          subtitle={mostExpensiveRoll ? mostExpensiveRoll.film_stock_name || 'Unknown roll' : 'No data'}
+        />
+        <StatCard
+          title="Lowest $ per shot"
+          value={cheapestPerShot ? `$${Number(cheapestPerShot.cost_per_shot).toFixed(3)}` : 'N/A'}
+          icon="star"
+          color="green"
+          subtitle={cheapestPerShot ? cheapestPerShot.film_stock_name || 'Unknown roll' : 'No data'}
+        />
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <CostBreakdownChart filmCost={costBreakdown.filmCost} devCost={costBreakdown.devCost} />
+        <ChemistryUsageChart chemistryUsage={chemistryUsage} />
+      </div>
+
+      {/* Chemistry Batch Details */}
+      {chemistryUsage.length > 0 && (
+        <ChemistryBatchTable chemistryUsage={chemistryUsage} chemistry={chemistry} />
+      )}
     </div>
   );
 }
@@ -272,11 +339,13 @@ function StatusDistributionChart({ rolls }) {
           />
           <Tooltip 
             contentStyle={{
-              backgroundColor: '#fff',
+              backgroundColor: 'rgba(255, 255, 255, 0.98)',
               border: '1px solid #e5e7eb',
               borderRadius: '8px',
-              fontSize: '14px'
+              fontSize: '14px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
             }}
+            wrapperStyle={{ zIndex: 1000 }}
             cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
           />
           <Bar dataKey="count" radius={[8, 8, 0, 0]}>
@@ -316,11 +385,13 @@ function FormatDistributionChart({ rolls }) {
           />
           <Tooltip 
             contentStyle={{
-              backgroundColor: '#fff',
+              backgroundColor: 'rgba(255, 255, 255, 0.98)',
               border: '1px solid #e5e7eb',
               borderRadius: '8px',
-              fontSize: '14px'
+              fontSize: '14px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
             }}
+            wrapperStyle={{ zIndex: 1000 }}
             cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
           />
           <Bar dataKey="count" fill="#0891b2" radius={[8, 8, 0, 0]} />
@@ -330,16 +401,463 @@ function FormatDistributionChart({ rolls }) {
   );
 }
 
-// Chart Placeholder Component
-function ChartPlaceholder({ title }) {
+// Top Film Stocks Chart Component
+function TopFilmStocksChart({ rolls }) {
+  const topStocks = calculateTopFilmStocks(rolls, 10);
+  const chartData = topStocks.map(([stock, count]) => ({ stock, count }));
+
+  if (chartData.length === 0) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Top Film Stocks</h3>
+        <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+          <div className="text-center">
+            <Icon name="film" size={48} className="mx-auto mb-2 text-gray-400" />
+            <p className="text-sm text-gray-500 dark:text-gray-400">No film stock data yet</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{title}</h3>
-      <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-900/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700">
-        <div className="text-center">
-          <Icon name="chart" size={48} className="mx-auto mb-2 text-gray-400" />
-          <p className="text-sm text-gray-500 dark:text-gray-400">Chart coming soon</p>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Top Film Stocks</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }} layout="vertical">
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+          <XAxis 
+            type="number" 
+            stroke="#6b7280"
+            className="dark:stroke-gray-400"
+            style={{ fontSize: '12px' }}
+            allowDecimals={false}
+          />
+          <YAxis 
+            type="category"
+            dataKey="stock" 
+            stroke="#6b7280"
+            className="dark:stroke-gray-400"
+            style={{ fontSize: '12px' }}
+            width={150}
+          />
+          <Tooltip 
+            contentStyle={{
+              backgroundColor: 'rgba(255, 255, 255, 0.98)',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '14px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}
+            wrapperStyle={{ zIndex: 1000 }}
+            cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
+          />
+          <Bar dataKey="count" fill="#8b5cf6" radius={[0, 8, 8, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// Rating Distribution Chart Component
+function RatingDistributionChart({ rolls }) {
+  const ratingDistribution = calculateRatingDistribution(rolls);
+  const chartData = toChartData(ratingDistribution, 'stars', 'count');
+  
+  // Check if there are any ratings
+  const hasRatings = chartData.some(d => d.count > 0);
+
+  if (!hasRatings) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Rating Distribution</h3>
+        <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+          <div className="text-center">
+            <Icon name="star" size={48} className="mx-auto mb-2 text-gray-400" />
+            <p className="text-sm text-gray-500 dark:text-gray-400">No ratings yet</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Rate your rolls to see distribution</p>
+          </div>
         </div>
+      </div>
+    );
+  }
+
+  // Color gradient for ratings (1=red to 5=green)
+  const ratingColors = {
+    '1': '#ef4444', // red-500
+    '2': '#f59e0b', // amber-500
+    '3': '#eab308', // yellow-500
+    '4': '#84cc16', // lime-500
+    '5': '#10b981', // green-500
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Rating Distribution</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+          <XAxis 
+            dataKey="stars" 
+            stroke="#6b7280"
+            className="dark:stroke-gray-400"
+            style={{ fontSize: '12px' }}
+            label={{ value: 'Stars', position: 'insideBottom', offset: -5, style: { fontSize: '12px' } }}
+          />
+          <YAxis 
+            stroke="#6b7280"
+            className="dark:stroke-gray-400"
+            style={{ fontSize: '12px' }}
+            allowDecimals={false}
+          />
+          <Tooltip 
+            contentStyle={{
+              backgroundColor: 'rgba(255, 255, 255, 0.98)',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '14px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}
+            wrapperStyle={{ zIndex: 1000 }}
+            cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
+          />
+          <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={ratingColors[entry.stars] || '#0891b2'} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// Cost Breakdown Pie Chart Component
+function CostBreakdownChart({ filmCost, devCost }) {
+  const data = [
+    { name: 'Film Cost', value: filmCost, color: '#8b5cf6' }, // purple
+    { name: 'Dev Cost', value: devCost, color: '#0891b2' },    // cyan
+  ].filter(d => d.value > 0);
+
+  if (data.length === 0) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Cost Breakdown</h3>
+        <div className="flex items-center justify-center h-64">
+          <p className="text-sm text-gray-500 dark:text-gray-400">No cost data</p>
+        </div>
+      </div>
+    );
+  }
+
+  const RADIAN = Math.PI / 180;
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text 
+        x={x} 
+        y={y} 
+        fill="white" 
+        textAnchor={x > cx ? 'start' : 'end'} 
+        dominantBaseline="central"
+        style={{ fontSize: '14px', fontWeight: 'bold' }}
+      >
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+    );
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Cost Breakdown</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            label={renderCustomizedLabel}
+            outerRadius={100}
+            fill="#8884d8"
+            dataKey="value"
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip 
+            formatter={(value) => `$${value.toFixed(2)}`}
+            contentStyle={{
+              backgroundColor: 'rgba(255, 255, 255, 0.98)',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '14px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}
+            wrapperStyle={{ zIndex: 1000 }}
+          />
+          <Legend 
+            verticalAlign="bottom" 
+            height={36}
+            formatter={(value, entry) => `${value}: $${entry.payload.value.toFixed(2)}`}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// Chemistry Usage Pie Chart Component
+function ChemistryUsageChart({ chemistryUsage }) {
+  if (chemistryUsage.length === 0) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Chemistry Usage</h3>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <Icon name="flask" size={48} className="mx-auto mb-2 text-gray-400" />
+            <p className="text-sm text-gray-500 dark:text-gray-400">No chemistry data</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Colors for different chemistry batches
+  const COLORS = ['#8b5cf6', '#0891b2', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#6366f1', '#14b8a6'];
+
+  const data = chemistryUsage.map((usage, index) => ({
+    name: usage.batchName,
+    value: usage.rollCount,
+    color: COLORS[index % COLORS.length],
+  }));
+
+  const RADIAN = Math.PI / 180;
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text 
+        x={x} 
+        y={y} 
+        fill="white" 
+        textAnchor={x > cx ? 'start' : 'end'} 
+        dominantBaseline="central"
+        style={{ fontSize: '14px', fontWeight: 'bold' }}
+      >
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+    );
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Chemistry Usage</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            label={renderCustomizedLabel}
+            outerRadius={100}
+            fill="#8884d8"
+            dataKey="value"
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip 
+            formatter={(value) => `${value} rolls`}
+            contentStyle={{
+              backgroundColor: 'rgba(255, 255, 255, 0.98)',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '14px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}
+            wrapperStyle={{ zIndex: 1000 }}
+          />
+          <Legend 
+            verticalAlign="bottom" 
+            height={36}
+            wrapperStyle={{ fontSize: '12px' }}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// Helper function to calculate total cost for a roll (matches statsCalculator logic)
+function calculateRollTotalCost(roll) {
+  if (roll.total_cost) return Number(roll.total_cost);
+  const filmCost = roll.not_mine ? 0 : Number(roll.film_cost || 0);
+  const devCost = Number(roll.dev_cost || 0);
+  return filmCost + devCost;
+}
+
+// Film Stock Value Chart - Rating vs Cost per Shot scatter plot
+function FilmStockValueChart({ rolls }) {
+  const filmStockStats = calculateFilmStockStats(rolls);
+
+  if (filmStockStats.length === 0) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Film Stock Value Analysis</h3>
+        <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+          <div className="text-center">
+            <Icon name="chart" size={48} className="mx-auto mb-2 text-gray-400" />
+            <p className="text-sm text-gray-500 dark:text-gray-400">Not enough data</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+              Rate your rolls and track costs to see value analysis
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Prepare data for scatter chart (avgRating on Y-axis, avgCostPerShot on X-axis)
+  const chartData = filmStockStats.map((stat) => ({
+    name: stat.filmStock,
+    x: stat.avgCostPerShot,
+    y: stat.avgRating,
+    z: stat.rollCount, // Size of bubble
+  }));
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Film Stock Value Analysis</h3>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+        Compare average rating vs cost per shot. Top-left = best value (high rating, low cost)
+      </p>
+      <ResponsiveContainer width="100%" height={400}>
+        <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 20 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+          <XAxis 
+            type="number" 
+            dataKey="x" 
+            name="Cost per Shot"
+            stroke="#6b7280"
+            className="dark:stroke-gray-400"
+            style={{ fontSize: '12px' }}
+            label={{ 
+              value: 'Avg Cost per Shot ($)', 
+              position: 'bottom', 
+              offset: 40,
+              style: { fontSize: '12px', fill: '#6b7280' }
+            }}
+            domain={['dataMin - 0.05', 'dataMax + 0.05']}
+          />
+          <YAxis 
+            type="number" 
+            dataKey="y" 
+            name="Rating"
+            stroke="#6b7280"
+            className="dark:stroke-gray-400"
+            style={{ fontSize: '12px' }}
+            label={{ 
+              value: 'Avg Rating (stars)', 
+              angle: -90, 
+              position: 'insideLeft',
+              style: { fontSize: '12px', fill: '#6b7280' }
+            }}
+            domain={[0, 5]}
+          />
+          <ZAxis type="number" dataKey="z" range={[60, 400]} name="Roll Count" />
+          <Tooltip 
+            cursor={{ strokeDasharray: '3 3' }}
+            contentStyle={{
+              backgroundColor: 'rgba(255, 255, 255, 0.98)',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '14px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}
+            wrapperStyle={{ zIndex: 1000 }}
+            content={({ active, payload }) => {
+              if (active && payload && payload.length) {
+                const data = payload[0].payload;
+                return (
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    fontSize: '14px',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                  }}>
+                    <div style={{ fontWeight: 'bold', marginBottom: '8px', color: '#0891b2' }}>
+                      {data.name}
+                    </div>
+                    <div style={{ marginBottom: '4px' }}>
+                      <strong>Rating:</strong> {data.y.toFixed(2)} stars
+                    </div>
+                    <div style={{ marginBottom: '4px' }}>
+                      <strong>Cost per Shot:</strong> ${data.x.toFixed(3)}
+                    </div>
+                    <div>
+                      <strong>Roll Count:</strong> {data.z} rolls
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            }}
+          />
+          <Scatter 
+            data={chartData} 
+            fill="#0891b2"
+            opacity={0.6}
+          />
+        </ScatterChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// Chemistry Batch Table Component
+function ChemistryBatchTable({ chemistryUsage, chemistry }) {
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Chemistry Batch Details</h3>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="text-left border-b border-gray-200 dark:border-gray-700">
+            <tr>
+              <th className="pb-3 font-semibold text-gray-700 dark:text-gray-300">Batch Name</th>
+              <th className="pb-3 font-semibold text-gray-700 dark:text-gray-300 text-right">Rolls Developed</th>
+              <th className="pb-3 font-semibold text-gray-700 dark:text-gray-300 text-right">Cost/Roll</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+            {chemistryUsage.map((usage) => {
+              const batch = chemistry.find((c) => c.id === usage.chemistryId);
+              const costPerRoll = batch && batch.total_cost && usage.rollCount > 0
+                ? batch.total_cost / usage.rollCount
+                : null;
+
+              return (
+                <tr key={usage.chemistryId} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <td className="py-3 text-gray-900 dark:text-gray-100">{usage.batchName}</td>
+                  <td className="py-3 text-gray-600 dark:text-gray-400 text-right">{usage.rollCount}</td>
+                  <td className="py-3 text-gray-600 dark:text-gray-400 text-right">
+                    {costPerRoll ? `$${costPerRoll.toFixed(2)}` : 'N/A'}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );

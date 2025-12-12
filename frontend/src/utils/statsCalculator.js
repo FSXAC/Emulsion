@@ -186,6 +186,7 @@ export function calculateChemistryUsage(rolls, chemistry) {
 
 /**
  * Find most expensive roll
+ * Properly calculates total cost including film + dev costs
  * 
  * @param {Array} rolls - Array of film roll objects
  * @returns {Object|null} Roll object with highest total_cost, or null if no rolls
@@ -193,29 +194,37 @@ export function calculateChemistryUsage(rolls, chemistry) {
 export function findMostExpensiveRoll(rolls) {
   if (rolls.length === 0) return null;
 
+  // Helper to get total cost for a roll
+  const getTotalCost = (roll) => {
+    if (roll.total_cost) return Number(roll.total_cost);
+    const filmCost = roll.not_mine ? 0 : Number(roll.film_cost || 0);
+    const devCost = Number(roll.dev_cost || 0);
+    return filmCost + devCost;
+  };
+
   return rolls.reduce((mostExpensive, roll) => {
-    const rollCost = roll.total_cost || roll.film_cost || 0;
-    const currentMax = mostExpensive.total_cost || mostExpensive.film_cost || 0;
+    const rollCost = getTotalCost(roll);
+    const currentMax = getTotalCost(mostExpensive);
     return rollCost > currentMax ? roll : mostExpensive;
   }, rolls[0]);
 }
 
 /**
  * Find cheapest cost per shot
- * Only considers rolls with actual_exposures and positive cost_per_shot
+ * Only considers user's rolls (not_mine=false) with actual_exposures and positive cost_per_shot
  * 
  * @param {Array} rolls - Array of film roll objects
  * @returns {Object|null} Roll object with lowest cost_per_shot, or null if no valid rolls
  */
 export function findCheapestPerShot(rolls) {
   const validRolls = rolls.filter(
-    (roll) => roll.cost_per_shot && roll.cost_per_shot > 0
+    (roll) => !roll.not_mine && roll.cost_per_shot && roll.cost_per_shot > 0
   );
 
   if (validRolls.length === 0) return null;
 
   return validRolls.reduce((cheapest, roll) => {
-    return roll.cost_per_shot < cheapest.cost_per_shot ? roll : cheapest;
+    return Number(roll.cost_per_shot) < Number(cheapest.cost_per_shot) ? roll : cheapest;
   }, validRolls[0]);
 }
 
@@ -230,6 +239,67 @@ export function formatCurrency(value) {
     return 'N/A';
   }
   return `$${Number(value).toFixed(2)}`;
+}
+
+/**
+ * Calculate average rating across all rated rolls
+ * 
+ * @param {Array} rolls - Array of film roll objects
+ * @returns {number} Average rating (0 if no rated rolls)
+ */
+export function calculateAverageRating(rolls) {
+  const ratedRolls = rolls.filter((roll) => roll.stars && roll.stars > 0);
+  if (ratedRolls.length === 0) return 0;
+  
+  const totalStars = ratedRolls.reduce((sum, roll) => sum + roll.stars, 0);
+  return totalStars / ratedRolls.length;
+}
+
+/**
+ * Calculate average rating per film stock
+ * Only includes film stocks with at least one rated roll
+ * 
+ * @param {Array} rolls - Array of film roll objects
+ * @returns {Array} Array of {filmStock, avgRating, avgCostPerShot, rollCount} objects
+ */
+export function calculateFilmStockStats(rolls) {
+  // Group rolls by film stock
+  const stockGroups = rolls.reduce((acc, roll) => {
+    const stock = roll.film_stock_name || 'Unknown';
+    if (!acc[stock]) {
+      acc[stock] = [];
+    }
+    acc[stock].push(roll);
+    return acc;
+  }, {});
+
+  // Calculate stats for each film stock
+  return Object.entries(stockGroups)
+    .map(([filmStock, stockRolls]) => {
+      // Calculate average rating (only from rated rolls)
+      const ratedRolls = stockRolls.filter((roll) => roll.stars && roll.stars > 0);
+      const avgRating = ratedRolls.length > 0
+        ? ratedRolls.reduce((sum, roll) => sum + roll.stars, 0) / ratedRolls.length
+        : null;
+
+      // Calculate average cost per shot (only from user's rolls with cost_per_shot)
+      const validCostRolls = stockRolls.filter(
+        (roll) => !roll.not_mine && roll.cost_per_shot && roll.cost_per_shot > 0
+      );
+      const avgCostPerShot = validCostRolls.length > 0
+        ? validCostRolls.reduce((sum, roll) => sum + Number(roll.cost_per_shot), 0) / validCostRolls.length
+        : null;
+
+      return {
+        filmStock,
+        avgRating,
+        avgCostPerShot,
+        rollCount: stockRolls.length,
+        ratedCount: ratedRolls.length,
+      };
+    })
+    .filter((stat) => stat.avgRating !== null && stat.avgCostPerShot !== null) // Only include stocks with both ratings and costs
+    .sort((a, b) => b.rollCount - a.rollCount); // Sort by popularity
 }
 
 /**
