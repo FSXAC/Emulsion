@@ -502,10 +502,12 @@ function GalleryTab({ rolls }) {
   );
 }
 
-// Film Stock Gallery Card Component - Refined with 3D Tilt Effect
+// Film Stock Gallery Card Component - Refined with 3D Tilt Effect + Parallax
 function FilmStockGalleryCard({ stock }) {
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
+  const [translateX, setTranslateX] = useState(0);
+  const [translateY, setTranslateY] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
 
   const handleMouseMove = (e) => {
@@ -517,17 +519,25 @@ function FilmStockGalleryCard({ stock }) {
     const mouseX = e.clientX - centerX;
     const mouseY = e.clientY - centerY;
     
-    // Calculate rotation (max 15 degrees)
-    const rotX = (mouseY / (rect.height / 2)) * -15;
-    const rotY = (mouseX / (rect.width / 2)) * 15;
+    // Calculate rotation for card (max 15 degrees)
+    const rotX = (mouseY / (rect.height / 2)) * -10;
+    const rotY = (mouseX / (rect.width / 2)) * 10;
+    
+    // Calculate subtle translation for thumbnail parallax (max 10px)
+    const transX = (mouseX / (rect.width / 2)) * 5;
+    const transY = (mouseY / (rect.height / 2)) * 5;
     
     setRotateX(rotX);
     setRotateY(rotY);
+    setTranslateX(transX);
+    setTranslateY(transY);
   };
 
   const handleMouseLeave = () => {
     setRotateX(0);
     setRotateY(0);
+    setTranslateX(0);
+    setTranslateY(0);
     setIsHovering(false);
   };
 
@@ -563,19 +573,28 @@ function FilmStockGalleryCard({ stock }) {
           </div>
         )}
 
-        {/* Film Stock Image */}
+        {/* Film Stock Image Container */}
         <div className="aspect-[3/4] overflow-hidden bg-gray-100 dark:bg-gray-900 relative">
+          {/* Museum Lighting Effects - Below thumbnail */}
+          <div className="absolute inset-0 z-0">
+            {/* Subtle vignette */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20 dark:to-black/40" />
+            
+            {/* Museum Reflection Effect */}
+            <div 
+              className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            />
+          </div>
+
+          {/* Film Stock Image - Above museum effects */}
           <img
             src={getFilmStockImage(stock.filmStock, stock.format)}
             alt={stock.filmStock}
-            className="w-full h-full object-cover"
-            style={{ transform: 'translateZ(20px)' }}
-          />
-          
-          {/* Subtle Reflection Effect - Keep this! */}
-          <div 
-            className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-            style={{ transform: 'translateZ(30px)' }}
+            className="relative z-10 w-full h-full object-cover"
+            style={{ 
+              transform: `translate(${translateX}px, ${translateY}px)`,
+              transition: isHovering ? 'none' : 'transform 0.3s ease-out',
+            }}
           />
         </div>
 

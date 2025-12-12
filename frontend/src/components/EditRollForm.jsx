@@ -384,7 +384,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan text-sm"
               >
-                <option value="35mm">35mm</option>
+                <option value="35 mm">35 mm</option>
                 <option value="HF">HF</option>
                 <option value="120">120</option>
                 <option value="110">110</option>
