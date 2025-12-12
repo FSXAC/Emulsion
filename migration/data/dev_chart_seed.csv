@@ -1,0 +1,35 @@
+film_stock,developer,iso_rating,dilution_ratio,temperature_celsius,development_time_seconds,agitation_notes,notes
+Ilford HP5 Plus 400,Ilfosol 3,400,1+4,20.0,6:30,First 30s continuous then 10s every minute,From Ilford datasheet
+Ilford HP5 Plus 400,Ilfosol 3,800,1+4,20.0,11:00,First 30s continuous then 10s every minute,Push +1 stop from Ilford datasheet
+Ilford HP5 Plus 400,Ilfosol 3,1600,1+4,20.0,16:00,First 30s continuous then 10s every minute,Push +2 stops from Ilford datasheet
+Ilford HP5 Plus 400,Ilfosol 3,400,1+9,20.0,8:00,First 30s continuous then 10s every minute,From Ilford datasheet
+Ilford HP5 Plus 400,Ilfosol 3,800,1+9,20.0,14:00,First 30s continuous then 10s every minute,Push +1 stop from Ilford datasheet
+Ilford HP5 Plus 400,D-76,400,1+1,20.0,9:30,Agitate 5s every 30s,From Ilford datasheet
+Ilford HP5 Plus 400,D-76,800,1+1,20.0,13:00,Agitate 5s every 30s,Push +1 stop from Ilford datasheet
+Ilford HP5 Plus 400,D-76,400,stock,20.0,7:00,Agitate 5s every 30s,From Ilford datasheet
+Ilford FP4 Plus 125,Ilfosol 3,125,1+4,20.0,5:30,First 30s continuous then 10s every minute,From Ilford datasheet
+Ilford FP4 Plus 125,Ilfosol 3,250,1+4,20.0,9:00,First 30s continuous then 10s every minute,Push +1 stop from Ilford datasheet
+Ilford FP4 Plus 125,Ilfosol 3,125,1+9,20.0,7:00,First 30s continuous then 10s every minute,From Ilford datasheet
+Ilford FP4 Plus 125,D-76,125,1+1,20.0,8:00,Agitate 5s every 30s,From Ilford datasheet
+Ilford FP4 Plus 125,D-76,125,stock,20.0,6:00,Agitate 5s every 30s,From Ilford datasheet
+Kodak Tri-X 400,D-76,400,1+1,20.0,10:00,Agitate 5s every 30s,From Kodak datasheet
+Kodak Tri-X 400,D-76,400,stock,20.0,8:00,Agitate 5s every 30s,From Kodak datasheet
+Kodak Tri-X 400,D-76,800,1+1,20.0,14:00,Agitate 5s every 30s,Push +1 stop from Kodak datasheet
+Kodak Tri-X 400,D-76,1600,1+1,20.0,18:00,Agitate 5s every 30s,Push +2 stops from Kodak datasheet
+Kodak Tri-X 400,HC-110,400,1+31,20.0,6:00,Agitate 5s every 30s,Dilution B from Kodak datasheet
+Kodak Tri-X 400,HC-110,800,1+31,20.0,8:00,Agitate 5s every 30s,Push +1 stop Dilution B
+Kodak Tri-X 400,Rodinal,400,1+50,20.0,13:00,Agitate 10s every minute,Standard Rodinal development
+Kodak T-Max 400,T-Max Developer,400,1+4,24.0,7:00,Agitate 5s every 30s,From Kodak datasheet at 24C
+Kodak T-Max 400,T-Max Developer,800,1+4,24.0,9:30,Agitate 5s every 30s,Push +1 stop at 24C
+Kodak T-Max 400,D-76,400,1+1,20.0,9:00,Agitate 5s every 30s,From Kodak datasheet
+Kodak T-Max 400,HC-110,400,1+31,20.0,5:30,Agitate 5s every 30s,Dilution B from Kodak datasheet
+Fomapan 400,D-76,400,1+1,20.0,11:00,Agitate 5s every 30s,From Foma datasheet
+Fomapan 400,Rodinal,400,1+50,20.0,12:00,Agitate 10s every minute,From Foma datasheet
+Ilford Delta 400,Ilfosol 3,400,1+9,20.0,7:00,First 30s continuous then 10s every minute,From Ilford datasheet
+Ilford Delta 400,Ilfosol 3,800,1+9,20.0,11:00,First 30s continuous then 10s every minute,Push +1 stop from Ilford datasheet
+Ilford Delta 400,D-76,400,1+1,20.0,9:00,Agitate 5s every 30s,From Ilford datasheet
+Ilford Delta 400,D-76,800,1+1,20.0,12:00,Agitate 5s every 30s,Push +1 stop from Ilford datasheet
+Ilford Delta 100,Ilfosol 3,100,1+9,20.0,6:00,First 30s continuous then 10s every minute,From Ilford datasheet
+Ilford Delta 100,D-76,100,1+1,20.0,7:30,Agitate 5s every 30s,From Ilford datasheet
+Ilford Delta 3200,Ilfosol 3,3200,1+4,20.0,12:00,First 30s continuous then 10s every minute,From Ilford datasheet
+Ilford Delta 3200,D-76,3200,stock,20.0,11:00,Agitate 5s every 30s,From Ilford datasheet
