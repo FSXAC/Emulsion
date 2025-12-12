@@ -5,7 +5,7 @@ import Icon from './Icon';
 import { getFilmStockImage } from '../utils/filmStockImages';
 import { useSound } from '../hooks/useSound';
 
-const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, onStatusChange }) => {
+const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoolUp, roll, onStatusChange }) => {
   const { playClick } = useSound();
   const [formData, setFormData] = useState({
     order_id: '',
@@ -193,6 +193,18 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
     onDuplicate(duplicateData);
     handleClose();
   };
+
+  const handleSpoolUp = () => {
+    if (!roll || !onSpoolUp) return;
+    onSpoolUp(roll);
+    handleClose();
+  };
+
+  // Detect if this is a bulk roll (35mm, NEW status, >36 exposures)
+  const isBulkRoll = roll &&
+                     roll.status === 'NEW' &&
+                     (roll.film_format === '35mm' || roll.film_format === '35 mm') &&
+                     roll.expected_exposures > 36;
 
   // Calculate estimated cost per shot
   const calculateCostPerShot = () => {
@@ -574,6 +586,16 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, roll, 
                 disabled={isSubmitting || isDeleting}
               >
                 <Icon name="copy" size={18} /> Duplicate
+              </button>
+            )}
+            {isBulkRoll && onSpoolUp && (
+              <button
+                type="button"
+                onClick={handleSpoolUp}
+                className="flex-1 px-4 py-2.5 sm:py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base flex items-center justify-center gap-2"
+                disabled={isSubmitting || isDeleting}
+              >
+                <Icon name="film" size={18} /> Spool Up
               </button>
             )}
             <button

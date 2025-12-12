@@ -17,6 +17,7 @@ import DatePickerModal from '../components/DatePickerModal';
 import Icon from '../components/Icon';
 import ChemistryPickerModal from '../components/ChemistryPickerModal';
 import RatingModal from '../components/RatingModal';
+import SpoolUpModal from '../components/SpoolUpModal';
 import EditRollForm from '../components/EditRollForm';
 import AddRollForm from '../components/AddRollForm';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -77,7 +78,7 @@ const parseSearchQuery = (query) => {
 
 export default function RollsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { playCardPickup, playCardSlide, playTransLoad, playTransUnload, playTransDeveloped, playTransScanned } = useSound();
+  const { playCardPickup, playCardSlide, playTransLoad, playTransUnload, playTransDeveloped, playTransScanned, playClick } = useSound();
   
   // Initialize search from URL params
   const initialSearch = searchParams.get('search') || '';
@@ -95,6 +96,7 @@ export default function RollsPage() {
   const [ratingModal, setRatingModal] = useState({ isOpen: false, roll: null });
   const [editRollModal, setEditRollModal] = useState({ isOpen: false, roll: null });
   const [addRollModal, setAddRollModal] = useState({ isOpen: false, initialData: null });
+  const [spoolUpModal, setSpoolUpModal] = useState({ isOpen: false, roll: null });
   const [searchHelpModal, setSearchHelpModal] = useState(false);
 
   // Search state
@@ -667,6 +669,63 @@ export default function RollsPage() {
     showToast('Opening form to duplicate roll');
   };
 
+  // Handle spool up (from edit form)
+  const handleSpoolUp = (bulkRoll) => {
+    setEditRollModal({ isOpen: false, roll: null });
+    setSpoolUpModal({ isOpen: true, roll: bulkRoll });
+  };
+
+  // Handle spool up confirmation
+  const handleSpoolUpConfirm = async (exposures) => {
+    const bulkRoll = spoolUpModal.roll;
+    if (!bulkRoll) return;
+
+    try {
+      setLoading(true);
+
+      // Calculate proportional costs
+      const totalExposures = bulkRoll.expected_exposures;
+      const remainingExposures = totalExposures - exposures;
+      const costPerExposure = parseFloat(bulkRoll.film_cost) / totalExposures;
+      const newRollCost = (costPerExposure * exposures).toFixed(2);
+      const remainingCost = (costPerExposure * remainingExposures).toFixed(2);
+
+      // Create new spooled roll
+      const newRollData = {
+        order_id: bulkRoll.order_id,
+        film_stock_name: bulkRoll.film_stock_name,
+        film_format: bulkRoll.film_format,
+        expected_exposures: exposures,
+        film_cost: parseFloat(newRollCost),
+        push_pull_stops: bulkRoll.push_pull_stops || 0,
+        not_mine: bulkRoll.not_mine || false,
+        notes: bulkRoll.notes ? `${bulkRoll.notes}\n[Spooled from bulk roll]` : '[Spooled from bulk roll]',
+      };
+
+      await createRoll(newRollData);
+
+      // Update bulk roll with remaining exposures and cost
+      const updateData = {
+        expected_exposures: remainingExposures,
+        film_cost: parseFloat(remainingCost),
+      };
+
+      await updateRoll(bulkRoll.id, updateData);
+
+      // Refresh roll list
+      await fetchRolls();
+
+      setSpoolUpModal({ isOpen: false, roll: null });
+      playClick();
+      showToast(`Spooled up ${exposures} exposures into new roll!`);
+    } catch (err) {
+      console.error('Spool up error:', err);
+      showToast('Failed to spool up roll', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="pb-4 flex items-center justify-center min-h-[400px]">
@@ -843,12 +902,20 @@ export default function RollsPage() {
         roll={ratingModal.roll}
       />
 
+      <SpoolUpModal
+        isOpen={spoolUpModal.isOpen}
+        onClose={() => setSpoolUpModal({ isOpen: false, roll: null })}
+        onConfirm={handleSpoolUpConfirm}
+        bulkRoll={spoolUpModal.roll}
+      />
+
       <EditRollForm
         isOpen={editRollModal.isOpen}
         onClose={() => setEditRollModal({ isOpen: false, roll: null })}
         onSubmit={handleEditRoll}
         onDelete={handleDeleteRoll}
         onDuplicate={handleDuplicateRoll}
+        onSpoolUp={handleSpoolUp}
         onStatusChange={isMobile ? handleStatusChangeFromForm : null}
         roll={editRollModal.roll}
       />
