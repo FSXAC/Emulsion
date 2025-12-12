@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import StatCard from '../components/StatCard';
 import Icon from '../components/Icon';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -9,6 +10,9 @@ import {
   calculateTotalSpending,
   calculateTotalShots,
   calculateAvgCostPerShot,
+  calculateStatusDistribution,
+  calculateFormatDistribution,
+  toChartData,
 } from '../utils/statsCalculator';
 
 export default function StatsPage() {
@@ -188,10 +192,10 @@ function OverviewTab({ rolls, chemistry }) {
         />
       </div>
 
-      {/* Charts - Placeholders for Phase 14.3 and 14.4 */}
+      {/* Status & Format Distribution Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartPlaceholder title="Status Distribution" />
-        <ChartPlaceholder title="Format Distribution" />
+        <StatusDistributionChart rolls={rolls} />
+        <FormatDistributionChart rolls={rolls} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -232,6 +236,96 @@ function GalleryTab({ rolls }) {
           Browse your film canister collection here
         </p>
       </div>
+    </div>
+  );
+}
+
+// Status Distribution Chart Component
+function StatusDistributionChart({ rolls }) {
+  const statusDistribution = calculateStatusDistribution(rolls);
+  const chartData = toChartData(statusDistribution, 'status', 'count');
+
+  // Color mapping for each status
+  const statusColors = {
+    NEW: '#a855f7',      // purple-500
+    LOADED: '#0891b2',   // cyan-600
+    EXPOSED: '#10b981',  // green-500
+    DEVELOPED: '#f59e0b', // amber-500
+    SCANNED: '#ef4444',  // red-500
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Status Distribution</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <XAxis 
+            dataKey="status" 
+            stroke="#6b7280"
+            style={{ fontSize: '12px' }}
+          />
+          <YAxis 
+            stroke="#6b7280"
+            style={{ fontSize: '12px' }}
+            allowDecimals={false}
+          />
+          <Tooltip 
+            contentStyle={{
+              backgroundColor: '#fff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '14px'
+            }}
+            cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
+          />
+          <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={statusColors[entry.status] || '#0891b2'} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// Format Distribution Chart Component
+function FormatDistributionChart({ rolls }) {
+  const formatDistribution = calculateFormatDistribution(rolls);
+  const chartData = toChartData(formatDistribution, 'format', 'count');
+
+  // Sort by count descending
+  chartData.sort((a, b) => b.count - a.count);
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Format Distribution</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <XAxis 
+            dataKey="format" 
+            stroke="#6b7280"
+            style={{ fontSize: '12px' }}
+          />
+          <YAxis 
+            stroke="#6b7280"
+            style={{ fontSize: '12px' }}
+            allowDecimals={false}
+          />
+          <Tooltip 
+            contentStyle={{
+              backgroundColor: '#fff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '14px'
+            }}
+            cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
+          />
+          <Bar dataKey="count" fill="#0891b2" radius={[8, 8, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 }

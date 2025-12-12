@@ -315,3 +315,5 @@ topStocks = Object.entries(stockCounts)
 - Recharts chosen for React integration and documentation
 - Existing film stock thumbnails will be reused for gallery
 - Date range filtering deferred to Phase 14.9
+
+Instructions for AI for testing: front-end NPM dev server is already running at 0.0.0.0:5173, no need to run command to spawn another dev.
