@@ -101,6 +101,16 @@ The production server serves both frontend and backend from port **8200**
 - Link to view all rolls using each batch
 - Duplicate and retire batch actions
 
+### Development Chart (B&W Timing)
+- **Lookup table** for B&W film development times
+- Database of film stock + developer + ISO + dilution + temperature → dev time
+- Pre-seeded with **34 common combinations** (Ilford HP5+, FP4+, Delta; Kodak Tri-X, T-Max; Fomapan)
+- Supports **push/pull processing** with different ISO ratings
+- **Easy data entry** via CSV import or API
+- **Autocomplete** for film stocks and developers
+- **Filtering** by film stock, developer, or ISO rating
+- **Lookup API** for quick dev time queries
+
 ### User Experience
 - **Touch-friendly** mobile-responsive design
 - **Drag-and-drop** with visual feedback
@@ -166,6 +176,16 @@ The production server serves both frontend and backend from port **8200**
 - `PUT /api/chemistry/{id}` - Update batch
 - `DELETE /api/chemistry/{id}` - Delete batch
 
+### Development Chart (B&W Timing Lookup)
+- `GET /api/dev-chart` - List all chart entries (filter: `?film_stock=HP5&developer=Ilfosol`)
+- `POST /api/dev-chart` - Create new chart entry
+- `GET /api/dev-chart/{id}` - Get chart entry
+- `PUT /api/dev-chart/{id}` - Update chart entry
+- `DELETE /api/dev-chart/{id}` - Delete chart entry
+- `POST /api/dev-chart/lookup` - Lookup dev time (body: `{film_stock, developer, iso_rating, dilution_ratio?, temperature_celsius?}`)
+- `GET /api/dev-chart/autocomplete/films` - Autocomplete film stock names
+- `GET /api/dev-chart/autocomplete/developers` - Autocomplete developer names
+
 ## 🗄️ Database
 
 **Location:** `backend/data/emulsion.db` (SQLite)
@@ -173,6 +193,7 @@ The production server serves both frontend and backend from port **8200**
 **Tables:**
 - `film_rolls` - Film roll tracking with computed status
 - `chemistry_batches` - Chemistry batch tracking with C41 dev time calculation
+- `development_chart` - B&W development timing lookup table
 
 **Changing Database Location:**
 
@@ -194,11 +215,31 @@ python import_chemistry.py --db-path ../../backend/data/emulsion.db
 # Import film rolls
 python import_rolls.py --db-path ../../backend/data/emulsion.db
 
+# Import development chart data (B&W timing)
+python import_dev_chart.py ../data/dev_chart_seed.csv --db-path ../../backend/data/emulsion.db
+
 # Validate imported data
 python validate.py --db-path ../../backend/data/emulsion.db
 ```
 
 See `migration/README.md` for CSV format requirements.
+
+### Development Chart CSV Format
+
+The development chart CSV should have these columns:
+```
+film_stock,developer,iso_rating,dilution_ratio,temperature_celsius,development_time_seconds,agitation_notes,notes
+```
+
+Example:
+```csv
+Ilford HP5 Plus 400,Ilfosol 3,400,1+4,20.0,6:30,First 30s continuous then 10s every minute,From Ilford datasheet
+Kodak Tri-X 400,D-76,800,1+1,20.0,14:00,Agitate 5s every 30s,Push +1 stop
+```
+
+**Note:** `development_time_seconds` can be in seconds (390) or MM:SS format (6:30).
+
+A seed file with 34 common film/developer combinations is provided at `migration/data/dev_chart_seed.csv`.
 
 ## 🏗️ Architecture
 
