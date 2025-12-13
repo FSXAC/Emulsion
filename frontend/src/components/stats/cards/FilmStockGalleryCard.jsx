@@ -59,6 +59,7 @@ export default function FilmStockGalleryCard({ stock }) {
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 }); // Percentage 0-100
 
   const tier = getBadgeForCount(stock.totalExposures);
+  const isStarter = tier.label === 'STARTER';
 
   const handleMouseMove = (e) => {
     const card = e.currentTarget;
@@ -109,6 +110,19 @@ export default function FilmStockGalleryCard({ stock }) {
         {/* Frame / Border */}
         <div className={`absolute inset-0 p-[6px] rounded-xl ${tier.frame} shadow-inner`}>
           
+          {/* Metallic Border Shine */}
+          <div
+            className="absolute inset-0 rounded-xl pointer-events-none"
+            style={{
+              background: `linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.8) 45%, rgba(255,255,255,0.0) 50%)`,
+              backgroundSize: '150% 150%',
+              backgroundPosition: isHovering ? `${mousePosition.x}% ${mousePosition.y}%` : '50% 50%',
+              mixBlendMode: 'overlay',
+              opacity: isHovering ? 1 : 0,
+              transition: isHovering ? 'opacity 0.1s ease-out' : 'opacity 0.5s ease-out',
+            }}
+          />
+
           {/* Inner Content Container */}
           <div className="h-full w-full bg-white dark:bg-gray-900 rounded-lg flex flex-col overflow-hidden shadow-sm relative">
             
@@ -118,9 +132,6 @@ export default function FilmStockGalleryCard({ stock }) {
               {/* Asymmetric Design Elements */}
               {/* Diagonal Slash */}
               <div className="absolute inset-0 bg-white/10 -skew-y-12 scale-150 origin-bottom-left translate-y-10" />
-              
-              {/* Texture Overlay */}
-              <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] mix-blend-overlay pointer-events-none" />
 
               {/* Tier Badge - Offset Asymmetrically */}
               <div className="absolute top-3 left-0 right-0 flex justify-end pr-3 z-20">
@@ -155,6 +166,27 @@ export default function FilmStockGalleryCard({ stock }) {
                 </div>
               )}
 
+              {/* Sparkles Effect - Only for ELITE and LEGEND */}
+              {/* TODO: move to asset */}
+              {(tier.label === 'ELITE' || tier.label === 'LEGEND') && (
+                <div
+                  className="absolute inset-0 pointer-events-none z-9 rounded-xl"
+                  style={{
+                    backgroundImage: `
+                      url("https://assets.codepen.io/13471/holo.png"),
+                      linear-gradient(125deg, #ff008450 15%, #fca40040 30%, #ffff0030 40%, #00ff8a20 60%, #00cfff40 70%, #cc4cfa50 85%)
+                    `,
+                    backgroundPosition: isHovering ? `${50 + (mousePosition.x - 50) / 7}% ${50 + (mousePosition.y - 50) / 7}%` : '50% 50%',
+                    backgroundSize: '100%',
+                    backgroundBlendMode: 'overlay',
+                    mixBlendMode: 'color-dodge',
+                    opacity: isHovering ? (tier.label === 'ELITE' ? 0.3 : 0.7) : 0,
+                    filter: isHovering ? 'brightness(1) contrast(1)' : 'brightness(1) contrast(1)',
+                    transition: isHovering ? 'opacity 0.1s ease-out' : 'opacity 0.5s ease-out'
+                  }}
+                />
+              )}
+
               {/* Film Image - Floating Overlay */}
               <div className="flex-grow flex items-center justify-center p-1 relative z-10 min-h-0 w-full">
                  <img
@@ -163,6 +195,8 @@ export default function FilmStockGalleryCard({ stock }) {
                     className="w-full h-full object-contain filter drop-shadow-2xl transition-transform duration-500"
                   />
               </div>
+
+              
             </div>
 
             {/* Bottom Info Section */}
@@ -194,11 +228,25 @@ export default function FilmStockGalleryCard({ stock }) {
               </div>
             </div>
 
-            {/* Pokemon Card Style Holo Gradient */}
-            <div
-              className="absolute inset-0 pointer-events-none z-30"
-              style={{
-                background: `
+          </div>
+
+          {/* Pokemon Card Style Holo Gradient */}
+          <div
+            className="absolute inset-0 pointer-events-none z-30 rounded-xl"
+            style={{
+              background: isStarter 
+                ? `
+                  linear-gradient(
+                    115deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.4) 25%,
+                    transparent 47%,
+                    transparent 53%,
+                    rgba(255, 255, 255, 0.4) 75%,
+                    transparent 100%
+                  )
+                `
+                : `
                   linear-gradient(
                     115deg,
                     transparent 0%,
@@ -209,36 +257,14 @@ export default function FilmStockGalleryCard({ stock }) {
                     transparent 100%
                   )
                 `,
-                backgroundSize: '250% 250%',
-                backgroundPosition: isHovering ? `${mousePosition.x}% ${mousePosition.y}%` : '50% 50%',
-                mixBlendMode: 'color-dodge',
-                opacity: isHovering ? 0.88 : 0,
-                filter: isHovering ? 'brightness(0.66) contrast(1.33)' : 'brightness(0.5) contrast(1)',
-                transition: isHovering ? 'opacity 0.1s ease-out' : 'opacity 0.5s ease-out'
-              }}
-            />
-
-            {/* Sparkles Effect - Only for ELITE and LEGEND */}
-            {/* TODO: move to asset */}
-            {(tier.label === 'ELITE' || tier.label === 'LEGEND') && (
-              <div
-                className="absolute inset-0 pointer-events-none z-40"
-                style={{
-                  backgroundImage: `
-                    url("https://assets.codepen.io/13471/holo.png"),
-                    linear-gradient(125deg, #ff008450 15%, #fca40040 30%, #ffff0030 40%, #00ff8a20 60%, #00cfff40 70%, #cc4cfa50 85%)
-                  `,
-                  backgroundPosition: isHovering ? `${50 + (mousePosition.x - 50) / 7}% ${50 + (mousePosition.y - 50) / 7}%` : '50% 50%',
-                  backgroundSize: '30%',
-                  backgroundBlendMode: 'overlay',
-                  mixBlendMode: 'color-dodge',
-                  opacity: isHovering ? (tier.label === 'ELITE' ? 0.3 : 0.7) : 0,
-                  filter: isHovering ? 'brightness(1) contrast(1)' : 'brightness(1) contrast(1)',
-                  transition: isHovering ? 'opacity 0.1s ease-out' : 'opacity 0.5s ease-out'
-                }}
-              />
-            )}
-          </div>
+              backgroundSize: '250% 250%',
+              backgroundPosition: isHovering ? `${mousePosition.x}% ${mousePosition.y}%` : '50% 50%',
+              mixBlendMode: 'color-dodge',
+              opacity: isHovering ? 0.88 : 0,
+              filter: isHovering ? 'brightness(0.66) contrast(1.33)' : 'brightness(0.5) contrast(1)',
+              transition: isHovering ? 'opacity 0.1s ease-out' : 'opacity 0.5s ease-out'
+            }}
+          />
         </div>
       </div>
     </div>
