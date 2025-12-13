@@ -56,6 +56,7 @@ export default function FilmStockGalleryCard({ stock }) {
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 }); // Percentage 0-100
 
   const tier = getBadgeForCount(stock.totalExposures);
 
@@ -68,11 +69,17 @@ export default function FilmStockGalleryCard({ stock }) {
     const mouseX = e.clientX - centerX;
     const mouseY = e.clientY - centerY;
     
+    // Calculate 3D rotation
     const rotX = (mouseY / (rect.height / 2)) * 15;
     const rotY = (mouseX / (rect.width / 2)) * -15;
     
+    // Calculate percentage position for holographic effects (0-100)
+    const px = Math.abs(Math.floor(100 / rect.width * (e.clientX - rect.left)));
+    const py = Math.abs(Math.floor(100 / rect.height * (e.clientY - rect.top)));
+
     setRotateX(rotX);
     setRotateY(rotY);
+    setMousePosition({ x: px, y: py });
   };
 
   const handleMouseLeave = () => {
@@ -96,7 +103,6 @@ export default function FilmStockGalleryCard({ stock }) {
         `}
         style={{
           transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
-          transformStyle: 'preserve-3d',
           transition: isHovering ? 'none' : 'transform 0.5s ease-out',
         }}
       >
@@ -154,10 +160,7 @@ export default function FilmStockGalleryCard({ stock }) {
                  <img
                     src={getFilmStockImage(stock.filmStock, stock.format)}
                     alt={stock.filmStock}
-                    className="w-full h-full object-contain filter drop-shadow-2xl transform transition-transform duration-500"
-                    style={{
-                      transform: isHovering ? 'translateZ(30px)' : 'translateZ(0px)',
-                    }}
+                    className="w-full h-full object-contain filter drop-shadow-2xl transition-transform duration-500"
                   />
               </div>
             </div>
@@ -191,16 +194,50 @@ export default function FilmStockGalleryCard({ stock }) {
               </div>
             </div>
 
-            {/* Holographic Shine Effect */}
-            <div 
-              className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-30 transition-opacity duration-300 z-50 mix-blend-color-dodge"
+            {/* Pokemon Card Style Holo Gradient */}
+            <div
+              className="absolute inset-0 pointer-events-none z-30"
               style={{
-                background: `linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.9) 45%, rgba(255, 255, 255, 0.5) 50%, transparent 55%)`,
+                background: `
+                  linear-gradient(
+                    115deg,
+                    transparent 0%,
+                    rgb(0, 231, 255) 25%,
+                    transparent 47%,
+                    transparent 53%,
+                    rgb(255, 0, 231) 75%,
+                    transparent 100%
+                  )
+                `,
                 backgroundSize: '250% 250%',
-                backgroundPosition: isHovering ? '0% 0%' : '100% 100%',
-                transition: 'background-position 0.6s ease-out'
+                backgroundPosition: isHovering ? `${mousePosition.x}% ${mousePosition.y}%` : '50% 50%',
+                mixBlendMode: 'color-dodge',
+                opacity: isHovering ? 0.88 : 0,
+                filter: isHovering ? 'brightness(0.66) contrast(1.33)' : 'brightness(0.5) contrast(1)',
+                transition: isHovering ? 'opacity 0.1s ease-out' : 'opacity 0.5s ease-out'
               }}
             />
+
+            {/* Sparkles Effect - Only for ELITE and LEGEND */}
+            {/* TODO: move to asset */}
+            {(tier.label === 'ELITE' || tier.label === 'LEGEND') && (
+              <div
+                className="absolute inset-0 pointer-events-none z-40"
+                style={{
+                  backgroundImage: `
+                    url("https://assets.codepen.io/13471/holo.png"),
+                    linear-gradient(125deg, #ff008450 15%, #fca40040 30%, #ffff0030 40%, #00ff8a20 60%, #00cfff40 70%, #cc4cfa50 85%)
+                  `,
+                  backgroundPosition: isHovering ? `${50 + (mousePosition.x - 50) / 7}% ${50 + (mousePosition.y - 50) / 7}%` : '50% 50%',
+                  backgroundSize: '30%',
+                  backgroundBlendMode: 'overlay',
+                  mixBlendMode: 'color-dodge',
+                  opacity: isHovering ? (tier.label === 'ELITE' ? 0.3 : 0.7) : 0,
+                  filter: isHovering ? 'brightness(1) contrast(1)' : 'brightness(1) contrast(1)',
+                  transition: isHovering ? 'opacity 0.1s ease-out' : 'opacity 0.5s ease-out'
+                }}
+              />
+            )}
           </div>
         </div>
       </div>
