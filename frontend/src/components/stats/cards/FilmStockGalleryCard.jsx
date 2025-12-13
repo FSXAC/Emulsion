@@ -4,7 +4,7 @@ import { getFilmStockImage } from '../../../utils/filmStockImages';
 
 const BADGE_TIERS = [
   {
-    min: 100,
+    min: 20,
     label: 'LEGEND',
     bg: 'bg-gradient-to-br from-amber-200 via-amber-300 to-yellow-500',
     text: 'text-amber-900',
@@ -12,7 +12,7 @@ const BADGE_TIERS = [
     icon: 'fill-amber-900',
   },
   {
-    min: 20,
+    min: 15,
     label: 'ELITE',
     bg: 'bg-red-600',
     text: 'text-white',
@@ -100,7 +100,8 @@ export default function FilmStockGalleryCard({ stock }) {
       }}
     >
       <div 
-        className="group relative bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:border-film-cyan dark:hover:border-film-cyan hover:shadow-xl transition-all duration-300"
+        className="group relative bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700
+          overflow-hidden hover:border-film-cyan dark:hover:border-film-cyan hover:shadow-xl transition-all duration-300"
         style={{
           transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
           transformStyle: 'preserve-3d',
@@ -130,6 +131,15 @@ export default function FilmStockGalleryCard({ stock }) {
           <div className="absolute inset-0 z-0">
             {/* Subtle vignette */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20 dark:to-black/40" />
+
+            {/* Solid color background depending on rarity */}
+            <div 
+              className={`absolute inset-0 opacity-75 ${
+                getBadgeForCount(stock.count)
+                  ? getBadgeForCount(stock.count).bg.replace('bg-', 'bg-').replace('from-', 'from-').replace('via-', 'via-').replace('to-', 'to-')
+                  : 'bg-gray-300 dark:bg-gray-700'
+              }`}
+            />
             
             {/* Museum Reflection Effect */}
             <div 
