@@ -4,7 +4,7 @@ import { getFilmStockImage } from '../../../utils/filmStockImages';
 
 const BADGE_TIERS = [
   {
-    min: 700,
+    min: 1000,
     label: 'LEGEND',
     badge: 'bg-amber-100 text-amber-900 border-amber-300',
     icon: 'fill-amber-700',
@@ -60,6 +60,7 @@ export default function FilmStockGalleryCard({ stock }) {
 
   const tier = getBadgeForCount(stock.totalExposures);
   const isStarter = tier.label === 'STARTER';
+  const isLegend = tier.label === 'LEGEND';
 
   const handleMouseMove = (e) => {
     const card = e.currentTarget;
@@ -114,7 +115,7 @@ export default function FilmStockGalleryCard({ stock }) {
           <div
             className="absolute inset-0 rounded-xl pointer-events-none"
             style={{
-              background: `linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.8) 45%, rgba(255,255,255,0.0) 50%)`,
+              backgroundImage: `linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.8) 45%, rgba(255,255,255,0.0) 50%)`,
               backgroundSize: '150% 150%',
               backgroundPosition: isHovering ? `${mousePosition.x}% ${mousePosition.y}%` : '50% 50%',
               mixBlendMode: 'overlay',
@@ -234,7 +235,7 @@ export default function FilmStockGalleryCard({ stock }) {
           <div
             className="absolute inset-0 pointer-events-none z-30 rounded-xl"
             style={{
-              background: isStarter 
+              backgroundImage: isStarter 
                 ? `
                   linear-gradient(
                     115deg,
@@ -246,21 +247,35 @@ export default function FilmStockGalleryCard({ stock }) {
                     transparent 100%
                   )
                 `
-                : `
-                  linear-gradient(
-                    115deg,
-                    transparent 0%,
-                    rgb(0, 231, 255) 25%,
-                    transparent 47%,
-                    transparent 53%,
-                    rgb(255, 0, 231) 75%,
-                    transparent 100%
-                  )
-                `,
+                : isLegend
+                  ? `
+                    linear-gradient(
+                      115deg,
+                      transparent 0%,
+                      rgb(255, 0, 0) 15%,
+                      rgb(255, 165, 0) 30%,
+                      rgb(0, 255, 0) 45%,
+                      rgb(0, 255, 255) 60%,
+                      rgb(0, 0, 255) 75%,
+                      rgb(255, 0, 255) 90%,
+                      transparent 100%
+                    )
+                  `
+                  : `
+                    linear-gradient(
+                      115deg,
+                      transparent 0%,
+                      rgb(0, 231, 255) 25%,
+                      transparent 47%,
+                      transparent 53%,
+                      rgb(255, 0, 231) 75%,
+                      transparent 100%
+                    )
+                  `,
               backgroundSize: '250% 250%',
               backgroundPosition: isHovering ? `${mousePosition.x}% ${mousePosition.y}%` : '50% 50%',
               mixBlendMode: 'color-dodge',
-              opacity: isHovering ? 0.88 : 0,
+              opacity: isHovering ? (isLegend ? 0.75 : 0.95) : 0,
               filter: isHovering ? 'brightness(0.66) contrast(1.33)' : 'brightness(0.5) contrast(1)',
               transition: isHovering ? 'opacity 0.1s ease-out' : 'opacity 0.5s ease-out'
             }}
