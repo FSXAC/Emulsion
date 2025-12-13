@@ -6,53 +6,58 @@ const BADGE_TIERS = [
   {
     min: 20,
     label: 'LEGEND',
-    bg: 'bg-gradient-to-br from-amber-200 via-amber-300 to-yellow-500',
-    text: 'text-amber-900',
-    border: 'border-amber-200',
-    icon: 'fill-amber-900',
+    badge: 'bg-amber-100 text-amber-900 border-amber-300',
+    icon: 'fill-amber-700',
+    cardBg: 'bg-gradient-to-br from-amber-300 via-yellow-500 to-amber-600',
+    frame: 'bg-gradient-to-br from-amber-200 via-yellow-100 to-amber-400 border-amber-300',
+    glow: 'shadow-[0_0_25px_rgba(251,191,36,0.6)] hover:shadow-[0_0_35px_rgba(251,191,36,0.8)]',
   },
   {
     min: 15,
     label: 'ELITE',
-    bg: 'bg-red-600',
-    text: 'text-white',
-    border: 'border-red-500',
-    icon: 'fill-white',
+    badge: 'bg-red-100 text-red-900 border-red-300',
+    icon: 'fill-red-700',
+    cardBg: 'bg-gradient-to-br from-red-500 via-red-600 to-red-800',
+    frame: 'bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300 border-gray-300',
+    glow: 'hover:shadow-xl',
   },
   {
     min: 10,
     label: 'PROVEN',
-    bg: 'bg-purple-600',
-    text: 'text-white',
-    border: 'border-purple-500',
-    icon: 'fill-white',
+    badge: 'bg-purple-100 text-purple-900 border-purple-300',
+    icon: 'fill-purple-700',
+    cardBg: 'bg-gradient-to-br from-purple-500 via-purple-600 to-purple-800',
+    frame: 'bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300 border-gray-300',
+    glow: 'hover:shadow-xl',
   },
   {
     min: 3,
     label: 'BREAKOUT',
-    bg: 'bg-blue-600',
-    text: 'text-white',
-    border: 'border-blue-500',
-    icon: 'fill-white',
+    badge: 'bg-blue-100 text-blue-900 border-blue-300',
+    icon: 'fill-blue-700',
+    cardBg: 'bg-gradient-to-br from-blue-500 via-blue-600 to-blue-800',
+    frame: 'bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300 border-gray-300',
+    glow: 'hover:shadow-xl',
   },
   {
-    min: 1,
+    min: 0,
     label: 'STARTER',
-    bg: 'bg-sky-200',
-    text: 'text-sky-900',
-    border: 'border-sky-300',
-    icon: 'fill-sky-900',
+    badge: 'bg-slate-100 text-slate-900 border-slate-300',
+    icon: 'fill-slate-700',
+    cardBg: 'bg-gradient-to-br from-slate-400 via-slate-500 to-slate-700',
+    frame: 'bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300 border-gray-300',
+    glow: 'hover:shadow-xl',
   },
 ];
 
-const getBadgeForCount = (count) => BADGE_TIERS.find((tier) => count >= tier.min);
+const getBadgeForCount = (count) => BADGE_TIERS.find((tier) => count >= tier.min) || BADGE_TIERS[BADGE_TIERS.length - 1];
 
 export default function FilmStockGalleryCard({ stock }) {
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
-  const [translateX, setTranslateX] = useState(0);
-  const [translateY, setTranslateY] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
+  
+  const tier = getBadgeForCount(stock.count);
 
   const handleMouseMove = (e) => {
     const card = e.currentTarget;
@@ -63,162 +68,140 @@ export default function FilmStockGalleryCard({ stock }) {
     const mouseX = e.clientX - centerX;
     const mouseY = e.clientY - centerY;
     
-    // Calculate rotation for card (max 15 degrees)
-    const rotX = (mouseY / (rect.height / 2)) * -10;
-    const rotY = (mouseX / (rect.width / 2)) * 10;
-    
-    // Calculate subtle translation for thumbnail parallax (max 10px)
-    const transX = (mouseX / (rect.width / 2)) * 5;
-    const transY = (mouseY / (rect.height / 2)) * 5;
+    const rotX = (mouseY / (rect.height / 2)) * 15;
+    const rotY = (mouseX / (rect.width / 2)) * -15;
     
     setRotateX(rotX);
     setRotateY(rotY);
-    setTranslateX(transX);
-    setTranslateY(transY);
   };
 
   const handleMouseLeave = () => {
     setRotateX(0);
     setRotateY(0);
-    setTranslateX(0);
-    setTranslateY(0);
     setIsHovering(false);
-  };
-
-  const handleMouseEnter = () => {
-    setIsHovering(true);
   };
 
   return (
     <div 
-      className="relative perspective-1000"
+      className="relative perspective-1000 group cursor-pointer select-none"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      onMouseEnter={handleMouseEnter}
-      style={{
-        perspective: '1000px',
-      }}
+      onMouseEnter={() => setIsHovering(true)}
+      style={{ perspective: '1000px' }}
     >
       <div 
-        className="group relative bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700
-          overflow-hidden hover:border-film-cyan dark:hover:border-film-cyan hover:shadow-xl transition-all duration-300"
+        className={`
+          relative w-full aspect-[2.5/3.5] rounded-xl transition-all duration-300
+          ${tier.glow}
+        `}
         style={{
           transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
           transformStyle: 'preserve-3d',
-          transition: isHovering ? 'border-color 0.3s, box-shadow 0.3s' : 'transform 0.3s ease-out, border-color 0.3s, box-shadow 0.3s',
+          transition: isHovering ? 'none' : 'transform 0.5s ease-out',
         }}
       >
-        {/* Achievement Badge - Top Right Corner */}
-        {getBadgeForCount(stock.count) && (
-          <div className="absolute top-2 right-2 z-10">
-            {(() => {
-              const badge = getBadgeForCount(stock.count);
-              return (
-                <div
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold shadow-md flex items-center gap-1 border uppercase tracking-wide ${badge.bg} ${badge.text} ${badge.border}`}
-                >
-                  <Icon name="star" size={10} className={badge.icon} />
-                  {badge.label}
-                </div>
-              );
-            })()}
-          </div>
-        )}
-
-        {/* Film Stock Image Container */}
-        <div className="aspect-[3/4] overflow-hidden bg-gray-100 dark:bg-gray-900 relative">
-          {/* Museum Lighting Effects - Below thumbnail */}
-          <div className="absolute inset-0 z-0">
-            {/* Subtle vignette */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20 dark:to-black/40" />
-
-            {/* Solid color background depending on rarity */}
-            <div 
-              className={`absolute inset-0 opacity-75 ${
-                getBadgeForCount(stock.count)
-                  ? getBadgeForCount(stock.count).bg.replace('bg-', 'bg-').replace('from-', 'from-').replace('via-', 'via-').replace('to-', 'to-')
-                  : 'bg-gray-300 dark:bg-gray-700'
-              }`}
-            />
-            
-            {/* Museum Reflection Effect */}
-            <div 
-              className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-            />
-          </div>
-
-          {/* Film Stock Image - Above museum effects */}
-          <img
-            src={getFilmStockImage(stock.filmStock, stock.format)}
-            alt={stock.filmStock}
-            className="relative z-10 w-full h-full object-cover"
-            style={{ 
-              transform: `translate(${translateX}px, ${translateY}px)`,
-              transition: isHovering ? 'none' : 'transform 0.3s ease-out',
-            }}
-          />
-        </div>
-
-        {/* Info Panel */}
-        <div className="relative bg-white dark:bg-gray-800 p-3">
-          {/* Accent line */}
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-film-cyan to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {/* Frame / Border */}
+        <div className={`absolute inset-0 p-[6px] rounded-xl ${tier.frame} shadow-inner`}>
           
-          <div className="space-y-2">
-            {/* Film Stock Name */}
-            <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 leading-tight line-clamp-2">
-              {stock.filmStock}
-            </h4>
+          {/* Inner Content Container */}
+          <div className="h-full w-full bg-white dark:bg-gray-900 rounded-lg flex flex-col overflow-hidden shadow-sm relative">
+            
+            {/* Top Area - Colorful Matte Background */}
+            <div className={`relative flex-grow ${tier.cardBg} flex flex-col min-h-0 overflow-hidden`}>
+              
+              {/* Asymmetric Design Elements */}
+              {/* Diagonal Slash */}
+              <div className="absolute inset-0 bg-white/10 -skew-y-12 scale-150 origin-bottom-left translate-y-10" />
+              
+              {/* Texture Overlay */}
+              <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] mix-blend-overlay pointer-events-none" />
 
-            {/* Format */}
-            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-              {stock.format}
-            </div>
-
-            {/* Stats - Always visible but subtle */}
-            <div className="flex items-center justify-between pt-1">
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-film-cyan/10 text-film-cyan border border-film-cyan/20">
-                <Icon name="film" size={12} />
-                {stock.count}
+              {/* Tier Badge - Offset Asymmetrically */}
+              <div className="absolute top-3 left-0 right-0 flex justify-end pr-3 z-20">
+                <div className={`
+                  px-2 py-0.5 rounded text-[9px] font-black tracking-widest uppercase border-y border-l shadow-lg flex items-center gap-1 transform skew-x-[-10deg] origin-right
+                  ${tier.badge}
+                `}>
+                  <div className="skew-x-[10deg] flex items-center gap-1">
+                     <Icon name="star" size={8} className={tier.icon} />
+                     {tier.label}
+                  </div>
+                </div>
               </div>
 
-              {/* Total Exposures Badge */}
-              {stock.totalExposures > 0 && (
-                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600" title="Total exposures shot">
-                  <Icon name="camera" size={12} />
-                  {stock.totalExposures}
+              {/* Rating Stars - High Contrast Ribbon on Left */}
+              {stock.avgRating > 0 && (
+                <div className="absolute left-0 top-0 bottom-0 w-6 bg-black/40 backdrop-blur-[1px] flex flex-col items-center justify-center gap-3 z-10">
+                  {Array.from({ length: 5 }, (_, i) => {
+                    const filled = i < Math.round(stock.avgRating);
+                    if (!filled) return null;
+                    return (
+                      <div key={i} className="relative">
+                        <Icon
+                          name="star"
+                          size={12}
+                          className="text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]"
+                          fill="currentColor"
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               )}
+
+              {/* Film Image - Floating Overlay */}
+              <div className="flex-grow flex items-center justify-center p-1 relative z-10 min-h-0 w-full">
+                 <img
+                    src={getFilmStockImage(stock.filmStock, stock.format)}
+                    alt={stock.filmStock}
+                    className="w-full h-full object-contain filter drop-shadow-2xl transform transition-transform duration-500"
+                    style={{
+                      transform: isHovering ? 'translateZ(30px)' : 'translateZ(0px)',
+                    }}
+                  />
+              </div>
             </div>
 
-            {/* Rating */}
-            {stock.avgRating > 0 && (
-              <div className="flex items-center justify-end pt-1">
-                <div className="flex items-center gap-0.5" title={`Average rating: ${stock.avgRating.toFixed(1)} stars`}>
-                  {Array.from({ length: 5 }, (_, i) => (
-                    <Icon
-                      key={i}
-                      name="star"
-                      size={12}
-                      className={`${
-                        i < Math.round(stock.avgRating) 
-                          ? 'fill-yellow-400 text-yellow-400' 
-                          : 'text-gray-300 dark:text-gray-600'
-                      }`}
-                    />
-                  ))}
+            {/* Bottom Info Section */}
+            <div className="relative bg-white dark:bg-gray-800 p-3 pt-5 z-20 min-h-0">
+               {/* Angled cutout effect */}
+               <div className="absolute -top-4 left-0 right-0 h-4 bg-white dark:bg-gray-800" style={{ clipPath: 'polygon(0 100%, 100% 0, 100% 100%)' }}></div>
+
+              {/* Name */}
+              <div className="flex items-center justify-left text-left mb-2 pl-2">
+                <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm leading-tight line-clamp-2 w-full uppercase tracking-tight transform -skew-x-6">
+                  {stock.filmStock}
+                </h3>
+              </div>
+
+              {/* Stats Bar */}
+              <div className="grid grid-cols-3 gap-1 text-[10px] border-t border-gray-100 dark:border-gray-700 pt-2">
+                <div className="flex flex-col items-center justify-center border-r border-gray-100 dark:border-gray-700">
+                  <span className="text-gray-400 dark:text-gray-500 uppercase text-[8px] font-bold tracking-wider">Fmt</span>
+                  <span className="font-mono font-bold text-gray-700 dark:text-gray-200">{stock.format}</span>
+                </div>
+                <div className="flex flex-col items-center justify-center border-r border-gray-100 dark:border-gray-700">
+                   <span className="text-gray-400 dark:text-gray-500 uppercase text-[8px] font-bold tracking-wider">Rolls</span>
+                   <span className="font-mono font-bold text-gray-700 dark:text-gray-200">{stock.count}</span>
+                </div>
+                 <div className="flex flex-col items-center justify-center">
+                   <span className="text-gray-400 dark:text-gray-500 uppercase text-[8px] font-bold tracking-wider">Exp</span>
+                   <span className="font-mono font-bold text-film-cyan">{stock.totalExposures}</span>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
 
-        {/* Shine Effect on Hover - Keep this! */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none overflow-hidden">
-          <div 
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 skew-x-12"
-            style={{ transform: 'translateZ(40px)' }}
-          />
+            {/* Holographic Shine Effect */}
+            <div 
+              className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-30 transition-opacity duration-300 z-50 mix-blend-color-dodge"
+              style={{
+                background: `linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.9) 45%, rgba(255, 255, 255, 0.5) 50%, transparent 55%)`,
+                backgroundSize: '250% 250%',
+                backgroundPosition: isHovering ? '0% 0%' : '100% 100%',
+                transition: 'background-position 0.6s ease-out'
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>
