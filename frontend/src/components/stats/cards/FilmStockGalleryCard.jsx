@@ -2,6 +2,51 @@ import { useState } from 'react';
 import Icon from '../../Icon';
 import { getFilmStockImage } from '../../../utils/filmStockImages';
 
+const BADGE_TIERS = [
+  {
+    min: 100,
+    label: 'LEGEND',
+    bg: 'bg-gradient-to-br from-amber-200 via-amber-300 to-yellow-500',
+    text: 'text-amber-900',
+    border: 'border-amber-200',
+    icon: 'fill-amber-900',
+  },
+  {
+    min: 20,
+    label: 'ELITE',
+    bg: 'bg-red-600',
+    text: 'text-white',
+    border: 'border-red-500',
+    icon: 'fill-white',
+  },
+  {
+    min: 10,
+    label: 'PROVEN',
+    bg: 'bg-purple-600',
+    text: 'text-white',
+    border: 'border-purple-500',
+    icon: 'fill-white',
+  },
+  {
+    min: 3,
+    label: 'BREAKOUT',
+    bg: 'bg-blue-600',
+    text: 'text-white',
+    border: 'border-blue-500',
+    icon: 'fill-white',
+  },
+  {
+    min: 1,
+    label: 'STARTER',
+    bg: 'bg-sky-200',
+    text: 'text-sky-900',
+    border: 'border-sky-300',
+    icon: 'fill-sky-900',
+  },
+];
+
+const getBadgeForCount = (count) => BADGE_TIERS.find((tier) => count >= tier.min);
+
 export default function FilmStockGalleryCard({ stock }) {
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
@@ -63,12 +108,19 @@ export default function FilmStockGalleryCard({ stock }) {
         }}
       >
         {/* Achievement Badge - Top Right Corner */}
-        {stock.count >= 10 && (
+        {getBadgeForCount(stock.count) && (
           <div className="absolute top-2 right-2 z-10">
-            <div className="bg-film-cyan text-white px-2 py-0.5 rounded-full text-[10px] font-bold shadow-md flex items-center gap-1">
-              <Icon name="star" size={10} className="fill-white" />
-              {stock.count >= 20 ? 'MASTER' : 'VET'}
-            </div>
+            {(() => {
+              const badge = getBadgeForCount(stock.count);
+              return (
+                <div
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold shadow-md flex items-center gap-1 border uppercase tracking-wide ${badge.bg} ${badge.text} ${badge.border}`}
+                >
+                  <Icon name="star" size={10} className={badge.icon} />
+                  {badge.label}
+                </div>
+              );
+            })()}
           </div>
         )}
 
