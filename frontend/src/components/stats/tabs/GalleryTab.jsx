@@ -6,7 +6,7 @@ import { getUniqueFilmStocks } from '../../../utils/statsCalculator';
 export default function GalleryTab({ rolls }) {
   const [filterFormat, setFilterFormat] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [sortBy, setSortBy] = useState('count'); // 'count', 'name', 'rating'
+  const [sortBy, setSortBy] = useState('exposures'); // 'count', 'name', 'rating', 'exposures'
 
   const uniqueFilmStocks = getUniqueFilmStocks(rolls);
   
@@ -28,6 +28,8 @@ export default function GalleryTab({ rolls }) {
     filteredStocks.sort((a, b) => a.filmStock.localeCompare(b.filmStock));
   } else if (sortBy === 'rating') {
     filteredStocks.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0));
+  } else if (sortBy === 'exposures') {
+    filteredStocks.sort((a, b) => b.totalExposures - a.totalExposures);
   }
   // Default is already sorted by count
 
@@ -95,6 +97,7 @@ export default function GalleryTab({ rolls }) {
               onChange={(e) => setSortBy(e.target.value)}
               className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-film-cyan"
             >
+              <option value="exposures">Most Exposures</option>
               <option value="count">Most Used</option>
               <option value="name">Name</option>
               <option value="rating">Rating</option>

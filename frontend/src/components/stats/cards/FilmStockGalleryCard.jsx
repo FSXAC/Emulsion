@@ -4,7 +4,7 @@ import { getFilmStockImage } from '../../../utils/filmStockImages';
 
 const BADGE_TIERS = [
   {
-    min: 20,
+    min: 700,
     label: 'LEGEND',
     badge: 'bg-amber-100 text-amber-900 border-amber-300',
     icon: 'fill-amber-700',
@@ -13,7 +13,7 @@ const BADGE_TIERS = [
     glow: 'shadow-[0_0_25px_rgba(251,191,36,0.6)] hover:shadow-[0_0_35px_rgba(251,191,36,0.8)]',
   },
   {
-    min: 15,
+    min: 300,
     label: 'ELITE',
     badge: 'bg-red-100 text-red-900 border-red-300',
     icon: 'fill-red-700',
@@ -22,7 +22,7 @@ const BADGE_TIERS = [
     glow: 'hover:shadow-xl',
   },
   {
-    min: 10,
+    min: 100,
     label: 'PROVEN',
     badge: 'bg-purple-100 text-purple-900 border-purple-300',
     icon: 'fill-purple-700',
@@ -31,7 +31,7 @@ const BADGE_TIERS = [
     glow: 'hover:shadow-xl',
   },
   {
-    min: 3,
+    min: 10,
     label: 'BREAKOUT',
     badge: 'bg-blue-100 text-blue-900 border-blue-300',
     icon: 'fill-blue-700',
@@ -56,8 +56,8 @@ export default function FilmStockGalleryCard({ stock }) {
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
-  
-  const tier = getBadgeForCount(stock.count);
+
+  const tier = getBadgeForCount(stock.totalExposures);
 
   const handleMouseMove = (e) => {
     const card = e.currentTarget;
