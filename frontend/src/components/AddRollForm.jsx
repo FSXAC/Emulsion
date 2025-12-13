@@ -9,7 +9,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
   const [formData, setFormData] = useState({
     order_id: '',
     film_stock_name: '',
-    film_format: '35mm',
+    film_format: '35 mm',
     expected_exposures: 36,
     film_cost: '',
     push_pull_stops: 0,
@@ -38,7 +38,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
       setFormData({
         order_id: initialData.order_id || '',
         film_stock_name: initialData.film_stock_name || '',
-        film_format: initialData.film_format || '35mm',
+        film_format: initialData.film_format || '35 mm',
         expected_exposures: initialData.expected_exposures || 36,
         film_cost: initialData.film_cost || '',
         push_pull_stops: initialData.push_pull_stops || 0,
@@ -50,7 +50,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
       setFormData({
         order_id: '',
         film_stock_name: '',
-        film_format: '35mm',
+        film_format: '35 mm',
         expected_exposures: 36,
         film_cost: '',
         push_pull_stops: 0,
@@ -145,7 +145,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
     setFormData({
       order_id: '',
       film_stock_name: '',
-      film_format: '35mm',
+      film_format: '35 mm',
       expected_exposures: 36,
       film_cost: '',
       push_pull_stops: 0,
@@ -237,7 +237,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan"
               >
-                <option value="35mm">35mm</option>
+                <option value="35 mm">35 mm</option>
                 <option value="HF">HF (Half Frame)</option>
                 <option value="120">120 (Medium Format)</option>
                 <option value="110">110</option>

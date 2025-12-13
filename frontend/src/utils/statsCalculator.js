@@ -415,12 +415,26 @@ export function getUniqueFilmStocks(rolls) {
         roll: roll, // Representative roll for this stock
         count: 1,
         rolls: [roll],
+        totalStars: roll.stars || 0,
+        ratedCount: (roll.stars && roll.stars > 0) ? 1 : 0,
+
+        // Intetionally removed expected_exposures to use actual_exposures only
+        totalExposures: roll.actual_exposures || 0,
       });
     } else {
       const entry = stockMap.get(key);
       entry.count++;
       entry.rolls.push(roll);
       
+      // Update stats
+      if (roll.stars && roll.stars > 0) {
+        entry.totalStars += roll.stars;
+        entry.ratedCount++;
+      }
+
+      // Intetionally removed expected_exposures to use actual_exposures only
+      entry.totalExposures += (roll.actual_exposures || 0);
+
       // Update representative roll to highest rated or most recent
       if (roll.stars > (entry.roll.stars || 0)) {
         entry.roll = roll;
@@ -430,6 +444,11 @@ export function getUniqueFilmStocks(rolls) {
     }
   });
 
-  // Convert to array and sort by count descending
-  return Array.from(stockMap.values()).sort((a, b) => b.count - a.count);
+  // Convert to array, calculate averages, and sort by count descending
+  return Array.from(stockMap.values())
+    .map(stock => ({
+      ...stock,
+      avgRating: stock.ratedCount > 0 ? stock.totalStars / stock.ratedCount : 0
+    }))
+    .sort((a, b) => b.count - a.count);
 }

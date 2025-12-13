@@ -182,24 +182,34 @@ export default function FilmStockGalleryCard({ stock }) {
                 {stock.count}
               </div>
 
-              {/* Rating */}
-              {stock.roll.stars > 0 && (
-                <div className="flex items-center gap-0.5">
+              {/* Total Exposures Badge */}
+              {stock.totalExposures > 0 && (
+                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600" title="Total exposures shot">
+                  <Icon name="camera" size={12} />
+                  {stock.totalExposures}
+                </div>
+              )}
+            </div>
+
+            {/* Rating */}
+            {stock.avgRating > 0 && (
+              <div className="flex items-center justify-end pt-1">
+                <div className="flex items-center gap-0.5" title={`Average rating: ${stock.avgRating.toFixed(1)} stars`}>
                   {Array.from({ length: 5 }, (_, i) => (
                     <Icon
                       key={i}
                       name="star"
                       size={12}
                       className={`${
-                        i < stock.roll.stars 
+                        i < Math.round(stock.avgRating) 
                           ? 'fill-yellow-400 text-yellow-400' 
                           : 'text-gray-300 dark:text-gray-600'
                       }`}
                     />
                   ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 

@@ -27,7 +27,7 @@ export default function GalleryTab({ rolls }) {
   if (sortBy === 'name') {
     filteredStocks.sort((a, b) => a.filmStock.localeCompare(b.filmStock));
   } else if (sortBy === 'rating') {
-    filteredStocks.sort((a, b) => (b.roll.stars || 0) - (a.roll.stars || 0));
+    filteredStocks.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0));
   }
   // Default is already sorted by count
 
