@@ -20,6 +20,15 @@ from app.api.schemas.actions import (
     AssignChemistryRequest,
     RateRollRequest,
 )
+from app.api.schemas.development_chart import (
+    DevelopmentChartBase,
+    DevelopmentChartCreate,
+    DevelopmentChartUpdate,
+    DevelopmentChartResponse,
+    DevelopmentChartList,
+    DevelopmentChartLookupQuery,
+    DevelopmentChartLookupResponse,
+)
 
 __all__ = [
     "FilmRollBase",
@@ -36,4 +45,11 @@ __all__ = [
     "UnloadRollRequest",
     "AssignChemistryRequest",
     "RateRollRequest",
+    "DevelopmentChartBase",
+    "DevelopmentChartCreate",
+    "DevelopmentChartUpdate",
+    "DevelopmentChartResponse",
+    "DevelopmentChartList",
+    "DevelopmentChartLookupQuery",
+    "DevelopmentChartLookupResponse",
 ]
