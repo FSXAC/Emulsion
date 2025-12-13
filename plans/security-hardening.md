@@ -17,15 +17,15 @@
 ### **HIGH PRIORITY**
 
 #### Phase 15.1: Perimeter (TLS + proxy) ⭐
-- [ ] 15.1.1 Terminate TLS/HSTS at a reverse proxy (Caddy/Nginx/Traefik); expose only 80/443 and firewall-drop 8200 to stop invalid HTTP request warnings.
-- [ ] 15.1.2 Run uvicorn behind the proxy with `--proxy-headers` and `--forwarded-allow-ips` set to proxy IPs; add health endpoint path to proxy checks.
-- [ ] 15.1.3 Enforce request shaping: proxy `client_max_body_size` (or Caddy equivalent) plus uvicorn `--limit-concurrency` and `--timeout-keep-alive` to blunt slowloris/bruteforce attempts.
+- [X] 15.1.1 Terminate TLS/HSTS at a reverse proxy (Caddy/Nginx/Traefik); expose only 80/443 and firewall-drop 8200 to stop invalid HTTP request warnings.
+- [X] 15.1.2 Run uvicorn behind the proxy with `--proxy-headers` and `--forwarded-allow-ips` set to proxy IPs; add health endpoint path to proxy checks.
+- [X] 15.1.3 Enforce request shaping: proxy `client_max_body_size` (or Caddy equivalent) plus uvicorn `--limit-concurrency` and `--timeout-keep-alive` to blunt slowloris/bruteforce attempts.
 
 #### Phase 15.2: App configuration lockdown ⭐
 - [ ] 15.2.1 Lock `cors_origins` to real domains via env; disable `allow_credentials` unless required.
 - [ ] 15.2.2 Default `debug=False` in production, turn off SQL echo, and standardize INFO logging with request IDs.
 - [ ] 15.2.3 Add `TrustedHostMiddleware` + security headers (HSTS, X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy) and a baseline CSP (self + asset host).
-- [ ] 15.2.4 Restrict `/docs` and `/openapi.json` to debug mode or behind auth/IP allowlist; serve static assets via the proxy with gzip/brotli.
+- [ ] 15.2.4 Restrict `/docs` and `/openapi.json` to debug mode or behind auth/IP allowlist (only local IPs with 192.168.1.*); serve static assets via the proxy with gzip/brotli.
 
 #### Phase 15.3: Authentication and authorization ⭐
 - [ ] 15.3.1 Add single-user guard (API key header or HTTP Basic with hashed secret from env) wrapping all API routers; protect `/health` if exposed externally.

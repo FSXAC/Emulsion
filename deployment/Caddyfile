@@ -1,0 +1,39 @@
+{
+    # Global options
+    admin off
+}
+
+# Match all hosts (or specific domain if known)
+:80, :443 {
+    # Enable automatic HTTPS (Caddy does this by default for domain names)
+    # For IP addresses/localhost, it might use self-signed or internal CA.
+
+    # 15.1.3 Enforce request shaping: client_max_body_size equivalent
+    request_body {
+        max_size 10MB
+    }
+
+    # Reverse proxy to the backend
+    reverse_proxy 127.0.0.1:8200 {
+        # 15.1.2 Add health endpoint path to proxy checks
+        health_uri /health
+        health_interval 10s
+        health_timeout 5s
+        
+        # Pass through host header
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    # Logging
+    log {
+        output file ../backend/logs/caddy_access.log {
+            roll_size 10mb
+            roll_keep 5
+        }
+    }
+    
+    # Gzip/Zstd compression (good practice)
+    encode gzip zstd
+}
