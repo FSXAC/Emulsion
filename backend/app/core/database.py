@@ -67,7 +67,7 @@ def init_db() -> None:
     Note: This only creates tables that don't exist yet. It won't modify existing tables.
     """
     # Import models to ensure they're registered with Base
-    from app.models import FilmRoll, ChemistryBatch
+    from app.models import FilmRoll, ChemistryBatch, DevelopmentChart
     
     # Ensure database directory exists
     settings.get_database_path()
