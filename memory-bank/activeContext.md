@@ -1,13 +1,12 @@
 # Active Context
 
 ## Current Focus
-Implementation of the **Statistics Page** (Phase 14).
-Core Status: **Partially Complete**
-- ✅ Overview Tab (Metrics, Charts)
-- ✅ Costs Tab (Analysis)
-- 🚧 Gallery Tab (In Progress)
+Core Status: **Palette Selection Phase**
+- ✅ Updated design-system.md with neubrutalism vision
+- ✅ Created visual palette mockups in DesignSystemPage.jsx
+- 🚧 Waiting for palette selection decision
 
-The **Gallery Tab** is the current active task. It involves displaying a grid of film stock thumbnails, filtering by format/status/rating, and viewing roll details.
+The **Design System** is now the primary focus. We're implementing a new style globally instead of modifying individual pages directly.
 
 ## Recent Changes
 - Created `StatsPage.jsx`, `StatCard.jsx`.
