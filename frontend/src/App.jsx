@@ -5,6 +5,7 @@ import RollsPage from './pages/RollsPage';
 import ChemistryPage from './pages/ChemistryPage';
 import StatsPage from './pages/StatsPage';
 import CanisterDemo from './pages/CanisterDemo';
+import DesignSystem from './pages/DesignSystem';
 import soundManager from './utils/soundManager';
 import './index.css';
 
@@ -33,6 +34,7 @@ function App() {
           <Route path="/chemistry" element={<ChemistryPage />} />
           <Route path="/stats" element={<StatsPage />} />
           <Route path="/canister-demo" element={<CanisterDemo />} />
+          <Route path="/design-system" element={<DesignSystem />} />
         </Routes>
       </Layout>
     </BrowserRouter>

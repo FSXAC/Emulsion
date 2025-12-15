@@ -4,17 +4,15 @@ import Icon from './Icon';
  * StatCard - Display a single statistic with icon and styling
  * Used for big number cards on statistics page
  */
-export default function StatCard({ title, value, icon, color = 'cyan', subtitle }) {
-  // Color mapping for different themes
+export default function StatCard({ title, value, icon, color = 'medium', subtitle }) {
+  // Color mapping using film-orange variations for different emphasis levels
   const colorClasses = {
-    cyan: 'bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-400',
-    green: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400',
-    purple: 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-400',
-    blue: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400',
-    amber: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400',
+    light: 'bg-film-orange-50 border-film-orange-100 text-film-orange-700',
+    medium: 'bg-film-orange-100 border-film-orange-200 text-film-orange-800',
+    strong: 'bg-film-orange-200 border-film-orange-300 text-film-orange-900',
   };
 
-  const colorClass = colorClasses[color] || colorClasses.cyan;
+  const colorClass = colorClasses[color] || colorClasses.medium;
 
   return (
     <div className={`rounded-xl border p-4 sm:p-6 ${colorClass} transition-all duration-200 hover:shadow-md`}>
