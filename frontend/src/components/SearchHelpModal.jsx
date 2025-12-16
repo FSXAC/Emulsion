@@ -98,12 +98,12 @@ export default function SearchHelpModal({ isOpen, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 overflow-y-auto p-4"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-start sm:items-center justify-center z-50 overflow-y-auto p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full my-8 max-h-[90vh] overflow-y-auto">
+      <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-4xl w-full my-8 max-h-[90vh] overflow-y-auto border border-gray-200/50 dark:border-gray-700/50">
         {/* Header */}
-        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-start justify-between">
+        <div className="sticky top-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border-b border-gray-200/60 dark:border-gray-700/60 px-6 py-4 flex items-start justify-between rounded-t-2xl">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <Icon name="search" size={24} /> Search Syntax Guide
@@ -134,7 +134,7 @@ export default function SearchHelpModal({ isOpen, onClose }) {
                   key={op.op}
                   className="flex items-baseline gap-2 text-sm"
                 >
-                  <code className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-film-cyan rounded font-mono">
+                  <code className="px-2 py-0.5 bg-gray-100/80 dark:bg-gray-700/80 backdrop-blur-sm text-film-cyan rounded-2xl font-mono shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
                     {op.op}
                   </code>
                   <span className="text-gray-600 dark:text-gray-400">{op.desc}</span>
@@ -153,9 +153,9 @@ export default function SearchHelpModal({ isOpen, onClose }) {
                 {category.items.map((item, idx) => (
                   <div
                     key={idx}
-                    className="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-gray-50/60 dark:bg-gray-700/30 backdrop-blur-sm rounded-3xl hover:bg-gray-100/60 dark:hover:bg-gray-700/50 transition-all duration-200 border-0 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
                   >
-                    <code className="px-3 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-film-cyan rounded font-mono text-sm flex-shrink-0">
+                    <code className="px-3 py-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 text-film-cyan rounded-2xl font-mono text-sm flex-shrink-0 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
                       {item.query}
                     </code>
                     <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -168,26 +168,26 @@ export default function SearchHelpModal({ isOpen, onClose }) {
           ))}
 
           {/* Tips */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+          <div className="bg-blue-50/60 dark:bg-blue-900/10 backdrop-blur-sm border-0 rounded-3xl p-4 shadow-[0_2px_6px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)]">
             <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2 flex items-center gap-2">
               <Icon name="info" size={16} /> Tips & Shortcuts
             </h3>
             <ul className="text-sm text-blue-800 dark:text-blue-400 space-y-1 list-disc list-inside">
               <li>Combine multiple filters with spaces (AND logic)</li>
-              <li>Use quotes for values with spaces: <code className="px-1 bg-blue-100 dark:bg-blue-900/50 rounded">stock:"Kodak Portra 400"</code></li>
+              <li>Use quotes for values with spaces: <code className="px-1 bg-blue-100/80 dark:bg-blue-900/50 backdrop-blur-sm rounded text-xs">stock:"Kodak Portra 400"</code></li>
               <li>Search is case-insensitive</li>
-              <li><kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded text-xs font-mono">⌘K</kbd> or <kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded text-xs font-mono">Ctrl+K</kbd> to focus search</li>
-              <li><kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded text-xs font-mono">Enter</kbd> or click the arrow button to search</li>
-              <li><kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded text-xs font-mono">Esc</kbd> to clear search</li>
+              <li><kbd className="px-1.5 py-0.5 bg-blue-100/80 dark:bg-blue-900/50 backdrop-blur-sm border-0 rounded text-xs font-mono shadow-[0_1px_2px_rgba(0,0,0,0.08)]">⌘K</kbd> or <kbd className="px-1.5 py-0.5 bg-blue-100/80 dark:bg-blue-900/50 backdrop-blur-sm border-0 rounded text-xs font-mono shadow-[0_1px_2px_rgba(0,0,0,0.08)]">Ctrl+K</kbd> to focus search</li>
+              <li><kbd className="px-1.5 py-0.5 bg-blue-100/80 dark:bg-blue-900/50 backdrop-blur-sm border-0 rounded text-xs font-mono shadow-[0_1px_2px_rgba(0,0,0,0.08)]">Enter</kbd> or click the arrow button to search</li>
+              <li><kbd className="px-1.5 py-0.5 bg-blue-100/80 dark:bg-blue-900/50 backdrop-blur-sm border-0 rounded text-xs font-mono shadow-[0_1px_2px_rgba(0,0,0,0.08)]">Esc</kbd> to clear search</li>
             </ul>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 px-6 py-4">
+        <div className="sticky bottom-0 bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border-t border-gray-200/60 dark:border-gray-700/60 px-6 py-4 rounded-b-2xl">
           <button
             onClick={onClose}
-            className="w-full sm:w-auto px-6 py-2 bg-film-cyan text-white rounded-lg hover:bg-film-cyan/90 transition-colors font-medium"
+            className="w-full sm:w-auto px-6 py-2.5 sm:py-2 bg-film-cyan hover:bg-film-cyan/90 backdrop-blur-sm text-white rounded-3xl font-medium transition-all duration-200 shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)]"
           >
             Got it!
           </button>

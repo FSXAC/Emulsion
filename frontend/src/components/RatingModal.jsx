@@ -72,10 +72,10 @@ const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-4 sm:p-6 animate-fadeIn">
+      <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full p-4 sm:p-6 animate-fadeIn border border-gray-200/50 dark:border-gray-700/50">
         {/* Header */}
         <div className="mb-6">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Rate This Roll</h2>
@@ -93,7 +93,7 @@ const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
         <form onSubmit={handleSubmit}>
           {/* Star Rating */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Rating
             </label>
             <div className="flex justify-center gap-2 py-4">
@@ -105,9 +105,9 @@ const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
           </div>
 
           {/* Rating Guide */}
-          <div className="mb-6 bg-gray-50 rounded-lg p-4">
-            <p className="text-xs font-medium text-gray-700 mb-2">Rating Guide:</p>
-            <div className="text-xs text-gray-600 space-y-1">
+          <div className="mb-6 bg-gray-50/60 dark:bg-gray-700/30 backdrop-blur-sm rounded-3xl p-4 border-0 shadow-[0_2px_6px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)]">
+            <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Rating Guide:</p>
+            <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
               <div><span className="font-semibold">1 star:</span> Major issues, mostly unusable</div>
               <div><span className="font-semibold">2 stars:</span> Below average, some good shots</div>
               <div><span className="font-semibold">3 stars:</span> Good, solid results</div>
@@ -118,7 +118,7 @@ const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
 
           {/* Actual Exposures */}
           <div className="mb-6">
-            <label htmlFor="actual-exposures" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="actual-exposures" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Actual Exposures (Optional)
             </label>
             <p className="text-xs text-gray-500 mb-2">
@@ -132,7 +132,7 @@ const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
               value={actualExposures}
               onChange={(e) => setActualExposures(e.target.value)}
               placeholder={roll?.expected_exposures ? `Expected: ${roll.expected_exposures}` : 'e.g., 36'}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan"
+              className="w-full px-4 py-3 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)]"
             />
             {roll?.expected_exposures && actualExposures && (
               <p className="text-xs text-gray-500 mt-2">
@@ -156,13 +156,13 @@ const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 sm:py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-colors text-sm sm:text-base"
+              className="flex-1 px-4 py-2.5 sm:py-2 bg-gray-200/80 hover:bg-gray-300/90 dark:bg-gray-700/60 dark:hover:bg-gray-600/70 backdrop-blur-sm text-gray-800 dark:text-gray-200 rounded-3xl font-medium transition-all duration-200 text-sm sm:text-base shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)]"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2.5 sm:py-3 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors text-sm sm:text-base"
+              className="flex-1 px-4 py-2.5 sm:py-2 backdrop-blur-sm text-white rounded-3xl font-medium transition-all duration-200 text-sm sm:text-base bg-film-cyan hover:bg-film-cyan/90 shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)]"
             >
               Save Rating
             </button>
