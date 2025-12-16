@@ -172,7 +172,7 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${
+                className={`w-full pt-3 pb-4 px-5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${
                   errors.name ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                 }`}
                 placeholder="e.g., C41 Batch #42"
@@ -190,7 +190,7 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                 name="chemistry_type"
                 value={formData.chemistry_type}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 text-sm appearance-none bg-[length:1.5em] bg-[right_0.5rem_center] bg-no-repeat shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)]" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%236b7280\' d=\'M6 9L1 4h10z\'/%3E%3C/svg%3E")'}}
+                className="w-full pt-3 pb-4 px-5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 text-sm appearance-none bg-[length:1.5em] bg-[right_0.5rem_center] bg-no-repeat shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)]" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%236b7280\' d=\'M6 9L1 4h10z\'/%3E%3C/svg%3E")'}}
               >
                 <option value="C41">C-41 (Color Negative)</option>
                 <option value="E6">E-6 (Color Positive/Slide)</option>
@@ -325,7 +325,7 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               value={formData.notes}
               onChange={handleChange}
               rows="3"
-              className="w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)]"
+              className="w-full pt-3 pb-4 px-5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)]"
               placeholder="Any notes about this batch (brand, dilution, shelf life, etc.)"
             />
           </div>

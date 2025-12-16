@@ -295,7 +295,7 @@ export default function ChemistryPage() {
                     </div>
 
                     {/* Stats Block */}
-                    <div className="bg-gray-50 rounded-xl px-3 py-2 space-y-2">
+                    <div className="bg-gray-50 dark:bg-gray-700 rounded-xl px-3 py-2 space-y-2">
                       {/* Rolls + Cost per Roll */}
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-600 dark:text-gray-400">
@@ -310,7 +310,7 @@ export default function ChemistryPage() {
                       {batch.chemistry_type === 'C41' && batch.development_time_formatted && (
                         <div className="flex items-center justify-between text-xs text-gray-500">
                           <span className="flex items-center gap-1"><Icon name="clock" size={12} /> Dev Time</span>
-                          <span className="font-bold text-purple-700">
+                          <span className="font-bold text-purple-700 dark:text-purple-400">
                             {batch.development_time_formatted}
                           </span>
                         </div>
