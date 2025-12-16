@@ -71,7 +71,7 @@ export default function CanisterDemo() {
                   onClick={() => setIs120(false)}
                   className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                     !is120
-                      ? 'bg-film-cyan text-white'
+                      ? 'bg-film-orange-600 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
                 >
@@ -81,7 +81,7 @@ export default function CanisterDemo() {
                   onClick={() => setIs120(true)}
                   className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                     is120
-                      ? 'bg-film-cyan text-white'
+                      ? 'bg-film-orange-600 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
                 >
@@ -97,8 +97,8 @@ export default function CanisterDemo() {
                   file:mr-4 file:py-2 file:px-4
                   file:rounded file:border-0
                   file:text-sm file:font-semibold
-                  file:bg-film-cyan file:text-white
-                  hover:file:bg-film-cyan/90
+                  file:bg-film-orange-600 file:text-white
+                  hover:file:bg-film-orange-700
                   cursor-pointer"
               />
               <p className="text-xs text-gray-500 mt-2">

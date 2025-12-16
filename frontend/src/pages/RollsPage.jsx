@@ -783,7 +783,7 @@ export default function RollsPage() {
           {/* Loading indicator overlay */}
           {loading && searchQuery && (
             <div className="absolute right-14 top-1/2 -translate-y-1/2 pointer-events-none">
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-film-cyan border-t-transparent"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-film-orange-600 border-t-transparent"></div>
             </div>
           )}
         </div>
@@ -802,9 +802,9 @@ export default function RollsPage() {
 
       {/* Search Results Banner */}
       {searchQuery && !loading && (
-        <div className="mb-4 p-3 bg-film-cyan/10 dark:bg-film-cyan/20 border border-film-cyan/30 dark:border-film-cyan/40 rounded-lg">
+        <div className="mb-4 p-3 bg-film-orange-600/10 dark:bg-film-orange-600/20 border border-film-orange-600/30 dark:border-film-orange-600/40 rounded-lg">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-medium text-film-cyan dark:text-film-cyan/90 flex items-center gap-1">
+            <span className="text-sm font-medium text-film-orange-600 dark:text-film-orange-500 flex items-center gap-1">
               <Icon name="search" size={16} /> Search results:
             </span>
             <span className="text-sm text-gray-700 dark:text-gray-300 font-semibold">

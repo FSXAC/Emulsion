@@ -26,13 +26,13 @@ export default function ActiveFilters({
           className="
             inline-flex items-center gap-1.5 
             px-2.5 py-1 
-            bg-film-cyan/10 dark:bg-film-cyan/20
-            border border-film-cyan/30 dark:border-film-cyan/40
-            text-film-cyan dark:text-film-cyan/90
+            bg-film-orange-600/10 dark:bg-film-orange-600/20
+            border border-film-orange-600/30 dark:border-film-orange-600/40
+            text-film-orange-600 dark:text-film-orange-500
             rounded-full 
             text-xs font-medium
             group
-            hover:bg-film-cyan/20 dark:hover:bg-film-cyan/30
+            hover:bg-film-orange-600/20 dark:hover:bg-film-orange-600/30
             transition-colors
           "
         >
@@ -55,7 +55,7 @@ export default function ActiveFilters({
               onClick={() => onRemoveFilter(index)}
               className="
                 p-0.5 rounded-full
-                hover:bg-film-cyan/30 dark:hover:bg-film-cyan/40
+                hover:bg-film-orange-600/30 dark:hover:bg-film-orange-600/40
                 transition-colors
               "
               aria-label={`Remove filter: ${filter.field ? `${filter.field}:${filter.value}` : filter.value}`}

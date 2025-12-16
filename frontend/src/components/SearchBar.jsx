@@ -98,7 +98,7 @@ export default function SearchBar({
             bg-white dark:bg-gray-800
             text-gray-900 dark:text-gray-100
             placeholder-gray-400 dark:placeholder-gray-500
-            focus:outline-none focus:ring-2 focus:ring-film-cyan focus:border-film-cyan
+            focus:outline-none focus:ring-2 focus:ring-film-orange-600 focus:border-film-orange-600
             transition-colors
           "
           aria-label="Search film rolls"
@@ -112,9 +112,9 @@ export default function SearchBar({
               onClick={handleSearch}
               className="
                 p-1 rounded-full
-                text-film-cyan dark:text-film-cyan
-                hover:text-film-cyan/80 dark:hover:text-film-cyan/80
-                hover:bg-film-cyan/10 dark:hover:bg-film-cyan/20
+                text-film-orange-600 dark:text-film-orange-500
+                hover:text-film-orange-600/80 dark:hover:text-film-orange-600/80
+                hover:bg-film-orange-600/10 dark:hover:bg-film-orange-600/20
                 transition-colors
               "
               aria-label="Search"

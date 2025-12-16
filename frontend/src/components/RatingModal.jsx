@@ -58,7 +58,7 @@ const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
         onClick={() => setStars(starNumber)}
         onMouseEnter={() => setHoveredStar(starNumber)}
         onMouseLeave={() => setHoveredStar(null)}
-        className="text-5xl transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-film-cyan rounded"
+        className="text-5xl transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-film-orange-600 rounded"
         aria-label={`${starNumber} star${starNumber !== 1 ? 's' : ''}`}
       >
         <Icon 
@@ -162,7 +162,7 @@ const RatingModal = ({ isOpen, onClose, onConfirm, roll }) => {
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2.5 sm:py-2 backdrop-blur-sm text-white rounded-3xl font-medium transition-all duration-200 text-sm sm:text-base bg-film-cyan hover:bg-film-cyan/90 shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)]"
+              className="flex-1 px-4 py-2.5 sm:py-2 backdrop-blur-sm text-white rounded-3xl font-medium transition-all duration-200 text-sm sm:text-base bg-film-orange-600 hover:bg-film-orange-700 shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)]"
             >
               Save Rating
             </button>

@@ -85,7 +85,7 @@ const FilmRollCard = ({ roll, onClick, isMobile = false }) => {
       className={`
         bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-md
         p-2 mb-2 ${isMobile ? 'cursor-pointer' : 'cursor-grab active:cursor-grabbing'}
-        border border-[#D9D9D9] dark:border-gray-700 hover:border-film-cyan dark:hover:border-film-cyan
+        border border-[#D9D9D9] dark:border-gray-700 hover:border-film-orange-600 dark:hover:border-film-orange-600
         transition-all duration-200 ease-in-out
         ${isDragging ? 'opacity-50 shadow-2xl' : ''}
       `}

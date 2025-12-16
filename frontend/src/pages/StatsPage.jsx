@@ -100,7 +100,7 @@ export default function StatsPage() {
               className={`
                 flex items-center gap-2 px-4 py-2 border-b-2 font-medium text-sm whitespace-nowrap transition-colors
                 ${activeTab === tab.id
-                  ? 'border-film-cyan text-film-cyan dark:text-film-cyan'
+                  ? 'border-film-orange-600 text-film-orange-600 dark:text-film-orange-500'
                   : tab.disabled
                     ? 'border-transparent text-gray-400 dark:text-gray-600 cursor-not-allowed'
                     : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'

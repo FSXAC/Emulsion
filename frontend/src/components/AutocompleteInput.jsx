@@ -113,7 +113,7 @@ const AutocompleteInput = ({
               onClick={() => handleSelectSuggestion(suggestion)}
               className={`px-3 py-2 cursor-pointer transition-colors ${
                 index === highlightedIndex 
-                  ? 'bg-film-cyan text-white' 
+                  ? 'bg-film-orange-600 text-white' 
                   : 'hover:bg-gray-100'
               }`}
             >

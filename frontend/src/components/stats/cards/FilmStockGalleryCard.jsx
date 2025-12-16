@@ -224,7 +224,7 @@ export default function FilmStockGalleryCard({ stock }) {
                 </div>
                  <div className="flex flex-col items-center justify-center">
                    <span className="text-gray-400 dark:text-gray-500 uppercase text-[8px] font-bold tracking-wider">Exp</span>
-                   <span className="font-mono font-bold text-film-cyan">{stock.totalExposures}</span>
+                   <span className="font-mono font-bold text-film-orange-600 dark:text-film-orange-500">{stock.totalExposures}</span>
                 </div>
               </div>
             </div>

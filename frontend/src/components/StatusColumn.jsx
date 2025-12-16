@@ -24,26 +24,26 @@ const StatusColumn = ({ status, rolls, totalCount, hasMore, onLoadMore, displayN
           mb-2 px-4 py-3 rounded-2xl shadow-md border-2 transition-all duration-200 cursor-pointer
           min-h-[68px] flex flex-col justify-center touch-friendly
           ${isOver 
-            ? 'bg-film-cyan border-film-cyan shadow-2xl ring-4 ring-film-cyan/30' 
+            ? 'bg-film-orange-600 border-film-orange-600 shadow-2xl ring-4 ring-film-orange-600/30'
             : 'bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-lg'
-          }
-        `}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Icon name={icon} size={32} className={isOver ? 'text-white' : 'text-gray-700 dark:text-gray-300'} />
-            <div>
-              <h3 className={`font-bold text-lg ${isOver ? 'text-white' : 'text-gray-900 dark:text-gray-100'}`}>
+          }`}>
+          {/* Header */}
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <div className="flex items-center gap-2">
+              <span className={`p-1.5 rounded-lg ${
+                isOver ? 'bg-white/20 text-white' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 shadow-sm'
+              }`}>
+                <Icon name={icon} size={18} />
+              </span>
+              <h3 className={`font-bold uppercase tracking-wider text-sm ${
+                isOver ? 'text-white' : 'text-gray-700 dark:text-gray-200'
+              }`}>
                 {displayName}
               </h3>
-              <p className={`text-xs ${isOver ? 'text-white/90' : 'text-gray-500 dark:text-gray-400'}`}>
-                {isOver ? '✓ Drop here to move roll' : 'Drop zone'}
-              </p>
             </div>
-          </div>
-          <span className={`text-sm font-semibold px-3 py-1 rounded-full min-w-[2rem] text-center ${
-            isOver ? 'bg-white text-film-cyan' : 'text-white bg-gray-700 dark:bg-gray-600'
-          }`}>
+            <span className={`text-sm font-semibold px-3 py-1 rounded-full min-w-[2rem] text-center ${
+              isOver ? 'bg-white text-film-orange-600' : 'text-white bg-gray-700 dark:bg-gray-600'
+            }`}>
             {totalCount}
           </span>
         </div>
@@ -72,7 +72,7 @@ const StatusColumn = ({ status, rolls, totalCount, hasMore, onLoadMore, displayN
               {hasMore && (
                 <button
                   onClick={onLoadMore}
-                  className="mt-3 w-full py-2 px-4 bg-film-cyan hover:bg-film-cyan/90 dark:bg-film-cyan/80 dark:hover:bg-film-cyan/70 text-white font-medium rounded-lg transition-colors duration-200 text-sm"
+                  className="mt-3 w-full py-2 px-4 bg-film-orange-600 hover:bg-film-orange-700 dark:bg-film-orange-600/90 dark:hover:bg-film-orange-600/80 text-white font-medium rounded-lg transition-colors duration-200 text-sm"
                 >
                   Load More ({totalCount - rolls.length} more)
                 </button>

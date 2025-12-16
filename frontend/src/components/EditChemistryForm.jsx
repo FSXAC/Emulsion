@@ -409,7 +409,7 @@ const EditChemistryForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, b
               )}
               <button
                 type="submit"
-                className="flex-1 px-4 py-2.5 sm:py-2 bg-film-cyan hover:bg-film-cyan/90 backdrop-blur-sm text-white rounded-3xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)]"
+                className="flex-1 px-4 py-2.5 sm:py-2 bg-film-orange-600 hover:bg-film-orange-700 backdrop-blur-sm text-white rounded-3xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)]"
                 disabled={isSubmitting || isDeleting}
               >
                 {isSubmitting ? 'Saving...' : 'Save Changes'}

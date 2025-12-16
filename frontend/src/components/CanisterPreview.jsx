@@ -80,7 +80,7 @@ export default function CanisterPreview({ textureUrl, onGenerate, config = {} })
         <button
           onClick={handleScreenshot}
           disabled={!renderer}
-          className="px-4 py-2 bg-film-cyan text-white rounded hover:bg-film-cyan/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-film-orange-600 text-white rounded hover:bg-film-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
         >
           <Icon name="image" size={18} /> Generate Thumbnail
         </button>

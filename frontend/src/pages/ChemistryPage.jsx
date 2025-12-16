@@ -265,7 +265,7 @@ export default function ChemistryPage() {
                   <div
                     key={batch.id}
                     onClick={() => handleEditBatch(batch)}
-                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-md p-4 transition-all duration-200 border border-[#D9D9D9] dark:border-gray-700 hover:border-film-cyan dark:hover:border-film-cyan cursor-pointer"
+                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-md p-4 transition-all duration-200 border border-[#D9D9D9] dark:border-gray-700 hover:border-film-orange-600 dark:hover:border-film-orange-600 cursor-pointer"
                   >
                     {/* Top Section: Name, Type & Cost */}
                     <div className="flex items-start justify-between mb-3">
@@ -329,7 +329,7 @@ export default function ChemistryPage() {
                       <Link
                         to={`/rolls?chemistry=${batch.id}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="text-xs text-film-cyan dark:text-film-cyan/90 hover:text-film-cyan/80 dark:hover:text-film-cyan/70 hover:underline transition-colors"
+                        className="text-xs text-film-orange-600 dark:text-film-orange-500 hover:text-film-orange-700 dark:hover:text-film-orange-400 hover:underline transition-colors"
                       >
                         View rolls →
                       </Link>
@@ -437,7 +437,7 @@ export default function ChemistryPage() {
                       <Link
                         to={`/rolls?chemistry=${batch.id}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="text-xs text-film-cyan hover:text-film-cyan/80 hover:underline transition-colors"
+                        className="text-xs text-film-orange-600 hover:text-film-orange-700 hover:underline transition-colors"
                       >
                         View rolls →
                       </Link>
