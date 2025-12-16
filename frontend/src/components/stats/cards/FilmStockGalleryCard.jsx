@@ -4,7 +4,7 @@ import { getFilmStockImage } from '../../../utils/filmStockImages';
 
 const BADGE_TIERS = [
   {
-    min: 1000,
+    min: 700,
     label: 'LEGEND',
     badge: 'bg-amber-100 text-amber-900 border-amber-300',
     icon: 'fill-amber-700',
@@ -72,8 +72,9 @@ export default function FilmStockGalleryCard({ stock }) {
     const mouseY = e.clientY - centerY;
     
     // Calculate 3D rotation
-    const rotX = (mouseY / (rect.height / 2)) * 15;
-    const rotY = (mouseX / (rect.width / 2)) * -15;
+    const rotations = 15; // Max rotation in degrees
+    const rotX = (mouseY / (rect.height / 2)) * rotations;
+    const rotY = (mouseX / (rect.width / 2)) * -rotations;
     
     // Calculate percentage position for holographic effects (0-100)
     const px = Math.abs(Math.floor(100 / rect.width * (e.clientX - rect.left)));
@@ -92,7 +93,7 @@ export default function FilmStockGalleryCard({ stock }) {
 
   return (
     <div 
-      className="relative perspective-1000 group cursor-pointer select-none"
+      className={`relative perspective-1000 group cursor-pointer select-none transition-all duration-300 ease-out ${isHovering ? 'scale-110 z-50' : 'z-0 scale-90'}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onMouseEnter={() => setIsHovering(true)}
@@ -109,7 +110,7 @@ export default function FilmStockGalleryCard({ stock }) {
         }}
       >
         {/* Frame / Border */}
-        <div className={`absolute inset-0 p-[6px] rounded-xl ${tier.frame} shadow-inner`}>
+        <div className={`absolute inset-0 p-[4px] rounded-xl ${tier.frame} shadow-inner`}>
           
           {/* Metallic Border Shine */}
           <div
@@ -174,15 +175,15 @@ export default function FilmStockGalleryCard({ stock }) {
                   className="absolute inset-0 pointer-events-none z-9 rounded-xl"
                   style={{
                     backgroundImage: `
-                      url("https://assets.codepen.io/13471/holo.png"),
+                      url("https://images.unsplash.com/photo-1655200810553-9ed2103a4ae9?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
                       linear-gradient(125deg, #ff008450 15%, #fca40040 30%, #ffff0030 40%, #00ff8a20 60%, #00cfff40 70%, #cc4cfa50 85%)
                     `,
                     backgroundPosition: isHovering ? `${50 + (mousePosition.x - 50) / 7}% ${50 + (mousePosition.y - 50) / 7}%` : '50% 50%',
-                    backgroundSize: '100%',
+                    backgroundSize: '150%',
                     backgroundBlendMode: 'overlay',
                     mixBlendMode: 'color-dodge',
-                    opacity: isHovering ? (tier.label === 'ELITE' ? 0.3 : 0.7) : 0,
-                    filter: isHovering ? 'brightness(1) contrast(1)' : 'brightness(1) contrast(1)',
+                    opacity: isHovering ? (tier.label === 'ELITE' ? 0.7 : 0.9) : 0.3,
+                    filter: isHovering ? 'brightness(0.9) contrast(1.9)' : 'brightness(0.9) contrast(1.5)',
                     transition: isHovering ? 'opacity 0.1s ease-out' : 'opacity 0.5s ease-out'
                   }}
                 />
@@ -224,7 +225,7 @@ export default function FilmStockGalleryCard({ stock }) {
                 </div>
                  <div className="flex flex-col items-center justify-center">
                    <span className="text-gray-400 dark:text-gray-500 uppercase text-[8px] font-bold tracking-wider">Exp</span>
-                   <span className="font-mono font-bold text-film-orange-600 dark:text-film-orange-500">{stock.totalExposures}</span>
+                   <span className="font-mono font-bold text-film-orange-500 dark:text-film-orange-300">{stock.totalExposures}</span>
                 </div>
               </div>
             </div>
