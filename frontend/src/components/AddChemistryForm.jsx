@@ -148,12 +148,12 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 overflow-y-auto"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-start sm:items-center justify-center z-50 overflow-y-auto"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh]">
+      <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-2xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh] border border-gray-200/50 dark:border-gray-700/50">
         {/* Header - Fixed */}
-        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200/60 dark:border-gray-700/60">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Add Chemistry Batch</h2>
           <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Create a new chemistry batch for developing</p>
         </div>
@@ -163,7 +163,7 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Batch Name */}
             <div className="md:col-span-2">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Batch Name *
               </label>
               <input
@@ -172,8 +172,8 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.name ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${
+                  errors.name ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                 }`}
                 placeholder="e.g., C41 Batch #42"
               />
@@ -182,7 +182,7 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
             {/* Chemistry Type */}
             <div>
-              <label htmlFor="chemistry_type" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="chemistry_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Chemistry Type *
               </label>
               <select
@@ -190,7 +190,7 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                 name="chemistry_type"
                 value={formData.chemistry_type}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan"
+                className="w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 text-sm appearance-none bg-[length:1.5em] bg-[right_0.5rem_center] bg-no-repeat shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)]" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%236b7280\' d=\'M6 9L1 4h10z\'/%3E%3C/svg%3E")'}}
               >
                 <option value="C41">C-41 (Color Negative)</option>
                 <option value="E6">E-6 (Color Positive/Slide)</option>
@@ -202,7 +202,7 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
             {/* Date Mixed */}
             <div>
-              <label htmlFor="date_mixed" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="date_mixed" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Date Mixed
               </label>
               <input
@@ -211,8 +211,8 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                 name="date_mixed"
                 value={formData.date_mixed}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.date_mixed ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${
+                  errors.date_mixed ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                 }`}
               />
               {errors.date_mixed && <p className="mt-1 text-xs text-red-600">{errors.date_mixed}</p>}
@@ -220,7 +220,7 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
             {/* Developer Cost */}
             <div>
-              <label htmlFor="developer_cost" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="developer_cost" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Developer Cost ($)
               </label>
               <input
@@ -231,8 +231,8 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.developer_cost ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${
+                  errors.developer_cost ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                 }`}
                 placeholder="0.00"
               />
@@ -241,7 +241,7 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
             {/* Fixer Cost */}
             <div>
-              <label htmlFor="fixer_cost" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="fixer_cost" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Fixer Cost ($)
               </label>
               <input
@@ -252,8 +252,8 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.fixer_cost ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${
+                  errors.fixer_cost ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                 }`}
                 placeholder="0.00"
               />
@@ -262,7 +262,7 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
             {/* Other Cost */}
             <div>
-              <label htmlFor="other_cost" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="other_cost" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Other Cost ($)
               </label>
               <input
@@ -273,18 +273,18 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.other_cost ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${
+                  errors.other_cost ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                 }`}
                 placeholder="0.00"
               />
-              <p className="mt-1 text-xs text-gray-500">Stabilizer, pre-wash, etc.</p>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Stabilizer, pre-wash, etc.</p>
               {errors.other_cost && <p className="mt-1 text-xs text-red-600">{errors.other_cost}</p>}
             </div>
 
             {/* Rolls Offset */}
             <div>
-              <label htmlFor="rolls_offset" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="rolls_offset" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Rolls Offset
               </label>
               <input
@@ -294,29 +294,29 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                 value={formData.rolls_offset}
                 onChange={handleChange}
                 min="0"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.rolls_offset ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${
+                  errors.rolls_offset ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                 }`}
               />
-              <p className="mt-1 text-xs text-gray-500">Pre-developed test rolls (for cost calculation)</p>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Pre-developed test rolls (for cost calculation)</p>
               {errors.rolls_offset && <p className="mt-1 text-xs text-red-600">{errors.rolls_offset}</p>}
             </div>
           </div>
 
           {/* Total Cost Preview */}
-          <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+          <div className="mt-4 p-3 bg-purple-50/60 dark:bg-purple-900/10 backdrop-blur-sm border-0 rounded-3xl shadow-[0_2px_6px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)]">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700">Total Chemistry Cost:</span>
-              <span className="text-lg font-bold text-purple-700">${calculateTotalCost().toFixed(2)}</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Chemistry Cost:</span>
+              <span className="text-lg font-bold text-purple-700 dark:text-purple-400">${calculateTotalCost().toFixed(2)}</span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               This cost will be amortized across all rolls developed with this batch
             </p>
           </div>
 
           {/* Notes */}
           <div className="mt-4">
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Notes
             </label>
             <textarea
@@ -325,31 +325,31 @@ const AddChemistryForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               value={formData.notes}
               onChange={handleChange}
               rows="3"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan"
+              className="w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)]"
               placeholder="Any notes about this batch (brand, dilution, shelf life, etc.)"
             />
           </div>
 
           {/* Submit Error */}
           {errors.submit && (
-            <div className="text-red-600 text-sm text-center p-2 bg-red-50 rounded">
+            <div className="text-red-600 dark:text-red-400 text-sm text-center p-2 bg-red-50/60 dark:bg-red-900/10 backdrop-blur-sm rounded-3xl border-0 shadow-[0_2px_6px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)]">
               {errors.submit}
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200">
+          <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200/60 dark:border-gray-700/60">
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
+              className="flex-1 px-4 py-2 bg-gray-200/80 hover:bg-gray-300/90 dark:bg-gray-700/60 dark:hover:bg-gray-600/70 backdrop-blur-sm text-gray-800 dark:text-gray-200 rounded-3xl font-medium transition-all duration-200 shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)] border-0"
               disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 bg-film-orange-600 hover:bg-film-orange-700 backdrop-blur-sm text-white rounded-3xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)] border-0"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Creating...' : 'Create Batch'}

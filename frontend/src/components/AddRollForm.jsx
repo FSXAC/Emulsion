@@ -174,14 +174,14 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 overflow-y-auto"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-start sm:items-center justify-center z-50 overflow-y-auto"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh]">
+      <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-2xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh] border border-gray-200/50 dark:border-gray-700/50">
         {/* Header - Fixed */}
-        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900">Add New Film Roll</h2>
-          <p className="text-sm text-gray-600 mt-1">Enter details for the new film roll</p>
+        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200/60 dark:border-gray-700/60">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Add New Film Roll</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Enter details for the new film roll</p>
         </div>
 
         {/* Form - Scrollable */}
@@ -189,7 +189,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Order ID */}
             <div>
-              <label htmlFor="order_id" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="order_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Order ID *
               </label>
               <AutocompleteInput
@@ -199,8 +199,8 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
                 onChange={handleChange}
                 suggestions={orderIdSuggestions}
                 placeholder="e.g., 42"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.order_id ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${
+                  errors.order_id ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                 }`}
               />
               {errors.order_id && <p className="mt-1 text-xs text-red-600">{errors.order_id}</p>}
@@ -208,7 +208,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
 
             {/* Film Stock Name */}
             <div>
-              <label htmlFor="film_stock_name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="film_stock_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Film Stock *
               </label>
               <AutocompleteInput
@@ -218,8 +218,8 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
                 onChange={handleChange}
                 suggestions={filmStockSuggestions}
                 placeholder="e.g., Kodak Portra 400"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.film_stock_name ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${
+                  errors.film_stock_name ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                 }`}
               />
               {errors.film_stock_name && <p className="mt-1 text-xs text-red-600">{errors.film_stock_name}</p>}
@@ -227,7 +227,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
 
             {/* Film Format */}
             <div>
-              <label htmlFor="film_format" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="film_format" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Format *
               </label>
               <select
@@ -235,7 +235,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
                 name="film_format"
                 value={formData.film_format}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan"
+                className="w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 text-sm appearance-none bg-[length:1.5em] bg-[right_0.5rem_center] bg-no-repeat shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)]" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%236b7280\' d=\'M6 9L1 4h10z\'/%3E%3C/svg%3E")'}}
               >
                 <option value="35 mm">35 mm</option>
                 <option value="HF">HF (Half Frame)</option>
@@ -249,7 +249,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
 
             {/* Expected Exposures */}
             <div>
-              <label htmlFor="expected_exposures" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="expected_exposures" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Expected Exposures *
               </label>
               <input
@@ -259,8 +259,8 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
                 value={formData.expected_exposures}
                 onChange={handleChange}
                 min="1"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.expected_exposures ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${
+                  errors.expected_exposures ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                 }`}
               />
               {errors.expected_exposures && <p className="mt-1 text-xs text-red-600">{errors.expected_exposures}</p>}
@@ -268,7 +268,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
 
             {/* Film Cost */}
             <div>
-              <label htmlFor="film_cost" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="film_cost" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Film Cost ($) *
               </label>
               <input
@@ -279,8 +279,8 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${
-                  errors.film_cost ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${
+                  errors.film_cost ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                 }`}
                 placeholder="0.00"
               />
@@ -289,7 +289,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
 
             {/* Push/Pull Stops */}
             <div>
-              <label htmlFor="push_pull_stops" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="push_pull_stops" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Push/Pull Stops
               </label>
               <input
@@ -301,7 +301,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
                 step="0.5"
                 min="-3"
                 max="3"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan"
+                className="w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)]"
               />
               <p className="mt-1 text-xs text-gray-500">e.g., +1, -0.5 (range: -3 to +3)</p>
             </div>
@@ -315,9 +315,9 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
                 name="not_mine"
                 checked={formData.not_mine}
                 onChange={handleChange}
-                className="w-4 h-4 text-film-cyan border-gray-300 rounded focus:ring-film-cyan"
+                className="w-4 h-4 text-film-orange-600 border-0 rounded-lg bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm transition-all duration-200 focus:ring-2 focus:ring-offset-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]"
               />
-              <span className="ml-2 text-sm text-gray-700 flex items-center gap-1">
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 flex items-center gap-1">
                 <Icon name="users" size={16} /> This is a friend's roll (exclude film cost from calculations)
               </span>
             </label>
@@ -325,7 +325,7 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
 
           {/* Notes */}
           <div className="mt-4">
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Notes
             </label>
             <textarea
@@ -334,32 +334,32 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
               value={formData.notes}
               onChange={handleChange}
               rows="3"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan"
+              className="w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)]"
               placeholder="Any additional notes about this roll..."
             />
           </div>
 
           {/* Cost Preview */}
           {formData.film_cost && formData.expected_exposures && (
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="mt-4 p-3 bg-green-50/60 dark:bg-green-900/10 backdrop-blur-sm border-0 rounded-3xl shadow-[0_2px_6px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)]">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">Film Cost:</span>
-                <span className="text-lg font-bold text-green-700">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Film Cost:</span>
+                <span className="text-lg font-bold text-green-700 dark:text-green-400">
                   ${parseFloat(formData.film_cost).toFixed(2)}
                 </span>
               </div>
               {calculateCostPerShot() && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-600">
+                  <span className="text-xs text-gray-600 dark:text-gray-400">
                     Estimated cost per shot ({formData.expected_exposures} exposures):
                   </span>
-                  <span className="text-sm font-semibold text-green-600">
+                  <span className="text-sm font-semibold text-green-600 dark:text-green-500">
                     ${calculateCostPerShot()}/shot
                   </span>
                 </div>
               )}
               {formData.not_mine && (
-                <p className="text-xs text-gray-500 mt-2 italic flex items-center gap-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 italic flex items-center gap-1">
                   <Icon name="users" size={12} /> This cost will not be included in your totals (friend's roll)
                 </p>
               )}
@@ -368,24 +368,24 @@ const AddRollForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
 
           {/* Submit Error */}
           {errors.submit && (
-            <div className="text-red-600 text-sm text-center p-2 bg-red-50 rounded">
+            <div className="text-red-600 dark:text-red-400 text-sm text-center p-2 bg-red-50/60 dark:bg-red-900/10 backdrop-blur-sm rounded-3xl border-0 shadow-[0_2px_6px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)]">
               {errors.submit}
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200">
+          <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200/60 dark:border-gray-700/60">
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2.5 sm:py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-colors text-sm sm:text-base"
+              className="flex-1 px-4 py-2.5 sm:py-2 bg-gray-200/80 hover:bg-gray-300/90 dark:bg-gray-700/60 dark:hover:bg-gray-600/70 backdrop-blur-sm text-gray-800 dark:text-gray-200 rounded-3xl font-medium transition-all duration-200 text-sm sm:text-base shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)] border-0"
               disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2.5 sm:py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+              className="flex-1 px-4 py-2.5 sm:py-2 bg-film-orange-600 hover:bg-film-orange-700 backdrop-blur-sm text-white rounded-3xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)] border-0"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Adding...' : 'Add Roll'}
