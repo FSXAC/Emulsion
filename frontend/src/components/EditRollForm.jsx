@@ -231,15 +231,15 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 overflow-y-auto"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-start sm:items-center justify-center z-50 overflow-y-auto"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh]">
+      <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-3xl w-full m-0 sm:m-4 sm:my-8 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh] border border-gray-200/50 dark:border-gray-700/50">
         {/* Header - Fixed */}
-        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200/60 dark:border-gray-700/60">
           <div className="flex items-start gap-4">
             {/* Thumbnail */}
-            <div className="flex-shrink-0 w-16 h-24 sm:w-20 sm:h-28 overflow-hidden rounded">
+            <div className="flex-shrink-0 w-16 h-24 sm:w-20 sm:h-28 overflow-hidden rounded-2xl shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
               <img
                 src={getFilmStockImage(roll.film_stock_name, roll.film_format)}
                 alt={roll.film_stock_name}
@@ -253,7 +253,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
               <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Update details for this roll</p>
               <div className="flex items-center gap-2 mt-2">
                 <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Status:</span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100/80 dark:bg-gray-700/80 backdrop-blur-sm text-gray-800 dark:text-gray-200 shadow-[0_2px_4px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)]">
                   {roll.status}
                 </span>
               </div>
@@ -262,14 +262,14 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
         </div>
 
         {/* Status Change Buttons - Mobile Only */}
-        <div className="flex-shrink-0 px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 sm:hidden">
+        <div className="flex-shrink-0 px-4 sm:px-6 py-3 border-b border-gray-200/60 dark:border-gray-700/60 bg-gray-50/60 dark:bg-gray-700/30 backdrop-blur-sm sm:hidden">
           <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Change Status:</p>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {roll.status !== 'NEW' && (
               <button
                 type="button"
                 onClick={() => handleStatusChange('NEW')}
-                className="flex-shrink-0 px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center gap-1"
+                className="flex-shrink-0 px-3 py-1.5 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm text-gray-700 dark:text-gray-300 rounded-2xl text-xs font-medium hover:bg-white dark:hover:bg-gray-600/80 transition-all duration-200 flex items-center gap-1 shadow-[0_2px_4px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_3px_5px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.2)]"
               >
                 <Icon name="film" size={14} /> New
               </button>
@@ -278,7 +278,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
               <button
                 type="button"
                 onClick={() => handleStatusChange('LOADED')}
-                className="flex-shrink-0 px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center gap-1"
+                className="flex-shrink-0 px-3 py-1.5 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm text-gray-700 dark:text-gray-300 rounded-2xl text-xs font-medium hover:bg-white dark:hover:bg-gray-600/80 transition-all duration-200 flex items-center gap-1 shadow-[0_2px_4px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_3px_5px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.2)]"
               >
                 <Icon name="camera" size={14} /> Loaded
               </button>
@@ -287,7 +287,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
               <button
                 type="button"
                 onClick={() => handleStatusChange('EXPOSED')}
-                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors flex items-center gap-1"
+                className="flex-shrink-0 px-3 py-1.5 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm text-gray-700 dark:text-gray-300 rounded-2xl text-xs font-medium hover:bg-white dark:hover:bg-gray-600/80 transition-all duration-200 flex items-center gap-1 shadow-[0_2px_4px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_3px_5px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.2)]"
               >
                 <Icon name="checkCircle" size={14} /> Exposed
               </button>
@@ -296,7 +296,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
               <button
                 type="button"
                 onClick={() => handleStatusChange('DEVELOPED')}
-                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors flex items-center gap-1"
+                className="flex-shrink-0 px-3 py-1.5 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm text-gray-700 dark:text-gray-300 rounded-2xl text-xs font-medium hover:bg-white dark:hover:bg-gray-600/80 transition-all duration-200 flex items-center gap-1 shadow-[0_2px_4px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_3px_5px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.2)]"
               >
                 <Icon name="chemistry" size={14} /> Developed
               </button>
@@ -305,7 +305,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
               <button
                 type="button"
                 onClick={() => handleStatusChange('SCANNED')}
-                className="flex-shrink-0 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded text-xs font-medium hover:bg-gray-50 transition-colors flex items-center gap-1"
+                className="flex-shrink-0 px-3 py-1.5 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm text-gray-700 dark:text-gray-300 rounded-2xl text-xs font-medium hover:bg-white dark:hover:bg-gray-600/80 transition-all duration-200 flex items-center gap-1 shadow-[0_2px_4px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_3px_5px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.2)]"
               >
                 <Icon name="star" size={14} /> Scanned
               </button>
@@ -327,7 +327,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
               onChange={handleChange}
               suggestions={filmStockSuggestions}
               placeholder="e.g., Kodak Portra 400"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${errors.film_stock_name ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-100 focus:ring-2 focus:bg-white dark:focus:bg-gray-700 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${errors.film_stock_name ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                 }`}
             />
             {errors.film_stock_name && <p className="mt-1 text-xs text-red-600">{errors.film_stock_name}</p>}
@@ -346,7 +346,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
                 onChange={handleChange}
                 suggestions={orderIdSuggestions}
                 placeholder="42"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${errors.order_id ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${errors.order_id ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                   }`}
               />
               {errors.order_id && <p className="mt-1 text-xs text-red-600">{errors.order_id}</p>}
@@ -364,7 +364,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
                 value={formData.expected_exposures}
                 onChange={handleChange}
                 min="1"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${errors.expected_exposures ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${errors.expected_exposures ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                   }`}
               />
               {errors.expected_exposures && <p className="mt-1 text-xs text-red-600">{errors.expected_exposures}</p>}
@@ -382,7 +382,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
                 name="film_format"
                 value={formData.film_format}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan text-sm"
+                className="w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 text-sm appearance-none bg-[length:1.5em] bg-[right_0.5rem_center] bg-no-repeat shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)]" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%236b7280\' d=\'M6 9L1 4h10z\'/%3E%3C/svg%3E")'}}
               >
                 <option value="35 mm">35 mm</option>
                 <option value="HF">HF</option>
@@ -412,7 +412,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
                     min="-3"
                     max="3"
                     list="push_pull_marks"
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-film-cyan"
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-film-orange-600"
                   />
                   <datalist id="push_pull_marks">
                     <option value="-3" label="-3"></option>
@@ -450,7 +450,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
               onChange={handleChange}
               min="0"
               step="0.01"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan ${errors.film_cost ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3.5 py-2.5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)] ${errors.film_cost ? 'ring-2 ring-red-400 dark:ring-red-500' : ''
                 }`}
               placeholder="0.00"
             />
@@ -465,7 +465,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
                 name="not_mine"
                 checked={formData.not_mine}
                 onChange={handleChange}
-                className="w-4 h-4 text-film-cyan border-gray-300 rounded focus:ring-film-cyan"
+                className="w-4 h-4 text-film-orange-600 border-0 rounded-lg bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm transition-all duration-200 focus:ring-2 focus:ring-offset-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]"
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 flex items-center gap-1">
                 <Icon name="users" size={16} /> This is a friend's roll (exclude film cost from calculations)
@@ -473,26 +473,11 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
             </label>
           </div>
 
-          {/* Notes */}
-          <div className="mt-4">
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Notes
-            </label>
-            <textarea
-              id="notes"
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
-              rows="3"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-film-cyan focus:border-film-cyan"
-              placeholder="Any additional notes about this roll..."
-            />
-          </div>
 
           {/* Cost Preview */}
           {formData.film_cost && formData.expected_exposures && (
-            <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-              <div className="flex items-center justify-between mb-1">
+            <div className="mt-4 pt-3 pb-4 px-5 bg-green-50/60 dark:bg-green-900/10 backdrop-blur-sm border-0 rounded-3xl shadow-[0_2px_6px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)]">
+              <div className="flex items-center justify-between">
                 <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Film Cost:</span>
                 <span className="text-base sm:text-lg font-bold text-green-700 dark:text-green-400">
                   ${parseFloat(formData.film_cost).toFixed(2)}
@@ -504,7 +489,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
                     Cost per shot ({formData.expected_exposures} exp):
                   </span>
                   <span className="text-sm font-semibold text-green-600 dark:text-green-500">
-                    ${calculateCostPerShot()}/shot
+                    ${calculateCostPerShot()}&nbsp;/shot
                   </span>
                 </div>
               )}
@@ -517,9 +502,26 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
           )}
 
 
+          {/* Notes */}
+          <div className="mt-4">
+            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Notes
+            </label>
+            <textarea
+              id="notes"
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+              rows="3"
+              className="w-full pt-3 pb-4 px-5 bg-white/60 dark:bg-gray-700/40 backdrop-blur-sm border-0 rounded-3xl transition-all duration-200 focus:ring-2 focus:bg-white dark:focus:bg-gray-700/60 resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)] focus:shadow-[inset_0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(0,0,0,0.06)]"
+              placeholder="Any additional notes about this roll..."
+            />
+          </div>
+
+
           {/* Delete Confirmation */}
           {showDeleteConfirm && (
-            <div className="my-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="my-3 p-3 bg-red-50/60 dark:bg-red-900/10 backdrop-blur-sm border-0 rounded-3xl shadow-[0_2px_6px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)]">
               <p className="text-xs text-gray-700 dark:text-gray-300 mb-2">
                 Delete this roll? This cannot be undone.
               </p>
@@ -560,10 +562,10 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
         </form>
 
         {/* Actions - Fixed Footer */}
-        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-t border-gray-200 bg-white/50 rounded-b-lg">
+        <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-t border-gray-200/60 dark:border-gray-700/60 bg-white/40 dark:bg-gray-800/40 backdrop-blur-md rounded-b-2xl">
           {/* Submit Error */}
           {errors.submit && (
-            <div className="text-red-600 text-xs sm:text-sm text-center p-2 bg-red-50 rounded mb-3">
+            <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm text-center p-2 bg-red-50/60 dark:bg-red-900/10 backdrop-blur-sm rounded-3xl mb-3 border-0 shadow-[0_2px_6px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)]">
               {errors.submit}
             </div>
           )}
@@ -573,7 +575,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2.5 sm:py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-colors text-sm sm:text-base"
+              className="flex-1 px-4 py-2.5 sm:py-2 bg-gray-200/80 hover:bg-gray-300/90 dark:bg-gray-700/60 dark:hover:bg-gray-600/70 backdrop-blur-sm text-gray-800 dark:text-gray-200 rounded-3xl font-medium transition-all duration-200 text-sm sm:text-base shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)] border-0"
               disabled={isSubmitting || isDeleting}
             >
               Cancel
@@ -582,7 +584,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
               <button
                 type="button"
                 onClick={handleDuplicate}
-                className="flex-1 px-4 py-2.5 sm:py-2 bg-film-amber hover:bg-film-amber/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2.5 sm:py-2 bg-film-orange-400/40 hover:bg-film-orange-300/20 backdrop-blur-sm text-white rounded-3xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base flex items-center justify-center gap-2 shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)] border-0"
                 disabled={isSubmitting || isDeleting}
               >
                 <Icon name="copy" size={18} /> Duplicate
@@ -592,7 +594,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
               <button
                 type="button"
                 onClick={handleSpoolUp}
-                className="flex-1 px-4 py-2.5 sm:py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2.5 sm:py-2 bg-purple-600 hover:bg-purple-700 backdrop-blur-sm text-white rounded-3xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base flex items-center justify-center gap-2 shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)] border-0"
                 disabled={isSubmitting || isDeleting}
               >
                 <Icon name="film" size={18} /> Spool Up
@@ -601,7 +603,7 @@ const EditRollForm = ({ isOpen, onClose, onSubmit, onDelete, onDuplicate, onSpoo
             <button
               type="button"
               onClick={handleSubmit}
-              className="flex-1 px-4 py-2.5 sm:py-2 bg-film-cyan hover:bg-film-cyan/90 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+              className="flex-1 px-4 py-2.5 sm:py-2 backdrop-blur-sm text-white rounded-3xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-sm hover:shadow-md bg-film-orange-600 hover:bg-film-orange-400 shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)]"
               disabled={isSubmitting || isDeleting}
             >
               {isSubmitting ? 'Saving...' : 'Save Changes'}
