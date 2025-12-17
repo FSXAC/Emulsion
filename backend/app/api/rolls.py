@@ -1,6 +1,7 @@
 """Film rolls API endpoints."""
 
 from typing import List, Optional
+from decimal import Decimal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
@@ -256,7 +257,7 @@ def assign_chemistry(
     db: Session = Depends(get_db),
 ):
     """
-    Assign chemistry batch to a roll (set chemistry_id).
+    Assign chemistry batch OR lab cost to a roll.
     
     This transitions the roll from EXPOSED -> DEVELOPED status.
     Triggered when dragging roll to DEVELOPED column or selecting chemistry.
@@ -268,17 +269,28 @@ def assign_chemistry(
     
     if not roll:
         raise HTTPException(status_code=404, detail="Film roll not found")
-    # Validate chemistry exists
-    chemistry = db.query(ChemistryBatch).filter(
-        ChemistryBatch.id == data.chemistry_id
-    ).first()
-    if not chemistry:
+
+    if data.chemistry_id:
+        # Validate chemistry exists
+        chemistry = db.query(ChemistryBatch).filter(
+            ChemistryBatch.id == data.chemistry_id
+        ).first()
+        if not chemistry:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Chemistry batch with id {data.chemistry_id} not found"
+            )
+        roll.chemistry_id = data.chemistry_id
+        roll.lab_dev_cost = None
+    elif data.lab_dev_cost is not None:
+        # Assign lab cost
+        roll.chemistry_id = None
+        roll.lab_dev_cost = Decimal(str(data.lab_dev_cost))
+    else:
         raise HTTPException(
-            status_code=404,
-            detail=f"Chemistry batch with id {data.chemistry_id} not found"
+            status_code=400,
+            detail="Either chemistry_id or lab_dev_cost must be provided"
         )
-    
-    roll.chemistry_id = data.chemistry_id
     
     db.commit()
     db.refresh(roll)

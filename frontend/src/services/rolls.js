@@ -60,10 +60,15 @@ export const unloadRoll = async (rollId, dateUnloaded) => {
 };
 
 // Assign chemistry to roll - EXPOSED → DEVELOPED
-export const assignChemistry = async (rollId, chemistryId) => {
-  return api.patch(`/api/rolls/${rollId}/chemistry`, {
-    chemistry_id: chemistryId
-  });
+// Supports either chemistry_id (from batch) or lab_dev_cost (flat rate)
+export const assignChemistry = async (rollId, chemistryIdOrCost, isLab = false) => {
+  const payload = {};
+  if (isLab) {
+    payload.lab_dev_cost = parseFloat(chemistryIdOrCost);
+  } else {
+    payload.chemistry_id = chemistryIdOrCost;
+  }
+  return api.patch(`/api/rolls/${rollId}/chemistry`, payload);
 };
 
 // Rate roll (set stars and optional actual_exposures) - DEVELOPED → SCANNED

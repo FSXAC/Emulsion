@@ -543,12 +543,12 @@ export default function RollsPage() {
   };
 
   // Handle chemistry picker confirmation
-  const handleChemistryConfirm = async (chemistryId) => {
+  const handleChemistryConfirm = async (chemistryIdOrCost, isLab) => {
     const { roll } = chemistryModal;
     if (!roll) return;
 
     try {
-      await assignChemistry(roll.id, chemistryId);
+      await assignChemistry(roll.id, chemistryIdOrCost, isLab);
 
       // Refresh all rolls to update cost calculations
       // (chemistry cost is amortized across all rolls using that batch)
@@ -558,7 +558,7 @@ export default function RollsPage() {
       playTransDeveloped();
       playCardSlide();
 
-      showToast('Chemistry batch assigned successfully');
+      showToast(isLab ? 'Lab development assigned successfully' : 'Chemistry batch assigned successfully');
     } catch (err) {
       console.error('Failed to assign chemistry:', err);
       showToast(`Failed to assign chemistry: ${err.message}`, 'error');

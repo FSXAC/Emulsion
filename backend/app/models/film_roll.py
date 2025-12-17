@@ -51,6 +51,7 @@ class FilmRoll(Base, TimestampMixin):
     # Rating and cost
     stars: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     film_cost: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
+    lab_dev_cost: Mapped[Optional[Decimal]] = mapped_column(Numeric(10, 2), nullable=True)
 
     # Flags and notes
     not_mine: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
@@ -71,7 +72,7 @@ class FilmRoll(Base, TimestampMixin):
         """
         if self.stars is not None and self.stars > 0:
             return "SCANNED"
-        if self.chemistry_id is not None:
+        if self.chemistry_id is not None or self.lab_dev_cost is not None:
             return "DEVELOPED"
         if self.date_unloaded is not None:
             return "EXPOSED"
@@ -82,11 +83,13 @@ class FilmRoll(Base, TimestampMixin):
     @property
     def dev_cost(self) -> Optional[Decimal]:
         """
-        Calculate development cost from chemistry batch.
+        Calculate development cost from chemistry batch or lab cost.
         
         Returns:
-            Cost per roll from chemistry batch, or None if no chemistry or division by zero
+            Cost per roll from chemistry batch, lab cost, or None if no chemistry/lab or division by zero
         """
+        if self.lab_dev_cost is not None:
+            return self.lab_dev_cost
         if self.chemistry is None:
             return None
         return self.chemistry.cost_per_roll

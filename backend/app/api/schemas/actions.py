@@ -17,7 +17,8 @@ class UnloadRollRequest(BaseModel):
 
 class AssignChemistryRequest(BaseModel):
     """Schema for assigning chemistry to a roll."""
-    chemistry_id: str = Field(..., description="Chemistry batch ID to associate with roll")
+    chemistry_id: Optional[str] = Field(None, description="Chemistry batch ID to associate with roll (optional if lab_dev_cost provided)")
+    lab_dev_cost: Optional[float] = Field(None, description="Lab development cost (optional if chemistry_id provided)")
 
 
 class RateRollRequest(BaseModel):

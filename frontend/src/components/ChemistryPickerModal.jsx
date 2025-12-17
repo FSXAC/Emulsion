@@ -10,6 +10,7 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedBatchId, setSelectedBatchId] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null); // 'batch' or 'lab'
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -39,6 +40,9 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
       // Pre-select current chemistry if roll has one
       if (roll?.chemistry_id) {
         setSelectedBatchId(roll.chemistry_id);
+        setSelectedOption('batch');
+      } else if (roll?.lab_dev_cost) {
+        setSelectedOption('lab');
       }
     } catch (err) {
       console.error('Failed to fetch chemistry:', err);
@@ -52,9 +56,13 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (selectedBatchId) {
+    if (selectedOption === 'batch' && selectedBatchId) {
       playClick();
-      onConfirm(selectedBatchId);
+      onConfirm(selectedBatchId, false);
+      onClose();
+    } else if (selectedOption === 'lab') {
+      playClick();
+      onConfirm(20.00, true);
       onClose();
     }
   };
@@ -123,15 +131,67 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
             </div>
           )}
 
-          {!loading && !error && chemistryBatches.length > 0 && (
+          {!loading && !error && (
             <form onSubmit={handleSubmit} id="chemistry-form">
               <div className="space-y-3">
+                {/* Lab Option */}
+                <label
+                  className={`
+                    block p-4 border-0 rounded-3xl cursor-pointer transition-all duration-200
+                    ${selectedOption === 'lab'
+                      ? 'bg-film-orange-500 dark:bg-film-orange-700 backdrop-blur-sm shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)]'
+                      : 'bg-gray-100 dark:bg-gray-700/60 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)]'
+                    }
+                  `}
+                >
+                  <input
+                    type="radio"
+                    name="chemistry_option"
+                    value="lab"
+                    checked={selectedOption === 'lab'}
+                    onChange={() => setSelectedOption('lab')}
+                    className="sr-only"
+                  />
+                  
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Icon name="chemistry" size={20} />
+                        <h4 className="font-bold text-gray-900 dark:text-gray-100">Lab Development</h4>
+                        {selectedOption === 'lab' && (
+                          <span className="text-white">✓</span>
+                        )}
+                      </div>
+                      <div className={`text-sm ${selectedOption === 'lab' ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'}`}>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">Cost:</span>
+                          <span className="font-medium">$20.00</span>
+                        </div>
+                        <div className="mt-1">
+                          Standard lab development service
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </label>
+
+                <div className="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+
+                {chemistryBatches.length === 0 && (
+                  <div className="text-center py-4">
+                    <p className="text-gray-600 font-medium">No active chemistry batches</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Create a chemistry batch to develop at home
+                    </p>
+                  </div>
+                )}
+
                 {chemistryBatches.map((batch) => (
                     <label
                       key={batch.id}
                       className={`
                         block p-4 border-0 rounded-3xl cursor-pointer transition-all duration-200
-                        ${selectedBatchId === batch.id
+                        ${selectedOption === 'batch' && selectedBatchId === batch.id
                           ? 'bg-film-orange-500 dark:bg-film-orange-700 backdrop-blur-sm shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)]'
                           : 'bg-gray-100 dark:bg-gray-700/60  backdrop-blur-sm hover:bg-white dark:hover:bg-gray-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(0,0,0,0.05)]'
                         }
@@ -139,10 +199,13 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
                     >
                     <input
                       type="radio"
-                      name="chemistry"
+                      name="chemistry_option"
                       value={batch.id}
-                      checked={selectedBatchId === batch.id}
-                      onChange={(e) => setSelectedBatchId(e.target.value)}
+                      checked={selectedOption === 'batch' && selectedBatchId === batch.id}
+                      onChange={() => {
+                        setSelectedOption('batch');
+                        setSelectedBatchId(batch.id);
+                      }}
                       className="sr-only"
                     />
                     
@@ -151,17 +214,17 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
                         <div className="flex items-center gap-2 mb-2">
                           <Icon name="chemistry" size={20} />
                           <h4 className="font-bold text-gray-900 dark:text-gray-100">{batch.name}</h4>
-                          {selectedBatchId === batch.id && (
+                          {selectedOption === 'batch' && selectedBatchId === batch.id && (
                             <span className="text-white">✓</span>
                           )}
                         </div>
                         
-                        <div className={`text-sm space-y-1 ${selectedBatchId === batch.id ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'}`}>
+                        <div className={`text-sm space-y-1 ${selectedOption === 'batch' && selectedBatchId === batch.id ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'}`}>
                           <div className="flex items-center gap-2">
                             <span className="font-medium">Type:</span>
                             <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium backdrop-blur-sm
                             shadow-[0_2px_4px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)]
-                            ${selectedBatchId === batch.id ? 'bg-film-orange-300 dark:bg-film-orange-400/100 text-white' : 'bg-purple-50/40 dark:bg-purple-800/20 text-purple-700 dark:text-purple-300'}`}>
+                            ${selectedOption === 'batch' && selectedBatchId === batch.id ? 'bg-film-orange-300 dark:bg-film-orange-400/100 text-white' : 'bg-purple-50/40 dark:bg-purple-800/20 text-purple-700 dark:text-purple-300'}`}>
                               {batch.chemistry_type}
                             </span>
                           </div>
@@ -212,10 +275,10 @@ const ChemistryPickerModal = ({ isOpen, onClose, onConfirm, roll }) => {
             <button
               type="submit"
               form="chemistry-form"
-              disabled={!selectedBatchId || loading}
+              disabled={(!selectedOption) || (selectedOption === 'batch' && !selectedBatchId) || loading}
               className="flex-1 px-4 py-2.5 sm:py-2 bg-film-orange-600 hover:bg-film-orange-600/90 backdrop-blur-sm text-white rounded-3xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-[0_4px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.2)] border-0"
             >
-              Assign Chemistry
+              Assign
             </button>
           </div>
         </div>
