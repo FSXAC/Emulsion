@@ -20,6 +20,7 @@ const DEFAULT_CONFIG = {
     backgroundColor: null, // null = transparent
     enableShadows: true,
     antialias: true,
+    pixelated: false,
 };
 
 /**
@@ -36,6 +37,24 @@ function mm2screen(value_mm, is120 = false) {
 }
 
 /**
+ * Add a toon outline to a mesh
+ * @param {THREE.Mesh} mesh - The mesh to outline
+ * @param {THREE.Group} group - The group to add the outline to
+ * @param {number} thickness - Outline thickness
+ */
+function addOutline(mesh, group, thickness = 0.05) {
+    const outlineMaterial = new THREE.MeshBasicMaterial({
+        color: 0x000000,
+        side: THREE.BackSide,
+    });
+    const outlineMesh = new THREE.Mesh(mesh.geometry, outlineMaterial);
+    outlineMesh.position.copy(mesh.position);
+    outlineMesh.rotation.copy(mesh.rotation);
+    outlineMesh.scale.copy(mesh.scale).multiplyScalar(1 + thickness);
+    group.add(outlineMesh);
+}
+
+/**
  * Create a film canister mesh with texture
  * @param {string} textureUrl - URL or data URL of the label texture
  * @param {Object} options - Canister options
@@ -46,6 +65,7 @@ function mm2screen(value_mm, is120 = false) {
  */
 export function createCanister(textureUrl, options = {}) {
     const is120 = options.is120 ?? false;
+    const pixelated = options.pixelated ?? false;
     const group = new THREE.Group();
 
     // Canister dimensions in mm converted to screen units
@@ -96,10 +116,16 @@ export function createCanister(textureUrl, options = {}) {
     texture.wrapT = THREE.ClampToEdgeWrapping;
     texture.colorSpace = THREE.SRGBColorSpace;
     
-    // Improve texture quality
-    texture.minFilter = THREE.LinearMipMapLinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    texture.anisotropy = 16; // Maximum anisotropic filtering
+    // Improve texture quality or use pixelated filtering
+    if (pixelated) {
+        texture.minFilter = THREE.NearestFilter;
+        texture.magFilter = THREE.NearestFilter;
+        texture.anisotropy = 1;
+    } else {
+        texture.minFilter = THREE.LinearMipMapLinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.anisotropy = 16; // Maximum anisotropic filtering
+    }
 
     // Canister body (cylinder) with custom shader for saturation boost
     const bodyGeometry = new THREE.CylinderGeometry(radius, radius, height, 32);
@@ -115,10 +141,44 @@ export function createCanister(textureUrl, options = {}) {
     // Custom shader to boost saturation and crush colors
     bodyMaterial.onBeforeCompile = (shader) => {
         // Add uniforms
-        shader.uniforms.saturationBoost = { value: 1.12 };
-        shader.uniforms.colorDepth = { value: 32.0 };
+        shader.uniforms.saturationBoost = { value: pixelated ? 1.3 : 1.12 };
+        shader.uniforms.colorDepth = { value: pixelated ? 6.0 : 32.0 };
+        shader.uniforms.pixelated = { value: pixelated ? 1.0 : 0.0 };
         
-        // Inject saturation adjustment and color crushing into fragment shader
+        // Inject saturation adjustment, color crushing, and dithering into fragment shader
+        shader.fragmentShader = `
+            uniform float saturationBoost;
+            uniform float colorDepth;
+            uniform float pixelated;
+
+            // Bayer 4x4 dithering matrix
+            float dither(vec2 pos, float brightness) {
+                int x = int(mod(pos.x, 4.0));
+                int y = int(mod(pos.y, 4.0));
+                int index = x + y * 4;
+                float limit = 0.0;
+
+                if (index == 0) limit = 0.0625;
+                else if (index == 1) limit = 0.5625;
+                else if (index == 2) limit = 0.1875;
+                else if (index == 3) limit = 0.6875;
+                else if (index == 4) limit = 0.8125;
+                else if (index == 5) limit = 0.3125;
+                else if (index == 6) limit = 0.9375;
+                else if (index == 7) limit = 0.4375;
+                else if (index == 8) limit = 0.25;
+                else if (index == 9) limit = 0.75;
+                else if (index == 10) limit = 0.125;
+                else if (index == 11) limit = 0.625;
+                else if (index == 12) limit = 1.0;
+                else if (index == 13) limit = 0.5;
+                else if (index == 14) limit = 0.875;
+                else if (index == 15) limit = 0.375;
+
+                return brightness < limit ? 0.0 : 1.0;
+            }
+        ` + shader.fragmentShader;
+
         shader.fragmentShader = shader.fragmentShader.replace(
             '#include <map_fragment>',
             `
@@ -133,21 +193,33 @@ export function createCanister(textureUrl, options = {}) {
                 vec3 grayVec = vec3(gray);
                 color = mix(grayVec, color, saturationBoost);
                 
-                // Color depth reduction (posterization)
-                color = floor(color * colorDepth) / colorDepth;
+                if (pixelated > 0.5) {
+                    // Apply dithering to the lighting/shading
+                    // We use screen coordinates for the dither pattern
+                    float brightness = dot(color, vec3(0.299, 0.587, 0.114));
+                    float d = dither(gl_FragCoord.xy, brightness);
+                    
+                    // Mix original color with dithered version for a "crunchy" look
+                    color = floor(color * colorDepth) / colorDepth;
+                    color *= (0.8 + 0.4 * d);
+                } else {
+                    // Simple color depth reduction (posterization)
+                    color = floor(color * colorDepth) / colorDepth;
+                }
                 
                 diffuseColor.rgb = color;
             }
             `
         );
-        
-        // Add uniform declarations
-        shader.fragmentShader = 'uniform float saturationBoost;\nuniform float colorDepth;\n' + shader.fragmentShader;
     };
     const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
     body.castShadow = true;
     body.receiveShadow = true;
     group.add(body);
+
+    if (pixelated) {
+        addOutline(body, group, 0.05);
+    }
 
     // Top and bottom caps
     const capGeometry = new THREE.CylinderGeometry(topCapRadius, topCapRadius, capHeight, 32);
@@ -166,6 +238,11 @@ export function createCanister(textureUrl, options = {}) {
     bottomCap.position.y = -height / 2 - 0.05;
     bottomCap.castShadow = true;
     group.add(bottomCap);
+
+    if (pixelated) {
+        addOutline(topCap, group, 0.05);
+        addOutline(bottomCap, group, 0.05);
+    }
 
     // Spool ring (hollow cylinder on top)
     if (!is120) {
@@ -190,6 +267,10 @@ export function createCanister(textureUrl, options = {}) {
         spoolRing.position.y = height / 2 + capHeight / 2 + spoolCapHeight / 2;
         spoolRing.castShadow = true;
         group.add(spoolRing);
+
+        if (pixelated) {
+            addOutline(spoolRing, group, 0.08);
+        }
     }
 
     // Rotate to show the label front (opposite side from seam)
@@ -207,6 +288,8 @@ export function createCanister(textureUrl, options = {}) {
 export function setupScene(config = {}) {
     const cfg = { ...DEFAULT_CONFIG, ...config };
     const is120 = cfg.is120 ?? false;
+    const pixelated = cfg.pixelated ?? false;
+    const pixelScale = pixelated ? 4 : 1;
 
     // Scene
     const scene = new THREE.Scene();
@@ -226,13 +309,19 @@ export function setupScene(config = {}) {
 
     // Renderer
     const renderer = new THREE.WebGLRenderer({
-        antialias: cfg.antialias,
+        antialias: pixelated ? false : cfg.antialias,
         alpha: true,
         preserveDrawingBuffer: true, // Needed for toDataURL
     });
-    renderer.setSize(cfg.width, cfg.height);
+    
+    // For pixelated mode, we render at a lower resolution and scale up
+    renderer.setSize(cfg.width / pixelScale, cfg.height / pixelScale, false);
+    renderer.domElement.style.width = `${cfg.width}px`;
+    renderer.domElement.style.height = `${cfg.height}px`;
+    renderer.domElement.style.imageRendering = pixelated ? 'pixelated' : 'auto';
+    
     renderer.shadowMap.enabled = cfg.enableShadows;
-    renderer.shadowMap.type = THREE.VSMShadowMap; // Softer shadows than PCF
+    renderer.shadowMap.type = THREE.VSMShadowMap; // Harder shadows for pixel art
     
     // Use Linear tone mapping for more vibrant colors
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -260,15 +349,15 @@ export function setupScene(config = {}) {
     const fillLight = new THREE.DirectionalLight(0xffffff, 0.2);
     fillLight.position.set(-0.5, 10, 1.5);
     fillLight.castShadow = true;
-    fillLight.shadow.mapSize.width = 2048;
-    fillLight.shadow.mapSize.height = 2048;
+    fillLight.shadow.mapSize.width = pixelated ? 512 : 2048;
+    fillLight.shadow.mapSize.height = pixelated ? 512 : 2048;
     fillLight.shadow.camera.near = 1;
     fillLight.shadow.camera.far = 50;
     fillLight.shadow.camera.left = -30;
     fillLight.shadow.camera.right = 30;
     fillLight.shadow.camera.top = 30;
     fillLight.shadow.camera.bottom = -30;
-    fillLight.shadow.radius = 12;
+    fillLight.shadow.radius = pixelated ? 4 : 12;
     fillLight.shadow.bias = -0.0005;
     scene.add(fillLight);
 
@@ -279,16 +368,16 @@ export function setupScene(config = {}) {
 
     // Add a box light to the left side for better illumination
     const rectLight = new THREE.RectAreaLight(0xffffff, 1.0, 2, 10);
-        rectLight.position.set(-1, 0, 2);
-        rectLight.lookAt(0, 0, 0);
-        scene.add(rectLight);
+    rectLight.position.set(-1, 0, 2);
+    rectLight.lookAt(0, 0, 0);
+    scene.add(rectLight);
     
 
     // Ground plane for shadows
     if (cfg.enableShadows) {
         const groundSize = 1000;
         const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize);
-        const groundMaterial = new THREE.ShadowMaterial({ opacity: 0.45 });
+        const groundMaterial = new THREE.ShadowMaterial({ opacity: pixelated ? 0.8 : 0.45 });
         const ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2;
 

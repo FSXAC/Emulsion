@@ -12,6 +12,7 @@ export default function CanisterDemo() {
   const [texturePreview, setTexturePreview] = useState('/sample-label.svg');
   const [thumbnail, setThumbnail] = useState(null);
   const [is120, setIs120] = useState(false);
+  const [isPixelated, setIsPixelated] = useState(false);
 
   const handleTextureUpload = (e) => {
     const file = e.target.files[0];
@@ -89,6 +90,31 @@ export default function CanisterDemo() {
                 </button>
               </div>
 
+              {/* Style Toggle */}
+              <div className="mb-4 flex items-center gap-3">
+                <label className="text-sm font-medium text-gray-700">Render Style:</label>
+                <button
+                  onClick={() => setIsPixelated(false)}
+                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                    !isPixelated
+                      ? 'bg-film-orange-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Realistic
+                </button>
+                <button
+                  onClick={() => setIsPixelated(true)}
+                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                    isPixelated
+                      ? 'bg-film-orange-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  8-bit
+                </button>
+              </div>
+
               <input
                 type="file"
                 accept="image/*"
@@ -153,6 +179,7 @@ export default function CanisterDemo() {
                   autoRotate: false,
                   enableOrbit: false,
                   is120: is120,
+                  pixelated: isPixelated,
                 }}
               />
             ) : (
